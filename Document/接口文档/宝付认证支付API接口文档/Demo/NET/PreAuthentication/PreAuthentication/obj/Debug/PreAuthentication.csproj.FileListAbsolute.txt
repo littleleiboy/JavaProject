@@ -1,0 +1,6 @@
+D:\NETWEB\PreAuthentication\PreAuthentication\bin\PreAuthentication.dll
+D:\NETWEB\PreAuthentication\PreAuthentication\bin\PreAuthentication.pdb
+D:\NETWEB\PreAuthentication\PreAuthentication\bin\Newtonsoft.Json.dll
+D:\NETWEB\PreAuthentication\PreAuthentication\obj\Debug\ResolveAssemblyReference.cache
+D:\NETWEB\PreAuthentication\PreAuthentication\obj\Debug\PreAuthentication.dll
+D:\NETWEB\PreAuthentication\PreAuthentication\obj\Debug\PreAuthentication.pdb
