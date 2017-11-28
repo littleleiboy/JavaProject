@@ -36,3 +36,7 @@ spring:
                 wall:
                     config:
                         multi-statement-allow: true
+
+myprop:
+    jsxt-key:
+        81015a4bf6ba58cfb15878db1b579afe

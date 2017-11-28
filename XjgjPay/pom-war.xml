@@ -8,8 +8,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging><!-- clean package -f pom-war.xml -->
 
-	<name>dp</name>
-	<description>dp开发框架SpringBoot版本</description>
+	<name>xjgjpay</name>
+	<description>西郊国际移动交易支付系统</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
