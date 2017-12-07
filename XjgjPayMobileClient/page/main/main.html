@@ -159,26 +159,24 @@
 					//account.innerText = state.mobile;
 				}, false);
 				$.plusReady(function() {
-					var settingPage = $.preload({
-						"id": 'setting',
-						"url": '../module/setting.html'
-					});
 					//设置
+					var settingPage = $.preload({
+						id: 'setting',
+						url: '../module/setting.html'
+					});
 					var settingButton = doc.getElementById('setting');
 					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
 					settingButton.addEventListener('tap', function(event) {
-						$.openWindow({
-							id: 'setting',
-							show: {
-								aniShow: 'pop-in'
-							},
-							styles: {
-								popGesture: 'hide'
-							},
-							waiting: {
-								autoShow: false
-							}
-						});
+						settingPage.show();
+					});
+					//扫码
+					var scanPage = $.preload({
+						id: 'scan',
+						url: '../module/barcode.html'
+					});
+					var scanButton = doc.getElementById('scan');
+					scanButton.addEventListener('tap', function(event) {
+						scanPage.show();
 					});
 					//----------end: 顶部标题栏-------------------
 
