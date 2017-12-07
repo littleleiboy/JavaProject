@@ -5,8 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
-		<link href="../../css/mui.min.css" rel="stylesheet" />
-		<link href="../../css/mui-icons-extra.css" rel="stylesheet" />
+		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+		<link href="../../lib/mui/css/mui-icons-extra.css" rel="stylesheet" />
 		<style>
 			.mui-slider {
 				height: 13em;
@@ -62,55 +62,55 @@
 			</div>
 			<ul class="mui-table-view mui-grid-view mui-grid-9">
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aRecharge">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-gold"></span>
 						<div class="mui-media-body">圈存</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aWithdrawal">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-card">
 		                    <div class="mui-media-body">圈提</div>
 					</a>
 				</li>
 		        <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-		        	<a href="#">
+		        	<a href="#" id="aBank">
 		                <span class="mui-icon mui-icon-extra mui-icon-extra-hotel"></span>
 						<div class="mui-media-body">中国银行</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aParking">
 						<span class="mui-icon mui-icon-map"></span>
 						<div class="mui-media-body">停车</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aRepast">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-cold"></span>
 						<div class="mui-media-body">就餐</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aTransfer">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
 						<div class="mui-media-body">转账</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aGoods">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-express"></span>
 						<div class="mui-media-body">货物登记</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aDetail">
 						<span class="mui-icon mui-icon-extra mui-icon-extra-prech"></span>
 						<div class="mui-media-body">明细</div>
 					</a>
 				</li>
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
-					<a href="#">
+					<a href="#" id="aMore">
 						<span class="mui-icon mui-icon-more"></span>
 						<div class="mui-media-body">更多</div>
 					</a>
@@ -123,15 +123,15 @@
 		</div>
 
 		<nav class="mui-bar mui-bar-tab">
-			<a class="mui-tab-item mui-active">
+			<a class="mui-tab-item mui-active" id="tpHome">
 				<span class="mui-icon mui-icon-home"></span>
 				<span class="mui-tab-label">首页</span>
 			</a>
-			<a class="mui-tab-item">
+			<a class="mui-tab-item" id="tpPerson">
 				<span class="mui-icon mui-icon-contact mui-icon-icon-contact"></span>
 				<span class="mui-tab-label">我的</span>
 			</a>
-			<a class="mui-tab-item" href="http://xjgj.com">
+			<a class="mui-tab-item" id="tpWebsite">
 				<span class="mui-icon mui-icon-extra mui-icon-extra-hotel"></span>
 				<span class="mui-tab-label">网站</span>
 			</a>
@@ -139,12 +139,12 @@
 		        <span class="mui-icon mui-icon-email"></span>
 		        <span class="mui-tab-label">通知</span>
 		    </a>-->
-			<a class="mui-tab-item">
+			<a class="mui-tab-item" id="tpAbout">
 				<span class="mui-icon mui-icon-info"></span>
 				<span class="mui-tab-label">关于</span>
 			</a>
 		</nav>
-		<script src="../../lib/mui/mui.min.js"></script>
+		<script src="../../lib/mui/js/mui.min.js"></script>
 		<script src="../../js/login/login.js"></script>
 		<script>
 			(function($, doc) {
@@ -203,46 +203,59 @@
 						"url": '../module/bank.html'
 					});
 
-					$mui('.mui-grid-9').on('tab', 'li', function() {
-						//TODO 单击图标以原生窗体的方式打开
-						//关于和中行增值服务的网址改为5+接口打开网址，不使用iframe
+					$mui('.mui-table-view-cell').on('tap', 'a', function() {
+						var title = doc.querySelector('.mui-title');
+						var id = this.getAttribute('id');
+						switch(id) {
+							case 'aRecharge': //圈存
+								pageRecharge.show();
+								break;
+							case 'aWithdrawal': //圈提
+								pageWidthdrawal.show();
+								break;
+							case 'aBank': //银行
+								pageBank.show();
+								title.innerHTML = '中国银行增值服务';
+								break;
+							default:
+								plus.nativeUI.toast('暂未开通！');
+						}
 					});
 					//----------end: 九宫格菜单-------------------
 
 					//----------begin: 底部导航栏-------------------
-					var Index = 0;
-					var subpages = ['../module/person.html', '../module/website.html', '../module/about.html'];
-					mui.plusReady(function() {
-						var self = plus.webview.currentWebview();
-						for(var i = 0; i < subpages.length; i++) {
-							var sub = plus.webview.create(subpages[i], subpages[i], {
-								top: '45px',
-								bottom: '50px'
-							});
-							if(i != Index) {
-								sub.hide();
-							}
-							self.append(sub);
-						}
+					var pagePerson = $.preload({
+						"id": 'pagePerson',
+						"url": '../module/person.html'
 					});
-					//当前激活选项
-					var activeTab = subpages[Index];
-					var title = document.querySelector(".mui-title");
-					//选项卡点击事件
-					mui('.mui-bar-tab').on('tap', 'a', function(e) {
-						//获取目标子页的id
-						var targetTab = this.getAttribute('href');
-						if(targetTab == activeTab) {
-							return;
+					var pageWebsite = $.preload({
+						"id": 'pageWebsite',
+						"url": 'http://www.xjgj.com/'
+					});
+					var pageAbout = $.preload({
+						"id": 'pageAbout',
+						"url": '../module/about.html'
+					});
+					$('.mui-bar-tab').on('tap', 'a', function() {
+						var title = doc.querySelector('.mui-title');
+						var id = this.getAttribute('id');
+						switch(id) {
+							case 'tpHome':
+								pagePerson.hide();
+								pageWebsite.hide();
+								pageAbout.hide();
+								break;
+							case 'tpPerson':
+								pagePerson.show();
+								break;
+							case 'tpWebsite':
+								pageWebsite.show();
+								title.innerHTML = '西郊国际';
+								break;
+							case 'tpAbout':
+								pageAbout.show();
+								break;
 						}
-						//更换标题
-						title.innerHTML = this.querySelector('.mui-tab-label').innerHTML;
-						//显示目标选项卡
-						plus.webview.show(targetTab);
-						//隐藏当前选项卡
-						plus.webview.hide(activeTab);
-						//更改当前活跃的选项卡
-						activeTab = targetTab;
 					});
 					//----------end: 底部导航栏---------------------
 
