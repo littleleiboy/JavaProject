@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+		<link href="../../lib/mui/css/mui-icons-extra.css" rel="stylesheet" />
+		<script src="../../lib/mui/js/mui.min.js"></script>
+		<style type="text/css">
+			#divBarcode {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				background: #000000;
+			}
+			
+			.footer-item {
+				margin: 10px;
+				color: #0062CC;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="background-color: #ffffff;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">二维码扫描</h1>
+			<span class="mui-icon mui-icon-extra mui-icon-extra-lamp mui-spin mui-pull-right" id="turnTheLight"></span>
+		</header>
+
+		<div class="mui-content">
+			<div id="divBarcode">
+				<!--放扫描控件的div-->
+			</div>
+		</div>
+
+		<div class="mui-bar mui-bar-footer">
+			<div class="mui-pull-left footer-item" onclick="scanPicture();">从相册选择二维码</div>
+			<div class="mui-pull-right mui-action-back footer-item">取消</div>
+		</div>
+
+		<script type="text/javascript">
+			mui.init();
+
+			scan = null; //扫描对象
+			mui.plusReady(function() {
+				startRecognize();
+			});
+
+			function startRecognize() {
+				try {
+					var filter;
+					//自定义的扫描控件样式
+					var styles = {
+						frameColor: "#29E52C",
+						scanbarColor: "#29E52C",
+						background: ""
+					}
+					//扫描控件构造
+					scan = new plus.barcode.Barcode('divBarcode', filter, styles);
+					scan.onmarked = onmarked;
+					scan.onerror = onerror;
+					scan.start();
+					//打开关闭闪光灯处理
+					var flag = false;
+					document.getElementById("turnTheLight").addEventListener('tap', function() {
+						if(flag == false) {
+							scan.setFlash(true);
+							flag = true;
+						} else {
+							scan.setFlash(false);
+							flag = false;
+						}
+					});
+				} catch(e) {
+					alert("出现错误啦:\n" + e);
+				}
+			};
+
+			function onerror(e) {
+				alert(e);
+			};
+
+			function onmarked(type, result) {
+				var text = '';
+				switch(type) {
+					case plus.barcode.QR:
+						text = 'QR: ';
+						break;
+					case plus.barcode.EAN13:
+						text = 'EAN13: ';
+						break;
+					case plus.barcode.EAN8:
+						text = 'EAN8: ';
+						break;
+				}
+				doSth(result);
+			};
+
+			// 从相册中选择二维码图片 
+			function scanPicture() {
+				plus.gallery.pick(function(path) {
+					plus.barcode.scan(path, onmarked, function(error) {
+						plus.nativeUI.alert("无法识别此图片");
+					});
+				}, function(err) {
+					plus.nativeUI.alert("Failed: " + err.message);
+				});
+			}
+
+			//TODO 根据扫码结果跳转到相应功能
+			function doSth(code) {
+				alert(text + " : " + result);
+			}
+		</script>
+	</body>
+
+</html>
