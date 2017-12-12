@@ -4,6 +4,7 @@
 
 use `xjgjpay`;
 
+drop table if exists `member_info`;
 -- 会员信息(对接结算系统的会员信息)
 create table `member_info`(
 	`id` bigint not null auto_increment comment '会员id',
@@ -21,10 +22,11 @@ create table `member_info`(
 	`gmt_create` datetime comment '创建时间',
 	`gmt_modified` datetime comment '修改时间',
 	primary key pk_id(`id`),
-	unique key uk_card_code(`card_code`),
-	index idx_card_type(`card_type`(2))
+	unique key uk_card_code(`card_id`),
+	index idx_card_type(`member_type`)
 ) engine=InnoDB default charset=utf8 comment '会员信息';
 
+drop table if exists `member_bankcard`;
 -- 会员绑定银行卡信息
 create table `member_bankcard`(
 	`id` bigint not null auto_increment comment 'id',
@@ -40,6 +42,7 @@ create table `member_bankcard`(
 	index idx_member_info_id(`member_info_id`)
 ) engine=InnoDB default charset=utf8 comment '会员绑定银行卡信息';
 
+drop table if exists `trade_log`;
 -- 交易记录
 create table `trade_log`(
 	`id` bigint not null auto_increment comment '交易记录id',

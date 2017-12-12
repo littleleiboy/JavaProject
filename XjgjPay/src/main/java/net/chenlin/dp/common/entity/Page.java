@@ -2,6 +2,7 @@ package net.chenlin.dp.common.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.ibatis.session.RowBounds;
 
 /**
@@ -13,8 +14,8 @@ import org.apache.ibatis.session.RowBounds;
  * @date 2017年8月8日 上午11:41:07
  */
 public class Page<T> extends RowBounds {
-    
-	/**
+
+    /**
      * 页编号 : 第几页
      */
     protected int pageNo = 1;
@@ -74,10 +75,13 @@ public class Page<T> extends RowBounds {
         this.calcOffset();
         this.calcLimit();
     }
-    
+
     public Page(Query search) {
-        this.pageNo = search.getAsInt("pageNumber");
-        this.pageSize = search.getAsInt("pageSize");
+        if (search.getAsInt("pageNumber") != null)
+            this.pageNo = search.getAsInt("pageNumber");
+        if (search.getAsInt("pageSize") != null)
+            this.pageSize = search.getAsInt("pageSize");
+
         this.calcOffset();
         this.calcLimit();
     }

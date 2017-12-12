@@ -129,7 +129,7 @@ var vm = new Vue({
 					ids[idx] = item.userId;
 				});
 				$.ConfirmForm({
-					msg : '您是否要禁用所选账户吗？',
+					msg : '您要禁用所选账户吗？',
 					url : '../../sys/user/disable?_' + $.now(),
 					param : ids,
 					success : function(data) {
@@ -145,7 +145,7 @@ var vm = new Vue({
 					ids[idx] = item.userId;
 				});
 				$.ConfirmForm({
-					msg : '您是否要启用所选账户吗？',
+					msg : '您要启用所选账户吗？',
 					url : '../../sys/user/enable?_' + $.now(),
 					param : ids,
 					success : function(data) {

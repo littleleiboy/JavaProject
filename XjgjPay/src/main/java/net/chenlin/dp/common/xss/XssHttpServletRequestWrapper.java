@@ -35,8 +35,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
+        if (super.getHeader(HttpHeaders.CONTENT_TYPE) == null) {
+            return super.getInputStream();
+        }
+
         //非json类型，直接返回
-        if(!super.getHeader(HttpHeaders.CONTENT_TYPE).equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE)){
+        if (!super.getHeader(HttpHeaders.CONTENT_TYPE).equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE)) {
             return super.getInputStream();
         }
 
@@ -94,9 +98,9 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Map<String,String[]> getParameterMap() {
-        Map<String,String[]> map = new LinkedHashMap<>();
-        Map<String,String[]> parameters = super.getParameterMap();
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> map = new LinkedHashMap<>();
+        Map<String, String[]> parameters = super.getParameterMap();
         for (String key : parameters.keySet()) {
             String[] values = parameters.get(key);
             for (int i = 0; i < values.length; i++) {

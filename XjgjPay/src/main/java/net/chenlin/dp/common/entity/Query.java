@@ -13,18 +13,19 @@ import java.util.Map;
  * @date 2017年8月11日 下午12:13:58
  */
 public class Query extends HashMap<String, Object> {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public Query() {
-		super();
-	}
 
-	public Query(Map<String, Object> params){
-        this.putAll(params);
+    private static final long serialVersionUID = 1L;
+
+    public Query() {
+        super();
     }
-	
-	public Double getAsDouble(String name) {
+
+    public Query(Map<String, Object> params) {
+        if (params != null)
+            this.putAll(params);
+    }
+
+    public Double getAsDouble(String name) {
         Object value = this.get(name);
         if (value != null)
             return Double.valueOf(value.toString());
@@ -57,14 +58,14 @@ public class Query extends HashMap<String, Object> {
     }
 
     public java.util.Date getAsDate(String name) {
-    	Object value = this.get(name);
+        Object value = this.get(name);
         if (value != null)
-        	return Date.valueOf(value.toString());
+            return Date.valueOf(value.toString());
         return null;
     }
 
     public Object getObj(String name) {
         return this.get(name);
     }
-	
+
 }

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.chenlin.dp.modules.base.dao.MemberInfoMapper">
+	
+	<select id="listForPage" resultType="net.chenlin.dp.modules.base.entity.MemberInfoEntity">
+		SELECT
+			`id`, 
+			`member_id`, 
+			`member_type`, 
+			`member_name`, 
+			`card_id`, 
+			`mobile`, 
+			`email`, 
+			`id_card`, 
+			`id_card_type`, 
+			`is_available`, 
+			`remark`, 
+			`xjgj_toCorpAddress`, 
+			`gmt_create`, 
+			`gmt_modified`
+		FROM
+			member_info
+		ORDER BY
+			id DESC
+	</select>
+	
+	<insert id="save">
+		INSERT INTO member_info (
+			`member_id`, 
+			`member_type`, 
+			`member_name`, 
+			`card_id`, 
+			`mobile`, 
+			`email`, 
+			`id_card`, 
+			`id_card_type`, 
+			`is_available`, 
+			`remark`, 
+			`xjgj_toCorpAddress`, 
+			`gmt_create`, 
+			`gmt_modified`
+		)
+		VALUES (
+			#{memberId}, 
+			#{memberType}, 
+			#{memberName}, 
+			#{cardId}, 
+			#{mobile}, 
+			#{email}, 
+			#{idCard}, 
+			#{idCardType}, 
+			#{isAvailable}, 
+			#{remark}, 
+			#{xjgjTocorpaddress}, 
+			#{gmtCreate}, 
+			#{gmtModified}
+		)
+	</insert>
+	
+	<select id="getObjectById" resultType="net.chenlin.dp.modules.base.entity.MemberInfoEntity">
+		SELECT
+			`id`, 
+			`member_id`, 
+			`member_type`, 
+			`member_name`, 
+			`card_id`, 
+			`mobile`, 
+			`email`, 
+			`id_card`, 
+			`id_card_type`, 
+			`is_available`, 
+			`remark`, 
+			`xjgj_toCorpAddress`, 
+			`gmt_create`, 
+			`gmt_modified`
+		FROM
+			member_info
+		WHERE
+			id = #{id}
+	</select>
+	
+	<update id="update">
+		UPDATE member_info
+	 	<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="memberType != null">`member_type` = #{memberType}, </if>
+			<if test="memberName != null">`member_name` = #{memberName}, </if>
+			<if test="cardId != null">`card_id` = #{cardId}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="email != null">`email` = #{email}, </if>
+			<if test="idCard != null">`id_card` = #{idCard}, </if>
+			<if test="idCardType != null">`id_card_type` = #{idCardType}, </if>
+			<if test="isAvailable != null">`is_available` = #{isAvailable}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="xjgjTocorpaddress != null">`xjgj_toCorpAddress` = #{xjgjTocorpaddress}, </if>
+			<if test="gmtCreate != null">`gmt_create` = #{gmtCreate}, </if>
+			<if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
+		</set>
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="batchRemove">
+		DELETE
+		FROM
+			member_info
+		WHERE
+			id IN
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

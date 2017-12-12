@@ -4,9 +4,9 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
         druid:
             default:  #默认数据源
-              url: jdbc:mysql://127.0.0.1:3306/dp-lte-boot?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+              url: jdbc:mysql://139.196.34.5:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
               username: root
-              password: root
+              password: root51698844
             initial-size: 10
             max-active: 100
             min-idle: 10
