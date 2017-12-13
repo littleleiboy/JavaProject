@@ -34,5 +34,7 @@ spring:
                         multi-statement-allow: true
 
 myprop:
-    jsxt-key:
+    api-jsxt-app-key:
         bfb0aebe0aa35d2aa9db2a15aaf02609
+    api-jsxt-app-url:
+        https://test.shxjgj.com:443/app/

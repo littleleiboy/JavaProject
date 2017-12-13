@@ -26,7 +26,7 @@ import javax.net.ssl.*;
 
 /**
  * Http请求帮助类
- * Andy
+ * Andy 2017-12-13
  */
 public final class HttpUtils {
 
@@ -92,17 +92,6 @@ public final class HttpUtils {
     }
 
     /**
-     * 发送 SSL POST 请求（HTTPS），K-V形式
-     *
-     * @param url API接口URL
-     * @param params 参数map
-     * @return
-     */
-    /*public static String requestPostSSL(String url, List<NameValuePair> params) {
-
-    }*/
-
-    /**
      * 描述:  发起https请求并获取结果
      *
      * @param requestUrl    请求地址
@@ -161,6 +150,26 @@ public final class HttpUtils {
             System.out.println("Https request error." + e.getMessage());
         }
         return buffer.toString();
+    }
+
+    /**
+     * 发起https post请求并获取结果
+     * @param requestUrl
+     * @param str
+     * @return
+     */
+    public static String postRequestSSL(String requestUrl, String str) {
+        return requestSSL(requestUrl, "POST", str);
+    }
+
+    /**
+     * 发起https get请求并获取结果
+     * @param requestUrl
+     * @param str
+     * @return
+     */
+    public static String getRequestSSL(String requestUrl, String str) {
+        return requestSSL(requestUrl, "GET", str);
     }
 
 	/*

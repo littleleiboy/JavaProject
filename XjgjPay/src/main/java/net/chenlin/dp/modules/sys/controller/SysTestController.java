@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/sys/test")
 public class SysTestController {
 
-    /*@Value("${myprop.jsxt-key}")
+    /*@Value("${myprop.api-jsxt-app-key}")
     private String jsxtKey;
 
     @RequestMapping(value = "/gdt", method = RequestMethod.GET)
