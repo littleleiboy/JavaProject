@@ -1,4 +1,4 @@
-package net.chenlin.dp.modules.base.service.impl;
+package net.chenlin.dp.modules.trade.service.impl;
 
 import java.util.Map;
 
@@ -9,9 +9,9 @@ import net.chenlin.dp.common.entity.Page;
 import net.chenlin.dp.common.entity.Query;
 import net.chenlin.dp.common.entity.R;
 import net.chenlin.dp.common.utils.CommonUtils;
-import net.chenlin.dp.modules.base.entity.TradeLogEntity;
-import net.chenlin.dp.modules.base.manager.TradeLogManager;
-import net.chenlin.dp.modules.base.service.TradeLogService;
+import net.chenlin.dp.modules.trade.entity.TradeLogEntity;
+import net.chenlin.dp.modules.trade.manager.TradeLogManager;
+import net.chenlin.dp.modules.trade.service.TradeLogService;
 
 /**
  * 交易记录

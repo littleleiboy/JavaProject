@@ -1,4 +1,4 @@
-package net.chenlin.dp.modules.base.controller;
+package net.chenlin.dp.modules.trade.controller;
 
 import java.util.Map;
 
@@ -11,8 +11,8 @@ import net.chenlin.dp.common.annotation.SysLog;
 import net.chenlin.dp.modules.sys.controller.AbstractController;
 import net.chenlin.dp.common.entity.Page;
 import net.chenlin.dp.common.entity.R;
-import net.chenlin.dp.modules.base.entity.TradeLogEntity;
-import net.chenlin.dp.modules.base.service.TradeLogService;
+import net.chenlin.dp.modules.trade.entity.TradeLogEntity;
+import net.chenlin.dp.modules.trade.service.TradeLogService;
 
 /**
  * 交易记录
@@ -23,7 +23,7 @@ import net.chenlin.dp.modules.base.service.TradeLogService;
  * @date 2017年12月12日 下午4:59:03
  */
 @RestController
-@RequestMapping("/base/trade_log")
+@RequestMapping("/trade/trade_log")
 public class TradeLogController extends AbstractController {
 	
 	@Autowired

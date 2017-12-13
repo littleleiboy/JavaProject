@@ -1,4 +1,4 @@
-package net.chenlin.dp.modules.base.manager.impl;
+package net.chenlin.dp.modules.trade.manager.impl;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import net.chenlin.dp.common.entity.Page;
 import net.chenlin.dp.common.entity.Query;
-import net.chenlin.dp.modules.base.dao.TradeLogMapper;
-import net.chenlin.dp.modules.base.entity.TradeLogEntity;
-import net.chenlin.dp.modules.base.manager.TradeLogManager;
+import net.chenlin.dp.modules.trade.dao.TradeLogMapper;
+import net.chenlin.dp.modules.trade.entity.TradeLogEntity;
+import net.chenlin.dp.modules.trade.manager.TradeLogManager;
 
 /**
  * 交易记录

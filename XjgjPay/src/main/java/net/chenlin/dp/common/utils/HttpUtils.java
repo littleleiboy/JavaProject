@@ -26,6 +26,7 @@ import javax.net.ssl.*;
 
 /**
  * Http请求帮助类
+ * Andy
  */
 public final class HttpUtils {
 

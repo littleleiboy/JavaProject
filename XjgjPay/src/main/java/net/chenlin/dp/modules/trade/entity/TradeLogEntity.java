@@ -1,4 +1,4 @@
-package net.chenlin.dp.modules.base.entity;
+package net.chenlin.dp.modules.trade.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

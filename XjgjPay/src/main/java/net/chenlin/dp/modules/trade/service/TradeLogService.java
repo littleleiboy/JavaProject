@@ -1,10 +1,10 @@
-package net.chenlin.dp.modules.base.service;
+package net.chenlin.dp.modules.trade.service;
 
 import java.util.Map;
 
 import net.chenlin.dp.common.entity.Page;
 import net.chenlin.dp.common.entity.R;
-import net.chenlin.dp.modules.base.entity.TradeLogEntity;
+import net.chenlin.dp.modules.trade.entity.TradeLogEntity;
 
 /**
  * 交易记录
