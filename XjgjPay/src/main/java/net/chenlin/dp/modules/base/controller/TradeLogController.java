@@ -34,7 +34,7 @@ public class TradeLogController extends AbstractController {
 	 * @param params
 	 * @return
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listData")
 	public Page<TradeLogEntity> list(@RequestBody Map<String, Object> params) {
 		return tradeLogService.listTradeLog(params);
 	}
