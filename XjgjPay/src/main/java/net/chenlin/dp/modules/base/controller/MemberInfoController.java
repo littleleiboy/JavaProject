@@ -36,7 +36,7 @@ public class MemberInfoController extends AbstractController {
      * @return
      */
     @RequestMapping("/listData")
-    public Page<MemberInfoEntity> list(@RequestBody(required = false) Map<String, Object> params) {
+    public Page<MemberInfoEntity> list(@RequestBody Map<String, Object> params) {
         return memberInfoService.listMemberInfo(params);
     }
 

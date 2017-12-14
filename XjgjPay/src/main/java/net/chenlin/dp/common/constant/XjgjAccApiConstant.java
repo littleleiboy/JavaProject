@@ -1,20 +1,42 @@
 package net.chenlin.dp.common.constant;
 
+import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
+
 /**
  * 西郊国际结算系统接口资源
  */
 public class XjgjAccApiConstant {
 
     /**
-     * 方法名常量，通过手机号查询会员是否已经绑定。
+     * 通过手机号查询会员是否已经绑定
      * 完整的请求url格式例如 https://mail.shxjgj.com:443/app/memberSearchRequest
      */
     public static final String METHOD_GET_MEMBER_BINDING_INFO = "memberSearchRequest";
 
     /**
-     * 方法名常量，已注册会员绑定APP。
+     * 已注册会员绑定APP
      */
     public static final String METHOD_MEMBER_APP_BIND = "memberBindRequest";
+
+    /**
+     * 会员注册
+     */
+    public static final String METHOD_MEMBER_REG = "memberCreateRequest";
+
+    /**
+     * 会员密码验证
+     */
+    public static final String METHOD_MEMBER_PASSWORD_CHECK = "memberPasswordCheckRequest";
+
+    /**
+     * 会员圈存（充值）结算
+     */
+    public static final String METHOD_RECHARGE = "memberQCRequest";
+
+    /**
+     * 会员圈存（充值）结算失败重试
+     */
+    public static final String METHOD_RECHARGE_RETRY = "memberQCRetryRequest";
 
     public static final String FIELD_KEY_STR = "keyStr";
     public static final String FIELD_MESSAGE = "message";

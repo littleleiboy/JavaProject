@@ -42,7 +42,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     /**
-     * 通过手机号查询会员绑定基本信息
+     * 查询会员绑定基本信息
      *
      * @param map 发送数据
      * @return 返回结果
@@ -54,7 +54,20 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     /**
+     * 会员密码验证
+     *
+     * @param map 发送数据
+     * @return 返回结果
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> checkMemberPassword(Map<String, Object> map) throws Exception {
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_PASSWORD_CHECK), mapToJsonStr(map)));
+    }
+
+    /**
      * 已注册会员绑定APP
+     *
      * @param map 发送数据
      * @return 返回结果
      * @throws Exception
@@ -62,6 +75,42 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     @Override
     public Map<String, Object> memberAppBind(Map<String, Object> map) throws Exception {
         return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_APP_BIND), mapToJsonStr(map)));
+    }
+
+    /**
+     * 会员注册
+     *
+     * @param map 发送数据
+     * @return 返回结果
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> regMember(Map<String, Object> map) throws Exception {
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_REG), mapToJsonStr(map)));
+    }
+
+    /**
+     * 会员圈存(充值)
+     *
+     * @param map 发送数据
+     * @return 返回结果
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> recharge(Map<String, Object> map) throws Exception {
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE), mapToJsonStr(map)));
+    }
+
+    /**
+     * 会员圈存(充值)失败重试
+     *
+     * @param map 发送数据
+     * @return 返回结果
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> retryRecharge(Map<String, Object> map) throws Exception {
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map)));
     }
 
 }
