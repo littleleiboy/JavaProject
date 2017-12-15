@@ -38,6 +38,24 @@ public class XjgjAccApiConstant {
      */
     public static final String METHOD_RECHARGE_RETRY = "memberQCRetryRequest";
 
+    /**
+     * 方法名常量，会员圈提
+     */
+    public static final String METHOD_MEMBER_WITH_DRAW = "https://mail.shxjgj.com:443/app/memberQTRequest";
+
+
+    /**账户余额查询
+     * */
+    public static final String SEARCH_MEMBER_ACCOUNT_BALANCE = "https://mail.shxjgj.com:443/app/memberAccountSearchRequest";
+
+    /**
+     * 方法名常量 查询一段时间内账户余额变动
+     * */
+    public static final String SEARCH_MEMBER_COST_LOG = "https://mail.shxjgj.com:443/app/memberCostLogRequest";
+
+
+
+
     public static final String FIELD_KEY_STR = "keyStr";
     public static final String FIELD_MESSAGE = "message";
     public static final String FIELD_RESULT = "result";

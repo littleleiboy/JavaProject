@@ -39,4 +39,29 @@ public interface XjgjAccApiService {
      * @throws Exception
      */
     Map<String, Object> regMember(Map<String, Object> map) throws Exception;
+
+    /**
+     * 会员圈提
+     * @param map
+     * @return
+     * 2017-12-15
+    * */
+    Map<String,Object> memberWithDraw(Map<String, Object> map) throws Exception;
+
+    /**
+     * 会员账户余额查询
+     * @param memberNo
+     * @return
+     * 2017-12-15
+     * */
+    Map<String,Object> searchMemberAccountBalance(String memberNo) throws Exception;
+
+    /**
+     * 一段时间内会员账户变动查询
+     * @param map
+     * @return
+     * 2017-12-15
+     * @throws Exception
+    * */
+    Map<String,Object> searchMemberCostLog(Map<String, Object> map) throws Exception;
 }

@@ -61,4 +61,38 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
         return apiManager.regMember(map);
     }
 
+    /**
+     * 会员圈提
+     * 2017-12-15
+     * @param map
+     * @return
+    * */
+    @Override
+    public Map<String, Object> memberWithDraw(Map<String, Object> map) throws Exception {
+        return apiManager.memberWithDraw(map);
+    }
+
+    /**
+     * 会员账户余额查询
+     * 2017-12-15
+     * @param memberNo
+     * @return
+     * @throws Exception
+    * */
+    @Override
+    public Map<String, Object> searchMemberAccountBalance(String memberNo) throws Exception {
+        return apiManager.searchMemberAccountBalance(memberNo);
+    }
+
+    /**
+     * 一段时间内账户变动查询
+     * 2017-12-15
+     * @param
+     * @return
+     * @throws Exception
+    * */
+    @Override
+    public Map<String, Object> searchMemberCostLog(Map<String, Object> map) throws Exception {
+        return apiManager.searchMemberCostLog(map);
+    }
 }
