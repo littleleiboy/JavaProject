@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Map;
 
 @RestController
@@ -32,5 +31,26 @@ public class XjgjAccApiController extends AbstractController {
         }
         return result;
     }
+
+
+    @RequestMapping("/memberWithDraw")
+    public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
+        ResultData result = new ResultData();
+        String accountBalancekey = "accountQty";
+        String drawKey = "moneyQty";
+        try {
+            Map<String,Object> map = apiService.memberWithDraw(params);
+            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(map);
+            int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
+            int drawMoney = (int)params.get(drawKey);
+            if(accountBalance <= 0 && drawMoney > accountBalance){
+                return new ResultData("err", false, "账户余额不足！", "");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResultData("ok",true,"",result);
+    }
+
 
 }
