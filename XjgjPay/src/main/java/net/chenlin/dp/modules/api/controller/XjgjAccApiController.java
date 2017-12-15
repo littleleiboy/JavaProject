@@ -5,6 +5,8 @@ import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.JSONUtils;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
 import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
+import net.chenlin.dp.modules.base.service.MemberBankcardService;
+import net.chenlin.dp.modules.base.service.MemberInfoService;
 import net.chenlin.dp.modules.sys.controller.AbstractController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/xjgjacc")
+@RequestMapping("/api/xjgjAcc")
 public class XjgjAccApiController extends AbstractController {
 
     private final static Logger logger = LoggerFactory.getLogger(XjgjAccApiController.class);
 
     @Autowired
     private XjgjAccApiService apiService;
+
+    @Autowired
+    private MemberInfoService memberInfoService;
+
+    @Autowired
+    private MemberBankcardService memberBankService;
 
     /**
      * 查询会员绑定基本信息
@@ -76,6 +84,7 @@ public class XjgjAccApiController extends AbstractController {
         try {
             Map<String, Object> mapResult = apiService.memberAppBind(params);
             if (mapResult != null) {
+                //TODO 保存会员信息
                 return new ResultData("r1", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
                 return new ResultData("e2", false, MsgConstant.MSG_REMOTE_ERROR, "");
@@ -97,6 +106,7 @@ public class XjgjAccApiController extends AbstractController {
         try {
             Map<String, Object> mapResult = apiService.regMember(params);
             if (mapResult != null) {
+                //TODO 保存会员信息
                 return new ResultData("r1", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
                 return new ResultData("e2", false, MsgConstant.MSG_REMOTE_ERROR, "");

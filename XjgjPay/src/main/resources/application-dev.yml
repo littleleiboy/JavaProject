@@ -38,3 +38,5 @@ myprop:
         bfb0aebe0aa35d2aa9db2a15aaf02609
     api-jsxt-app-url:
         https://test.shxjgj.com:443/app/
+    api-baofoo-url:
+        https://tgw.baofoo.com/cutpayment/api/
