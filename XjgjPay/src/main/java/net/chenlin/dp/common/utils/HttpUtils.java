@@ -21,6 +21,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 
@@ -29,6 +31,8 @@ import javax.net.ssl.*;
  * Andy 2017-12-13
  */
 public final class HttpUtils {
+
+    private final static Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     public static String requestGet(String urlWithParams) throws Exception {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
@@ -145,15 +149,18 @@ public final class HttpUtils {
             inputStream.close();
             httpUrlConn.disconnect();
         } catch (ConnectException ce) {
-            System.out.println("Weixin server connection error." + ce.getMessage());
+            //System.out.println("API server connection error." + ce.getMessage());
+            logger.error("API server connection error.", ce);
         } catch (Exception e) {
-            System.out.println("Https request error." + e.getMessage());
+            //System.out.println("Https request error." + e.getMessage());
+            logger.error("Https request error.", e);
         }
         return buffer.toString();
     }
 
     /**
      * 发起https post请求并获取结果
+     *
      * @param requestUrl
      * @param str
      * @return
@@ -164,6 +171,7 @@ public final class HttpUtils {
 
     /**
      * 发起https get请求并获取结果
+     *
      * @param requestUrl
      * @param str
      * @return

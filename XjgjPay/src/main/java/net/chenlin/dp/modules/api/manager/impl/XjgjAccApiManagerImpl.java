@@ -50,7 +50,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> getMemberBindingInfo(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BINDING_INFO), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BINDING_INFO), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
     /**
@@ -62,7 +66,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> checkMemberPassword(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_PASSWORD_CHECK), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_PASSWORD_CHECK), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
     /**
@@ -74,7 +82,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> memberAppBind(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_APP_BIND), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_APP_BIND), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
     /**
@@ -86,7 +98,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> regMember(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_REG), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_REG), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
     /**
@@ -98,7 +114,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> recharge(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
     /**
@@ -110,7 +130,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> retryRecharge(Map<String, Object> map) throws Exception {
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map)));
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map));
+        if (!r.isEmpty())
+            return JSONUtils.jsonToMap(r);
+        else
+            return null;
     }
 
 }
