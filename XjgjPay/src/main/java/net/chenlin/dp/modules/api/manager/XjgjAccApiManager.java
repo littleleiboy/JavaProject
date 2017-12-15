@@ -70,10 +70,10 @@ public interface XjgjAccApiManager {
 
     /**
      *查询会员账户余额
-     * @param map 发送数据
+     * @param memberNo 发送数据
      * @return 返回结果
      * */
-    Map<String,Object> searchMemberAccountBalance(Map<String, Object> map) throws Exception;
+    Map<String,Object> searchMemberAccountBalance(String memberNo) throws Exception;
 
     /**
      * 查询一段时间内账户变动记录

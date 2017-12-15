@@ -75,13 +75,13 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
     /**
      * 会员账户余额查询
      * 2017-12-15
-     * @param map
+     * @param memberNo
      * @return
      * @throws Exception
     * */
     @Override
-    public Map<String, Object> searchMemberAccountBalance(Map<String, Object> map) throws Exception {
-        return apiManager.searchMemberAccountBalance(map);
+    public Map<String, Object> searchMemberAccountBalance(String memberNo) throws Exception {
+        return apiManager.searchMemberAccountBalance(memberNo);
     }
 
     /**

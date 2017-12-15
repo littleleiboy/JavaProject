@@ -1,6 +1,7 @@
 package net.chenlin.dp.modules.api.controller;
 
 import net.chenlin.dp.common.entity.ResultData;
+import net.chenlin.dp.common.utils.JSONUtils;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
 import net.chenlin.dp.modules.sys.controller.AbstractController;
 import org.slf4j.Logger;
@@ -35,12 +36,13 @@ public class XjgjAccApiController extends AbstractController {
 
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
-        ResultData result = new ResultData();
+        Object result = null;
         String accountBalancekey = "accountQty";
         String drawKey = "moneyQty";
         try {
             Map<String,Object> map = apiService.memberWithDraw(params);
-            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(map);
+            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
+            result = JSONUtils.mapToBean(map,null);
             int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
             int drawMoney = (int)params.get(drawKey);
             if(accountBalance <= 0 && drawMoney > accountBalance){
@@ -49,8 +51,19 @@ public class XjgjAccApiController extends AbstractController {
         } catch (Exception e){
             e.printStackTrace();
         }
-        return new ResultData("ok",true,"",result);
+        return new ResultData("ok",true,"查询成功",result);
     }
 
+    @RequestMapping()
+    public ResultData searchMemberAccountBalance(@RequestBody String param){
+        Object result = null;
+        try {
+            Map<String,Object> mapResult = apiService.searchMemberAccountBalance(param);
+            result = JSONUtils.mapToBean(mapResult,null);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return  new ResultData("ok",true,"查询成功",result);
+    }
 
 }

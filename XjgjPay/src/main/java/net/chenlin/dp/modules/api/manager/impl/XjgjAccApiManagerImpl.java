@@ -124,11 +124,11 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
 
     /**
      *查询会员账户余额
-     * @param map 发送数据
+     * @param memberNo 发送数据
      * @return 返回结果
      * */
-    public Map<String,Object> searchMemberAccountBalance(Map<String, Object> map) throws Exception{
-        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), mapToJsonStr(map)));
+    public Map<String,Object> searchMemberAccountBalance(String memberNo) throws Exception{
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), memberNo));
     }
 
     /**
