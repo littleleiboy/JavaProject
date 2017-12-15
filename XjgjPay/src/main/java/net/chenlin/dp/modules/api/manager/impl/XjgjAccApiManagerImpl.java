@@ -113,4 +113,32 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
         return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map)));
     }
 
+    /**
+     * 会员圈提
+     * @param map 发送的数据
+     * @return 返回值
+     * */
+    public Map<String,Object> memberWithDraw(Map<String, Object> map) throws Exception{
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_WITH_DRAW), mapToJsonStr(map)));
+    }
+
+    /**
+     *查询会员账户余额
+     * @param map 发送数据
+     * @return 返回结果
+     * */
+    public Map<String,Object> searchMemberAccountBalance(Map<String, Object> map) throws Exception{
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), mapToJsonStr(map)));
+    }
+
+    /**
+     * 查询一段时间内账户变动记录
+     * @param map 参数
+     * @return 返回结果
+     * */
+    public Map<String,Object> searchMemberCostLog(Map<String, Object> map) throws Exception{
+        return JSONUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_COST_LOG), mapToJsonStr(map)));
+    }
+
+
 }
