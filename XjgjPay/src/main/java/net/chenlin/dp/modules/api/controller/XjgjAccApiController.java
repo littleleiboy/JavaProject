@@ -3,6 +3,7 @@ package net.chenlin.dp.modules.api.controller;
 import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.JSONUtils;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
+import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.sys.controller.AbstractController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class XjgjAccApiController extends AbstractController {
         try {
             Map<String,Object> map = apiService.memberWithDraw(params);
             Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
-            result = JSONUtils.mapToBean(map,null);
+            result = JSONUtils.mapToBean(map,MemberInfoEntity.class);
             int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
             int drawMoney = (int)params.get(drawKey);
             if(accountBalance <= 0 && drawMoney > accountBalance){
@@ -54,12 +55,24 @@ public class XjgjAccApiController extends AbstractController {
         return new ResultData("ok",true,"查询成功",result);
     }
 
-    @RequestMapping()
+    @RequestMapping("/searchMemberAccountBalance")
     public ResultData searchMemberAccountBalance(@RequestBody String param){
         Object result = null;
         try {
             Map<String,Object> mapResult = apiService.searchMemberAccountBalance(param);
-            result = JSONUtils.mapToBean(mapResult,null);
+            result = JSONUtils.mapToBean(mapResult,MemberInfoEntity.class);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return  new ResultData("ok",true,"查询成功",result);
+    }
+
+    @RequestMapping("/searchMemberAccountChange")
+    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String,Object> map){
+        Object result = null;
+        try {
+            Map<String,Object> mapResult = apiService.searchMemberCostLog(map);
+            result = JSONUtils.mapToBean(mapResult,MemberInfoEntity.class);
         } catch (Exception e){
             e.printStackTrace();
         }
