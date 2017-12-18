@@ -39,4 +39,4 @@ myprop:
     api-jsxt-app-url:
         https://test.shxjgj.com:443/app/
     api-baofoo-url:
-        https://tgw.baofoo.com/cutpayment/api/
+        https://vgw.baofoo.com/cutpayment/api/backTransRequest

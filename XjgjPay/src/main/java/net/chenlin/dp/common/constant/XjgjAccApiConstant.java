@@ -1,7 +1,5 @@
 package net.chenlin.dp.common.constant;
 
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
-
 /**
  * 西郊国际结算系统接口资源
  */
