@@ -16,10 +16,10 @@ import java.util.Map;
 @Component("xjgjAccApiManager")
 public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
 
-    @Value("${myprop.api-jsxt-app-key}")
+    @Value("${myprop.api.jsxt.app-key}")
     private String accApiToken;
 
-    @Value("${myprop.api-jsxt-app-url}")
+    @Value("${myprop.api.jsxt.app-url}")
     private String urlPerfix;
 
     private String getApiUrl(String method) {

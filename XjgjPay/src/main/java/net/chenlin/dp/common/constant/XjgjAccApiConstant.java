@@ -1,7 +1,7 @@
 package net.chenlin.dp.common.constant;
 
 /**
- * 西郊国际结算系统接口资源
+ * 西郊国际结算系统接口静态资源
  */
 public class XjgjAccApiConstant {
 
@@ -50,9 +50,6 @@ public class XjgjAccApiConstant {
      * 方法名常量 查询一段时间内账户余额变动
      * */
     public static final String SEARCH_MEMBER_COST_LOG = "https://mail.shxjgj.com:443/app/memberCostLogRequest";
-
-
-
 
     public static final String FIELD_KEY_STR = "keyStr";
     public static final String FIELD_MESSAGE = "message";
