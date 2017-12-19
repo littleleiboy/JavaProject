@@ -63,3 +63,5 @@ myprop:
                 100000276
             data-type: #数据类型json/xml
                 json
+            biz-type: #接入类型
+                0000

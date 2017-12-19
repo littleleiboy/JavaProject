@@ -7,7 +7,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 
 import net.chenlin.dp.common.entity.R;
-import net.chenlin.dp.common.utils.JSONUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -51,7 +51,7 @@ public class OAuth2Filter extends AuthenticatingFilter {
         if(StringUtils.isBlank(token)){
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             R r = R.error(HttpStatus.SC_UNAUTHORIZED, "invalid token");
-            String json = JSONUtils.beanToJson(r);
+            String json = JacksonUtils.beanToJson(r);
             httpResponse.getWriter().print(json);
 
             return false;
@@ -70,7 +70,7 @@ public class OAuth2Filter extends AuthenticatingFilter {
         try {
             Throwable throwable = e.getCause() == null ? e : e.getCause();
             R r = R.error(HttpStatus.SC_UNAUTHORIZED, throwable.getMessage());
-            String json = JSONUtils.beanToJson(r);
+            String json = JacksonUtils.beanToJson(r);
             httpResponse.getWriter().print(json);
         } catch (Exception ee) {
         	

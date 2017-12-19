@@ -1,6 +1,8 @@
 package net.chenlin.dp.common.utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,25 +14,29 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
- * json工具类(jackjson)
+ * Jackson工具类(json/xml)
  *
- * @author ZhouChenglin
- * @email yczclcn@163.com
- * @url www.chenlintech.com
- * @date 2017年9月3日 上午2:37:04
+ * @author Andy Wang
+ * @date 2017-12-19
  */
-public class JSONUtils {
+public class JacksonUtils {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static XmlMapper xmlMapper = new XmlMapper();
 
-    private JSONUtils() {
+    private JacksonUtils() {
 
     }
 
-    public static ObjectMapper getInstance() {
+    public static ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    public static XmlMapper getXmlMapper() {
+        return xmlMapper;
     }
 
     /**
@@ -44,7 +50,6 @@ public class JSONUtils {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -62,13 +67,10 @@ public class JSONUtils {
         try {
             return objectMapper.readValue(jsonStr, clazz);
         } catch (JsonParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
@@ -133,6 +135,81 @@ public class JSONUtils {
     @SuppressWarnings("rawtypes")
     public static <T> T mapToBean(Map map, Class<T> clazz) {
         return objectMapper.convertValue(map, clazz);
+    }
+
+    /**
+     * xml转成对象
+     *
+     * @param xmlPath
+     * @param cls
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    public static <T> T xmlToBean(String xmlPath, Class<T> cls) {
+        T obj = null;
+        try {
+            obj = xmlMapper.readValue(new File(xmlPath), cls);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    /**
+     * xml转成对象
+     *
+     * @param xmlFile
+     * @param cls
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    public static <T> T xmlToBean(File xmlFile, Class<T> cls) {
+        T obj = null;
+        try {
+            obj = xmlMapper.readValue(xmlFile, cls);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    /**
+     * xml转成对象
+     *
+     * @param xmlInputStream
+     * @param cls
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
+    public static <T> T xmlToBean(InputStream xmlInputStream, Class<T> cls) {
+        T obj = null;
+        try {
+            obj = xmlMapper.readValue(xmlInputStream, cls);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    /**
+     * 对象转成xml
+     *
+     * @param bean
+     * @param <T>
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static <T> String beanToXml(T bean) {
+        String string = null;
+        try {
+            string = xmlMapper.writeValueAsString(bean);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return string;
     }
 
 }

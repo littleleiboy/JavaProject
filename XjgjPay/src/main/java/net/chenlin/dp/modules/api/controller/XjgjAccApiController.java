@@ -2,7 +2,7 @@ package net.chenlin.dp.modules.api.controller;
 
 import net.chenlin.dp.common.constant.MsgConstant;
 import net.chenlin.dp.common.entity.ResultData;
-import net.chenlin.dp.common.utils.JSONUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
 import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.base.service.MemberBankcardService;
@@ -126,7 +126,7 @@ public class XjgjAccApiController extends AbstractController {
         try {
             Map<String,Object> map = apiService.memberWithDraw(params);
             Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
-            result = JSONUtils.mapToBean(map,MemberInfoEntity.class);
+            result = JacksonUtils.mapToBean(map,MemberInfoEntity.class);
             int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
             int drawMoney = (int)params.get(drawKey);
             if(accountBalance <= 0 && drawMoney > accountBalance){
@@ -143,7 +143,7 @@ public class XjgjAccApiController extends AbstractController {
         Object result = null;
         try {
             Map<String,Object> mapResult = apiService.searchMemberAccountBalance(param);
-            result = JSONUtils.mapToBean(mapResult,MemberInfoEntity.class);
+            result = JacksonUtils.mapToBean(mapResult,MemberInfoEntity.class);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -155,7 +155,7 @@ public class XjgjAccApiController extends AbstractController {
         Object result = null;
         try {
             Map<String,Object> mapResult = apiService.searchMemberCostLog(map);
-            result = JSONUtils.mapToBean(mapResult,MemberInfoEntity.class);
+            result = JacksonUtils.mapToBean(mapResult,MemberInfoEntity.class);
         } catch (Exception e){
             e.printStackTrace();
         }

@@ -15,7 +15,7 @@ import net.chenlin.dp.common.annotation.SysLog;
 import net.chenlin.dp.common.utils.CommonUtils;
 import net.chenlin.dp.common.utils.HttpContextUtils;
 import net.chenlin.dp.common.utils.IPUtils;
-import net.chenlin.dp.common.utils.JSONUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.common.utils.ShiroUtils;
 import net.chenlin.dp.modules.sys.entity.SysLogEntity;
 import net.chenlin.dp.modules.sys.entity.SysUserEntity;
@@ -70,7 +70,7 @@ public class SysLogAspect {
 		//请求的参数
 		Object[] args = joinPoint.getArgs();
 		try{
-			String params = JSONUtils.beanToJson(args[0]);
+			String params = JacksonUtils.beanToJson(args[0]);
 			sysLog.setParams(params);
 		}catch (Exception e){
 

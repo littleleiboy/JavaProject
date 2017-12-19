@@ -13,7 +13,7 @@ import org.quartz.TriggerKey;
 
 import net.chenlin.dp.common.constant.SystemConstant.ScheduleStatus;
 import net.chenlin.dp.common.exception.RRException;
-import net.chenlin.dp.common.utils.JSONUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.common.utils.SpringContextUtils;
 import net.chenlin.dp.modules.quartz.entity.QuartzJobEntity;
 
@@ -79,7 +79,7 @@ public class ScheduleUtils {
             CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(scheduleJob.getJobId())).withSchedule(scheduleBuilder).build();
 
             //放入参数，运行时的方法可以获取
-            jobDetail.getJobDataMap().put(QuartzJobEntity.JOB_PARAM_KEY, JSONUtils.beanToJson(scheduleJob));
+            jobDetail.getJobDataMap().put(QuartzJobEntity.JOB_PARAM_KEY, JacksonUtils.beanToJson(scheduleJob));
             
             scheduler.scheduleJob(jobDetail, trigger);
             
@@ -110,7 +110,7 @@ public class ScheduleUtils {
             trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
             
             //参数
-            trigger.getJobDataMap().put(QuartzJobEntity.JOB_PARAM_KEY, JSONUtils.beanToJson(scheduleJob));
+            trigger.getJobDataMap().put(QuartzJobEntity.JOB_PARAM_KEY, JacksonUtils.beanToJson(scheduleJob));
             
             scheduler.rescheduleJob(triggerKey, trigger);
             
@@ -132,7 +132,7 @@ public class ScheduleUtils {
         try {
         	//参数
         	JobDataMap dataMap = new JobDataMap();
-        	dataMap.put(QuartzJobEntity.JOB_PARAM_KEY, JSONUtils.beanToJson(scheduleJob));
+        	dataMap.put(QuartzJobEntity.JOB_PARAM_KEY, JacksonUtils.beanToJson(scheduleJob));
         	
             scheduler.triggerJob(getJobKey(scheduleJob.getJobId()), dataMap);
         } catch (SchedulerException e) {

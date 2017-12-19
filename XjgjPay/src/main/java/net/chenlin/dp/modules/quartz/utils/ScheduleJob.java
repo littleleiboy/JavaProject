@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import net.chenlin.dp.common.utils.JSONUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.common.utils.SpringContextUtils;
 import net.chenlin.dp.modules.quartz.entity.QuartzJobEntity;
 import net.chenlin.dp.modules.quartz.entity.QuartzJobLogEntity;
@@ -35,7 +35,7 @@ public class ScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         String jobStr = context.getMergedJobDataMap().getString(QuartzJobEntity.JOB_PARAM_KEY);
-    	QuartzJobEntity scheduleJob = JSONUtils.jsonToBean(jobStr, QuartzJobEntity.class);
+    	QuartzJobEntity scheduleJob = JacksonUtils.jsonToBean(jobStr, QuartzJobEntity.class);
         
         //获取spring bean
         QuartzJobLogManager quartzJobLogManager = (QuartzJobLogManager) SpringContextUtils.getBean("quartzJobLogManager");
