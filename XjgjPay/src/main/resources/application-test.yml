@@ -38,9 +38,28 @@ spring:
                         multi-statement-allow: true
 
 myprop:
-    api-jsxt-app-key:
-        81015a4bf6ba58cfb15878db1b579afe
-    api-jsxt-app-url:
-        https://test.shxjgj.com:443/app/
-    api-baofoo-url:
-        https://tgw.baofoo.com/cutpayment/api/
+    api:
+        jsxt:
+            app-key: #结算系统访问口令生成密钥
+                bfb0aebe0aa35d2aa9db2a15aaf02609
+            app-url: #结算系统接口url
+                https://test.shxjgj.com:443/app/
+        baofoo:
+            url: #宝付支付接口url
+                https://vgw.baofoo.com/cutpayment/api/backTransRequest
+            version:
+                4.0.0.0
+            char-set: #宝付接口默认编码格式
+                UTF-8
+            pfx-name: #商户私钥路径
+                bfkey_100000276@@100000990.pfx
+            pfx-pwd: #商户私钥密码
+                123456
+            cer-name: #宝付公钥路径
+                bfkey_100000276@@100000990.cer
+            terminal-id: #终端号
+                100000990
+            member-id: #商户号
+                100000276
+            data-type: #数据类型json/xml
+                json
