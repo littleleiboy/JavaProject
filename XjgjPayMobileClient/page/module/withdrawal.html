@@ -20,10 +20,21 @@
 						<a class="mui-navigate-right" id="BOC">中国银行</a>
 					</li>
 				</ul>
-
+				<div class="mui-input-row">
+					<label>会员姓名</label>
+					<input id="memberName" type="text" class="mui-input-clear" placeholder="会员姓名" />
+				</div>
+				<div class="mui-input-row">
+					<label>会员账号</label>
+					<input id="memberNo" type="text" class="mui-input-clear" placeholder="1000000000000" />
+				</div>
+				<div class="mui-input-row">
+					<label>主卡密码</label>
+					<input id="passWord" type="password" class="mui-input-clear" placeholder="******" />
+				</div>
 				<div class="mui-input-row">
 					<label>圈提金额</label>
-					<input type="text" class="mui-input-clear" placeholder="请输入圈提金额">
+					<input id="withDrawQty" type="text" class="mui-input-clear" placeholder="请输入圈提金额">
 				</div>
 			</form>
 			<div class="mui-content-padded">
@@ -31,8 +42,9 @@
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script src="../../js/Module/withdrawal.js"></script>
 		<script type="text/javascript">
-			mui.init();
+			mui.init(); 
 		</script>
 	</body>
 
