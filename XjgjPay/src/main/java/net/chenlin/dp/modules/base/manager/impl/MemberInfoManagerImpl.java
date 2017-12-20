@@ -52,5 +52,9 @@ public class MemberInfoManagerImpl implements MemberInfoManager {
 		int count = memberInfoMapper.batchRemove(id);
 		return count;
 	}
+
+	public MemberInfoEntity getMemberInfoByNO(String memberNO){
+		return memberInfoMapper.getMemberInfoByNO(memberNO);
+	}
 	
 }

@@ -1,5 +1,7 @@
 package net.chenlin.dp.modules.base.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,39 +26,51 @@ import net.chenlin.dp.modules.base.service.MemberInfoService;
 @Service("memberInfoService")
 public class MemberInfoServiceImpl implements MemberInfoService {
 
-	@Autowired
-	private MemberInfoManager memberInfoManager;
+    @Autowired
+    private MemberInfoManager memberInfoManager;
 
-	@Override
-	public Page<MemberInfoEntity> listMemberInfo(Map<String, Object> params) {
-		Query query = new Query(params);
-		Page<MemberInfoEntity> page = new Page<>(query);
-		memberInfoManager.listMemberInfo(page, query);
-		return page;
-	}
+    @Override
+    public Page<MemberInfoEntity> listMemberInfo(Map<String, Object> params) {
+        Query query = new Query(params);
+        Page<MemberInfoEntity> page = new Page<>(query);
+        memberInfoManager.listMemberInfo(page, query);
+        return page;
+    }
 
-	@Override
-	public R saveMemberInfo(MemberInfoEntity role) {
-		int count = memberInfoManager.saveMemberInfo(role);
-		return CommonUtils.msg(count);
-	}
+    @Override
+    public MemberInfoEntity getMemberInfoByNO(String memberNO) {
+        memberInfoManager.getMemberInfoByNO(memberNO);
+        return null;
+    }
 
-	@Override
-	public R getMemberInfoById(Long id) {
-		MemberInfoEntity memberInfo = memberInfoManager.getMemberInfoById(id);
-		return CommonUtils.msg(memberInfo);
-	}
+    @Override
+    public MemberInfoEntity getMemberInfoByCardID(String cardID) {
+        //TODO  根据会员卡号查询会员信息
+        return null;
+    }
 
-	@Override
-	public R updateMemberInfo(MemberInfoEntity memberInfo) {
-		int count = memberInfoManager.updateMemberInfo(memberInfo);
-		return CommonUtils.msg(count);
-	}
+    @Override
+    public R saveMemberInfo(MemberInfoEntity role) {
+        int count = memberInfoManager.saveMemberInfo(role);
+        return CommonUtils.msg(count);
+    }
 
-	@Override
-	public R batchRemove(Long[] id) {
-		int count = memberInfoManager.batchRemove(id);
-		return CommonUtils.msg(id, count);
-	}
+    @Override
+    public R getMemberInfoById(Long id) {
+        MemberInfoEntity memberInfo = memberInfoManager.getMemberInfoById(id);
+        return CommonUtils.msg(memberInfo);
+    }
+
+    @Override
+    public R updateMemberInfo(MemberInfoEntity memberInfo) {
+        int count = memberInfoManager.updateMemberInfo(memberInfo);
+        return CommonUtils.msg(count);
+    }
+
+    @Override
+    public R batchRemove(Long[] id) {
+        int count = memberInfoManager.batchRemove(id);
+        return CommonUtils.msg(id, count);
+    }
 
 }

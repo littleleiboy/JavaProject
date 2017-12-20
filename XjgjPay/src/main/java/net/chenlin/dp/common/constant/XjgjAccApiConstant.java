@@ -9,7 +9,7 @@ public class XjgjAccApiConstant {
      * 通过手机号查询会员是否已经绑定
      * 完整的请求url格式例如 https://mail.shxjgj.com:443/app/memberSearchRequest
      */
-    public static final String METHOD_GET_MEMBER_BINDING_INFO = "memberSearchRequest";
+    public static final String METHOD_GET_MEMBER_BASE_INFO = "memberSearchRequest";
 
     /**
      * 已注册会员绑定APP
@@ -63,7 +63,7 @@ public class XjgjAccApiConstant {
     public static final String FIELD_ID_CARD = "idCardNo";
     public static final String FIELD_PASSWORD = "password";
     public static final String FIELD_BANK_ACCOUNT = "bankAccount";
-    public static final String FIELD_M_CARD_NO = "mCardNo2";
+    public static final String FIELD_MEMBER_CARD_NO = "mCardNo2";
     public static final String FIELD_TO_CORP_ADDRESS = "toCorpAddress";
     public static final String FIELD_BANK_NAME = "bankName";
     public static final String FIELD_ACCOUNT_QTY = "accountQty";

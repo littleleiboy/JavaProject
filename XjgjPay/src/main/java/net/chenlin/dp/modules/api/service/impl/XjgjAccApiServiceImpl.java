@@ -14,15 +14,15 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
     private XjgjAccApiManager apiManager;
 
     /**
-     * 查询会员绑定基本信息
+     * 查询会员基本信息
      *
      * @param map
      * @return
      * @throws Exception
      */
     @Override
-    public Map<String, Object> getMemberBindingInfo(Map<String, Object> map) throws Exception {
-        return apiManager.getMemberBindingInfo(map);
+    public Map<String, Object> getMemberBaseInfo(Map<String, Object> map) throws Exception {
+        return apiManager.getMemberBaseInfo(map);
     }
 
     /**

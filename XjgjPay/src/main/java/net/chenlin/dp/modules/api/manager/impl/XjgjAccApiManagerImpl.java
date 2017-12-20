@@ -42,15 +42,15 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     /**
-     * 查询会员绑定基本信息
+     * 查询会员基本信息
      *
      * @param map 发送数据
      * @return 返回结果
      * @throws Exception
      */
     @Override
-    public Map<String, Object> getMemberBindingInfo(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BINDING_INFO), mapToJsonStr(map));
+    public Map<String, Object> getMemberBaseInfo(Map<String, Object> map) throws Exception {
+        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BASE_INFO), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else

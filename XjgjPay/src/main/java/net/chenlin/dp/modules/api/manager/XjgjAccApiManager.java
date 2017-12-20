@@ -8,13 +8,13 @@ import java.util.Map;
 public interface XjgjAccApiManager {
 
     /**
-     * 查询会员绑定基本信息
+     * 查询会员基本信息
      *
      * @param map 发送数据
      * @return 返回结果
      * @throws Exception
      */
-    Map<String, Object> getMemberBindingInfo(Map<String, Object> map) throws Exception;
+    Map<String, Object> getMemberBaseInfo(Map<String, Object> map) throws Exception;
 
     /**
      * 会员密码验证

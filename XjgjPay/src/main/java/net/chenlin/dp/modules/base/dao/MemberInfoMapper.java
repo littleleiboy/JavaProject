@@ -15,5 +15,7 @@ import net.chenlin.dp.modules.sys.dao.BaseMapper;
  */
 @Mapper
 public interface MemberInfoMapper extends BaseMapper<MemberInfoEntity> {
-	
+
+    MemberInfoEntity getMemberInfoByNO(String memberNO);
+
 }

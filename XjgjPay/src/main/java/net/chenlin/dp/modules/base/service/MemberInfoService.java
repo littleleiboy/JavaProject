@@ -17,7 +17,11 @@ import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 public interface MemberInfoService {
 
 	Page<MemberInfoEntity> listMemberInfo(Map<String, Object> params);
-	
+
+	MemberInfoEntity getMemberInfoByNO(String memberNO);
+
+	MemberInfoEntity getMemberInfoByCardID(String cardID);
+
 	R saveMemberInfo(MemberInfoEntity memberInfo);
 	
 	R getMemberInfoById(Long id);
