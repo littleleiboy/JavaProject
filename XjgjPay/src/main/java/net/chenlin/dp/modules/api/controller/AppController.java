@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/xjgjAcc")
-public class XjgjAccApiController extends AbstractController {
+@RequestMapping("/api/app")
+public class AppController extends AbstractController {
 
-    private final static Logger logger = LoggerFactory.getLogger(XjgjAccApiController.class);
+    private final static Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @Autowired
     private XjgjAccApiService apiService;
