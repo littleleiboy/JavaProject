@@ -62,6 +62,13 @@ public interface XjgjAccApiManager {
     Map<String, Object> retryRecharge(Map<String, Object> map) throws Exception;
 
     /**
+     * 会员圈提绑定
+     *
+     *
+    * */
+    Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception;
+
+    /**
      * 会员圈提
      * @param map 发送的数据
      * @return 返回值
