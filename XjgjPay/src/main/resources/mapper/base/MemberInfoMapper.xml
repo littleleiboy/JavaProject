@@ -15,8 +15,9 @@
 			`id_card`, 
 			`id_card_type`, 
 			`is_available`, 
-			`remark`, 
-			`xjgj_toCorpAddress`, 
+			`remark`,
+			`member_address`,
+			`to_corp_address`, 
 			`gmt_create`, 
 			`gmt_modified`
 		FROM
@@ -36,8 +37,9 @@
 			`id_card`, 
 			`id_card_type`, 
 			`is_available`, 
-			`remark`, 
-			`xjgj_toCorpAddress`, 
+			`remark`,
+			`member_address`,
+			`to_corp_address`, 
 			`gmt_create`, 
 			`gmt_modified`
 		)
@@ -51,8 +53,9 @@
 			#{idCard}, 
 			#{idCardType}, 
 			#{isAvailable}, 
-			#{remark}, 
-			#{xjgjTocorpaddress}, 
+			#{remark},
+			#{memberAddress},
+			#{toCorpAddress},
 			#{gmtCreate}, 
 			#{gmtModified}
 		)
@@ -70,8 +73,9 @@
 			`id_card`, 
 			`id_card_type`, 
 			`is_available`, 
-			`remark`, 
-			`xjgj_toCorpAddress`, 
+			`remark`,
+			`member_address`,
+			`to_corp_address`, 
 			`gmt_create`, 
 			`gmt_modified`
 		FROM
@@ -93,7 +97,8 @@
             <if test="idCardType != null">`id_card_type` = #{idCardType},</if>
             <if test="isAvailable != null">`is_available` = #{isAvailable},</if>
             <if test="remark != null">`remark` = #{remark},</if>
-            <if test="xjgjTocorpaddress != null">`xjgj_toCorpAddress` = #{xjgjTocorpaddress},</if>
+            <if test="memberAddress !=null ">`member_address` = #{memberAddress}</if>
+            <if test="toCorpAddress != null">`to_corp_address` = #{toCorpAddress},</if>
             <if test="gmtCreate != null">`gmt_create` = #{gmtCreate},</if>
             <if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
         </set>
@@ -125,35 +130,14 @@
 		`id_card_type`,
 		`is_available`,
 		`remark`,
-		`xjgj_toCorpAddress`,
+		`member_address`,
+		`to_corp_address`,
 		`gmt_create`,
 		`gmt_modified`
 		FROM
 		member_info
 		WHERE
 		id = #{member_id}
-	</select>
-
-    <select id="getMemberInfoByCardID" resultType="net.chenlin.dp.modules.base.entity.MemberInfoEntity">
-		SELECT
-		`id`,
-		`member_id`,
-		`member_type`,
-		`member_name`,
-		`card_id`,
-		`mobile`,
-		`email`,
-		`id_card`,
-		`id_card_type`,
-		`is_available`,
-		`remark`,
-		`xjgj_toCorpAddress`,
-		`gmt_create`,
-		`gmt_modified`
-		FROM
-		member_info
-		WHERE
-		id = #{card_id}
 	</select>
 
 </mapper>

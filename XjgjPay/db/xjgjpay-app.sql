@@ -18,11 +18,12 @@ create table `member_info`(
 	`id_card_type` int default '1' comment '身份证类型(默认1为身份证)',
 	`is_available` tinyint(1) default '0' comment '可用标识(0-不可用;1-可用)',
 	`remark` varchar(100) default '' comment '备注',
-	`xjgj_toCorpAddress` varchar(100) default '' comment '商品去向地址',
+	`member_address` varchar(100) default '' comment '会员地址',
+	`to_corp_address` varchar(100) default '' comment '商品去向地址',
 	`gmt_create` datetime comment '创建时间',
 	`gmt_modified` datetime comment '修改时间',
 	primary key pk_id(`id`),
-	unique key uk_card_code(`card_id`),
+	unique key uk_card_code(`member_id`),
 	index idx_card_type(`member_type`)
 ) engine=InnoDB default charset=utf8 comment '会员信息';
 

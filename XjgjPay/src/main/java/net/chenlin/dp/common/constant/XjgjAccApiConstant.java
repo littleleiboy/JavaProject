@@ -42,13 +42,14 @@ public class XjgjAccApiConstant {
     public static final String METHOD_MEMBER_WITH_DRAW = "https://mail.shxjgj.com:443/app/memberQTRequest";
 
 
-    /**账户余额查询
-     * */
+    /**
+     * 账户余额查询
+     */
     public static final String SEARCH_MEMBER_ACCOUNT_BALANCE = "https://mail.shxjgj.com:443/app/memberAccountSearchRequest";
 
     /**
      * 方法名常量 查询一段时间内账户余额变动
-     * */
+     */
     public static final String SEARCH_MEMBER_COST_LOG = "https://mail.shxjgj.com:443/app/memberCostLogRequest";
 
     public static final String FIELD_KEY_STR = "keyStr";
@@ -58,12 +59,14 @@ public class XjgjAccApiConstant {
     public static final String FIELD_IS_MEMBER = "ifHasMember";
     public static final String FIELD_MEMBER_NO = "memberNo";
     public static final String FIELD_MEMBER_NAME = "memberName";
+    public static final String FIELD_MEMBER_TYPE = "memberType";
     public static final String FIELD_BIND_ID = "bind_id";
     public static final String FIELD_IS_QT_BINDED = "ifQtBinded";
     public static final String FIELD_ID_CARD = "idCardNo";
     public static final String FIELD_PASSWORD = "password";
     public static final String FIELD_BANK_ACCOUNT = "bankAccount";
     public static final String FIELD_MEMBER_CARD_NO = "mCardNo2";
+    public static final String FIELD_MEMBER_ADDRESS="memberAddress";
     public static final String FIELD_TO_CORP_ADDRESS = "toCorpAddress";
     public static final String FIELD_BANK_NAME = "bankName";
     public static final String FIELD_ACCOUNT_QTY = "accountQty";

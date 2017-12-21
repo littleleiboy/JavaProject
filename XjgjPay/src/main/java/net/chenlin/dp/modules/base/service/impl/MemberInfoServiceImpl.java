@@ -44,12 +44,6 @@ public class MemberInfoServiceImpl implements MemberInfoService {
     }
 
     @Override
-    public MemberInfoEntity getMemberInfoByCardID(String cardID) {
-        //TODO  根据会员卡号查询会员信息
-        return null;
-    }
-
-    @Override
     public R saveMemberInfo(MemberInfoEntity role) {
         int count = memberInfoManager.saveMemberInfo(role);
         return CommonUtils.msg(count);

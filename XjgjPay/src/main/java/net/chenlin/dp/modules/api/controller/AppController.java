@@ -110,6 +110,11 @@ public class AppController extends AbstractController {
 
                 //TODO 保存会员注册填写的信息到数据库
                 MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByNO(String.valueOf(memberNO));
+                if (memberEntity != null) {
+                    
+                } else {
+
+                }
 
                 //调接口推送会员注册或绑定信息给结算系统
                 Map<String, Object> mapResult = apiService.memberAppBind(params);

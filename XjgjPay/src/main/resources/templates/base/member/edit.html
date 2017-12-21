@@ -65,9 +65,15 @@
 	            </td>
         	</tr>
 			<tr>
+				<td class="formTitle">会员地址<font face="宋体">*</font></td>
+				<td class="formValue">
+					<input type="text" class="form-control" placeholder="商品去向地址" v-model="memberInfo.memberAddress" isvalid="yes" checkexpession="NotNull">
+				</td>
+			</tr>
+			<tr>
 	            <td class="formTitle">商品去向地址<font face="宋体">*</font></td>
 	            <td class="formValue">
-					<input type="text" class="form-control" placeholder="商品去向地址" v-model="memberInfo.xjgjTocorpaddress" isvalid="yes" checkexpession="NotNull">
+					<input type="text" class="form-control" placeholder="商品去向地址" v-model="memberInfo.toCorpAddress" isvalid="yes" checkexpession="NotNull">
 	            </td>
         	</tr>
 			<tr>

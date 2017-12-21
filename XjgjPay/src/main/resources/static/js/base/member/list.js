@@ -33,8 +33,9 @@ function getGrid() {
 			{field : "idCard", title : "身份证号", width : "100px"}, 
 			{field : "idCardType", title : "身份证类型(默认1为身份证)", width : "100px"}, 
 			{field : "isAvailable", title : "可用标识(0-不可用;1-可用)", width : "100px"}, 
-			{field : "remark", title : "备注", width : "100px"}, 
-			{field : "xjgjTocorpaddress", title : "商品去向地址", width : "100px"}, 
+			{field : "remark", title : "备注", width : "100px"},
+            {field : "memberAddress", title : "会员地址", width : "100px"},
+            {field : "toCorpAddress", title : "商品去向地址", width : "100px"},
 			{field : "gmtCreate", title : "创建时间", width : "100px"}, 
 			{field : "gmtModified", title : "修改时间", width : "100px"}
 		]
