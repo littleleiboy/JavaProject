@@ -47,6 +47,11 @@ public class MemberInfoEntity implements Serializable {
     private String mobile;
 
     /**
+     * 密码（作为APP接口访问口令）
+     */
+    private String password;
+
+    /**
      * 电子邮箱
      */
     private String email;
@@ -142,6 +147,14 @@ public class MemberInfoEntity implements Serializable {
 
     public String getMobile() {
         return mobile;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setEmail(String email) {

@@ -10,7 +10,8 @@
 			`member_type`, 
 			`member_name`, 
 			`card_id`, 
-			`mobile`, 
+			`mobile`,
+			`password`,
 			`email`, 
 			`id_card`, 
 			`id_card_type`, 
@@ -32,7 +33,8 @@
 			`member_type`, 
 			`member_name`, 
 			`card_id`, 
-			`mobile`, 
+			`mobile`,
+			`password`,
 			`email`, 
 			`id_card`, 
 			`id_card_type`, 
@@ -48,7 +50,8 @@
 			#{memberType}, 
 			#{memberName}, 
 			#{cardId}, 
-			#{mobile}, 
+			#{mobile},
+			#{password}
 			#{email}, 
 			#{idCard}, 
 			#{idCardType}, 
@@ -68,7 +71,8 @@
 			`member_type`, 
 			`member_name`, 
 			`card_id`, 
-			`mobile`, 
+			`mobile`,
+			`password`,
 			`email`, 
 			`id_card`, 
 			`id_card_type`, 
@@ -92,6 +96,7 @@
             <if test="memberName != null">`member_name` = #{memberName},</if>
             <if test="cardId != null">`card_id` = #{cardId},</if>
             <if test="mobile != null">`mobile` = #{mobile},</if>
+            <if test="password != null">`password` = #{password}</if>
             <if test="email != null">`email` = #{email},</if>
             <if test="idCard != null">`id_card` = #{idCard},</if>
             <if test="idCardType != null">`id_card_type` = #{idCardType},</if>
@@ -125,6 +130,7 @@
 		`member_name`,
 		`card_id`,
 		`mobile`,
+		`password`,
 		`email`,
 		`id_card`,
 		`id_card_type`,
@@ -137,7 +143,31 @@
 		FROM
 		member_info
 		WHERE
-		id = #{member_id}
+		id = #{memberId}
+	</select>
+
+    <select id="getMemberInfoByMobile" resultType="net.chenlin.dp.modules.base.entity.MemberInfoEntity">
+		SELECT
+		`id`,
+		`member_id`,
+		`member_type`,
+		`member_name`,
+		`card_id`,
+		`mobile`,
+		`password`,
+		`email`,
+		`id_card`,
+		`id_card_type`,
+		`is_available`,
+		`remark`,
+		`member_address`,
+		`to_corp_address`,
+		`gmt_create`,
+		`gmt_modified`
+		FROM
+		member_info
+		WHERE
+		id = #{mobile}
 	</select>
 
 </mapper>

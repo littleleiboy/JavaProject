@@ -7,24 +7,25 @@ use `xjgjpay`;
 drop table if exists `member_info`;
 -- 会员信息(对接结算系统的会员信息)
 create table `member_info`(
-	`id` bigint not null auto_increment comment '会员id',
-	`member_id` varchar(50) default '' comment '会员编号',
-	`member_type` int default '0' comment '会员类型',
-	`member_name` varchar(50) not null comment '会员名',
-	`card_id` varchar(50) default '' comment '会员卡号',
-	`mobile` varchar(20) not null comment '银行卡绑定手机号',
-	`email` varchar(50) default '' comment '电子邮箱',
-	`id_card` varchar(50) default '' comment '身份证号',
-	`id_card_type` int default '1' comment '身份证类型(默认1为身份证)',
-	`is_available` tinyint(1) default '0' comment '可用标识(0-不可用;1-可用)',
-	`remark` varchar(100) default '' comment '备注',
-	`member_address` varchar(100) default '' comment '会员地址',
-	`to_corp_address` varchar(100) default '' comment '商品去向地址',
-	`gmt_create` datetime comment '创建时间',
-	`gmt_modified` datetime comment '修改时间',
-	primary key pk_id(`id`),
-	unique key uk_card_code(`member_id`),
-	index idx_card_type(`member_type`)
+  `id` bigint not null auto_increment comment '会员id',
+  `member_id` varchar(50) default '' comment '会员编号',
+  `member_type` int default '0' comment '会员类型',
+  `member_name` varchar(50) not null comment '会员名',
+  `card_id` varchar(50) default '' comment '会员卡号',
+  `mobile` varchar(20) not null comment '银行卡绑定手机号',
+  `password` varchar(100) default '' comment '密码',
+  `email` varchar(50) default '' comment '电子邮箱',
+  `id_card` varchar(50) default '' comment '身份证号',
+  `id_card_type` int default '1' comment '身份证类型(默认1为身份证)',
+  `is_available` tinyint(1) default '0' comment '可用标识(0-不可用;1-可用)',
+  `remark` varchar(100) default '' comment '备注',
+  `member_address` varchar(100) default '' comment '会员地址',
+  `to_corp_address` varchar(100) default '' comment '商品去向地址',
+  `gmt_create` datetime comment '创建时间',
+  `gmt_modified` datetime comment '修改时间',
+  primary key pk_id(`id`),
+  unique key uk_card_code(`member_id`),
+  index idx_card_type(`member_type`)
 ) engine=InnoDB default charset=utf8 comment '会员信息';
 
 drop table if exists `member_bankcard`;

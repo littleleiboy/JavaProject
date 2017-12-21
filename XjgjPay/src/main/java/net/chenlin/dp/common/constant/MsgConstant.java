@@ -36,6 +36,16 @@ public class MsgConstant {
     public static final String MSG_INIT_FORM = "初始化表单数据失败，请重试！";
 
     /**
+     * 访问授权验证未通过
+     */
+    public static final String MSG_ERR_ACCESS_TOKEN = "访问授权验证未通过！";
+
+    /**
+     * 访问授权验证未通过错误代码：err_access_token
+     */
+    public static final String MSG_ERR_ACCESS_TOKEN_CODE = "err_access_token";
+
+    /**
      * 删除数据项不是全部所选
      *
      * @param total

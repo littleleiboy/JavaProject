@@ -18,4 +18,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfoEntity> {
 
     MemberInfoEntity getMemberInfoByNO(String memberNO);
 
+    MemberInfoEntity getMemberInfoByMobile(String mobile);
+
 }

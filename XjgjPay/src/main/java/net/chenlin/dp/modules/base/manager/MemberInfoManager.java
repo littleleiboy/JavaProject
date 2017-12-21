@@ -27,4 +27,6 @@ public interface MemberInfoManager {
 	int batchRemove(Long[] id);
 
 	MemberInfoEntity getMemberInfoByNO(String memberNO);
+
+	MemberInfoEntity getMemberInfoByMobile(String mobile);
 }
