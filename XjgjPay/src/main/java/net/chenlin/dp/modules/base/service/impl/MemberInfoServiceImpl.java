@@ -44,6 +44,12 @@ public class MemberInfoServiceImpl implements MemberInfoService {
     }
 
     @Override
+    public MemberInfoEntity getMemberInfoByMobile(String memberNO) {
+        memberInfoManager.getMemberInfoByMobile(memberNO);
+        return null;
+    }
+
+    @Override
     public R saveMemberInfo(MemberInfoEntity role) {
         int count = memberInfoManager.saveMemberInfo(role);
         return CommonUtils.msg(count);

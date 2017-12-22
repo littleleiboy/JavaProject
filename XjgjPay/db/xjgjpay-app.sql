@@ -37,6 +37,8 @@ create table `member_bankcard`(
 	`bank_code` varchar(50) default '' comment '发卡行编号',
 	`bf_bind_id` varchar(100) default '' comment '宝付绑定标识号',
 	`member_info_id` bigint not null comment '会员id',
+	`is_recharge` tinyint(1) default '0' comment '是否可充值(0-否；1-是)',
+	`is_withdraw` tinyint(1) default '0' comment '是否可提现(0-否；1-是)',
 	`remark` varchar(100) comment '备注',
 	`gmt_create` datetime comment '创建时间',
 	`gmt_modified` datetime comment '修改时间',

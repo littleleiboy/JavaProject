@@ -20,6 +20,8 @@ public interface MemberInfoService {
 
 	MemberInfoEntity getMemberInfoByNO(String memberNO);
 
+	MemberInfoEntity getMemberInfoByMobile(String memberNO);
+
 	R saveMemberInfo(MemberInfoEntity memberInfo);
 	
 	R getMemberInfoById(Long id);

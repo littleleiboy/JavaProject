@@ -46,6 +46,11 @@ public class MsgConstant {
     public static final String MSG_ERR_ACCESS_TOKEN_CODE = "err_access_token";
 
     /**
+     * 是否已经绑定APP
+     */
+    public static final String MSG_IS_APP_BOUND = "is_app_bound";
+
+    /**
      * 删除数据项不是全部所选
      *
      * @param total

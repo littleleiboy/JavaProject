@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -176,15 +177,28 @@ public class AppController extends AbstractController {
     @RequestMapping("/getMemberBaseInfo")
     public ResultData getMemberBaseInfo(@RequestBody Map<String, Object> params) {
         try {
+            //先在本系统数据库查询会员是否已经绑定APP
+            Object objMobile = params.get(XjgjAccApiConstant.FIELD_MOBILE_NUM);
+            if (null == objMobile || "".equals(objMobile)) {
+                return new ResultData("err_param", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+            String mobile = String.valueOf(objMobile);
+            MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByMobile(mobile);
+
             Map<String, Object> mapResult = apiService.getMemberBaseInfo(params);
             if (mapResult != null) {
-                return new ResultData("r1", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                if (memberEntity != null) {//已经绑定APP
+                    mapResult.put(MsgConstant.MSG_IS_APP_BOUND, true);
+                } else {
+                    mapResult.put(MsgConstant.MSG_IS_APP_BOUND, false);
+                }
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
-                return new ResultData("e2", false, MsgConstant.MSG_REMOTE_ERROR, "");
+                return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
 
@@ -218,11 +232,49 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberAppBind")
     public ResultData memberAppBind(@RequestBody Map<String, Object> params) {
         try {
+            Map<String, Object> mapResult = apiService.memberAppBind(params);
+            return memberAppRegister(1, mapResult, params);
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
+    /**
+     * 会员注册
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/regMember")
+    public ResultData regMember(@RequestBody Map<String, Object> params) {
+        try {
+            Map<String, Object> mapResult = apiService.regMember(params);
+            return memberAppRegister(0, mapResult, params);
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+        }
+    }
+
+    /**
+     * 新会员注册或老会员绑定
+     *
+     * @param opration  0-注册；1-绑定
+     * @param mapResult 接口返回结果
+     * @param params    请求参数
+     * @return
+     */
+    public ResultData memberAppRegister(int opration, Map<String, Object> mapResult, Map<String, Object> params) {
+        try {
+            Object memberNO = null;
             if (params != null) {
                 //必要的后台验证
-                Object memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
-                if (null == memberNO || "".equals(memberNO)) {
-                    return new ResultData("err_memberNO_isnull", false, "会员账号不能为空！");
+                if (opration == 1) {//绑定
+                    memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
+                    if (null == memberNO || "".equals(memberNO)) {
+                        return new ResultData("err_memberNO_isnull", false, "会员账号不能为空！");
+                    }
                 }
                 Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
                 if (null == memberName || "".equals(memberName)) {
@@ -244,34 +296,55 @@ public class AppController extends AbstractController {
                 Object memberAddr = params.get(XjgjAccApiConstant.FIELD_MEMBER_ADDRESS);//会员地址
                 Object toCorpAddr = params.get(XjgjAccApiConstant.FIELD_TO_CORP_ADDRESS);//会员商品去向地址(西郊)
 
-                //TODO 保存会员注册填写的信息到数据库
-                MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByNO(String.valueOf(memberNO));
-                if (memberEntity != null) {
-                    memberEntity.setMemberId(String.valueOf(memberNO));
-                    memberEntity.setMemberType(0);//默认为普通（个人买方）
-                    memberEntity.setMemberName(String.valueOf(memberName));
-                    memberEntity.setIdCard(String.valueOf(idCard));
-                    memberEntity.setIdCardType(1);//默认为身份证
-                    memberEntity.setMobile(String.valueOf(mobileNum));
-
-                    String accToken = EncryptUtils.MD5(mobileNum + "|" + pass);
-                    memberEntity.setPassword(accToken);
-
-                    memberInfoService.updateMemberInfo(memberEntity);
-                } else {
-
-                }
-
-                //调接口推送会员注册或绑定信息给结算系统
-                Map<String, Object> mapResult = apiService.memberAppBind(params);
                 if (mapResult != null) {
-                    Object resultState = mapResult.get(XjgjAccApiConstant.FIELD_RESULT);
+                    if (opration == 0) {//新注册
+                        memberNO = mapResult.get(XjgjAccApiConstant.FIELD_MEMBER_NO);
+                    }
+                    Object resultState = mapResult.get(XjgjAccApiConstant.FIELD_RESULT);// 1-成功,0-失败,2-已经绑定过APP
                     Object message = mapResult.get(XjgjAccApiConstant.FIELD_MESSAGE);
-                    Object isQtBinded = mapResult.get(XjgjAccApiConstant.FIELD_IS_QT_BINDED);
-                    Object bankAccount = mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);
+                    //Object isQtBinded = mapResult.get(XjgjAccApiConstant.FIELD_IS_QT_BINDED);
+                    //Object bankAccount = mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);
                     Object mCardNO = mapResult.get(XjgjAccApiConstant.FIELD_MEMBER_CARD_NO);
-                    if ("1".equals(resultState)) {//调用结算系统会员绑定接口处理成功
-                        //TODO 调接口绑定宝付
+                    if ("1".equals(resultState) || "2".equals(resultState)) {//调用结算系统会员绑定接口处理成功
+                        //保存会员注册填写的信息到数据库
+                        MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByNO(String.valueOf(memberNO));
+                        Boolean isNew = false;
+                        Date now = new Date();
+                        if (memberEntity == null) {
+                            memberEntity = new MemberInfoEntity();
+                            memberEntity.setGmtCreate(now);
+                            isNew = true;
+                        } else {
+                            isNew = false;
+                            memberEntity.setGmtModified(now);
+                        }
+
+                        memberEntity.setMemberId(String.valueOf(memberNO));
+                        memberEntity.setMemberType(0);//默认为普通（个人买方）
+                        memberEntity.setMemberName(String.valueOf(memberName));
+                        memberEntity.setIdCard(String.valueOf(idCard));
+                        memberEntity.setIdCardType(1);//默认为身份证
+                        memberEntity.setMobile(String.valueOf(mobileNum));
+
+                        String accToken = EncryptUtils.MD5(mobileNum + "|" + pass);
+                        memberEntity.setPassword(accToken);
+
+                        if (null != mCardNO || !"".equals(mCardNO))
+                            memberEntity.setCardId(String.valueOf(mCardNO));
+
+                        if (null != memberAddr || !"".equals(memberAddr))
+                            memberEntity.setMemberAddress(String.valueOf(memberAddr));
+
+                        if (null != toCorpAddr || !"".equals(toCorpAddr))
+                            memberEntity.setToCorpAddress(String.valueOf(toCorpAddr));
+
+                        memberEntity.setIsAvailable(1);
+
+                        if (isNew) {
+                            memberInfoService.saveMemberInfo(memberEntity);
+                        } else {
+                            memberInfoService.updateMemberInfo(memberEntity);
+                        }
 
                         return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                     } else {
@@ -291,29 +364,6 @@ public class AppController extends AbstractController {
             return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
         }
     }
-
-    /**
-     * 会员注册
-     *
-     * @param params
-     * @return
-     */
-    @RequestMapping("/regMember")
-    public ResultData regMember(@RequestBody Map<String, Object> params) {
-        try {
-            Map<String, Object> mapResult = apiService.regMember(params);
-            if (mapResult != null) {
-                //TODO 保存会员信息
-                return new ResultData("r1", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-            } else {
-                return new ResultData("e2", false, MsgConstant.MSG_REMOTE_ERROR, "");
-            }
-        } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
-        }
-    }
-
 
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
