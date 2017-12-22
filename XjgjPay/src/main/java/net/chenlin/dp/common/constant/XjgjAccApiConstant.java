@@ -42,6 +42,11 @@ public class XjgjAccApiConstant {
     public static final String METHOD_MEMBER_BIND_BOC = "memberBankBindRequest";
 
     /**
+     * 会员圈提解绑
+    * */
+    public static final String METHOD_MEMBER_UNBIND_BOC = "memberBankUnBindRequest";
+
+    /**
      * 方法名常量，会员圈提
      */
     public static final String METHOD_MEMBER_WITH_DRAW = "memberQTRequest";

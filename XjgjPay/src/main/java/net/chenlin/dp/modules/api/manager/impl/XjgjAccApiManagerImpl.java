@@ -147,6 +147,21 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     /**
+     * 会员圈提解绑
+     *
+     * @param map
+     * @return
+    * */
+    public Map<String,Object> memberUnBindBOC(Map<String,Object> map) throws Exception{
+        String returnString = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_UNBIND_BOC), mapToJsonStr(map));
+        if(!returnString.isEmpty()){
+            return JacksonUtils.jsonToMap(returnString);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 会员圈提
      * @param map 发送的数据
      * @return 返回值

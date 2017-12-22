@@ -175,7 +175,7 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      * */
-    @RequestMapping("/")
+    @RequestMapping("/memberBindBOC")
     public ResultData memberBindBOC(@RequestBody Map<String,Object> params){
         try {
             Map<String,Object> mapResult = apiService.memberBindBOC(params);
@@ -187,6 +187,28 @@ public class AppController extends AbstractController {
         } catch (Exception e){
             logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
             return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        }
+    }
+
+    /**
+     * 会员圈提解绑
+     *
+     * @param
+     * @return
+     *
+    * */
+    @RequestMapping("/memberUnBindBOC")
+    public ResultData memberUnBindBOC(@RequestBody Map<String,Object> params){
+        try {
+            Map<String,Object> mapResult = apiService.memberUnBindBOC(params);
+            if(mapResult != null){
+                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+            } else{
+                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+            }
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
         }
     }
 

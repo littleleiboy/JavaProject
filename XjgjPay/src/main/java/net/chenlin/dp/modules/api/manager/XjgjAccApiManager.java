@@ -64,9 +64,18 @@ public interface XjgjAccApiManager {
     /**
      * 会员圈提绑定
      *
-     *
+     * @param map
+     * @return
     * */
     Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception;
+
+    /**
+     * 会员圈提解绑
+     *
+     * @param map
+     * @return
+    * */
+    Map<String,Object> memberUnBindBOC(Map<String,Object> map) throws Exception;
 
     /**
      * 会员圈提
