@@ -1,9 +1,11 @@
 package net.chenlin.dp.modules.api.service.impl;
 
 import net.chenlin.dp.common.constant.BaofooApiConstant;
+import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.common.utils.EncryptUtils;
 import net.chenlin.dp.common.utils.RSAUtils;
+import net.chenlin.dp.common.utils.SpringContextUtils;
 import net.chenlin.dp.modules.api.manager.BaofooApiManager;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +40,21 @@ public class BaofooApiServiceImpl implements BaofooApiService {
     @Value("${myprop.api.baofoo.pfx-pwd}")
     private String pfx_pwd;
 
+    @Value("${myprop.api.baofoo.pfx-name}")
+    private String pfx_name;
+
+//    @Value("${myprop.api.baofoo.cer-name}")
+//    private String cer_name;
+
     /**
      * 宝付支付接口调用
-     * @param pfxPath
-     * @param cerPath
+     *
      * @param map
      * @return
      * @throws Exception
      */
     @Override
-    public Map<String, Object> backTrans(String pfxPath, String cerPath, Map<String, String> map) throws Exception {
+    public Map<String, Object> backTrans(Map<String, String> map) throws Exception {
         if (map != null) {
             /*String pay_code = request.getParameter("pay_code");//银行卡编码
             String acc_no = request.getParameter("acc_no");//银行卡卡号
@@ -135,6 +142,10 @@ public class BaofooApiServiceImpl implements BaofooApiService {
 
             //String pfxpath = BaofooAction.getWebRoot() + "CER\\" + BaofooAction.getConstants().get("pfx.name");//商户私钥
             //String cerpath = BaofooAction.getWebRoot()+"CER\\"+BaofooAction.getConstants().get("cer.name");//宝付公钥
+
+            String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
+            String pfxPath = path + "\\" + pfx_name;//商户私钥
+            //String cerPath = path + "\\" + cer_name;//宝付公钥
 
             String base64str = EncryptUtils.Base64Encode(jsonOrXml);
             String data_content = RSAUtils.encryptByPriPfxFile(base64str, pfxPath, pfx_pwd);

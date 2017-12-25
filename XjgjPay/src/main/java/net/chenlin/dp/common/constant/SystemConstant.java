@@ -31,6 +31,11 @@ public class SystemConstant {
     public static final String ACCESS_TOKEN = "access_token";
 
     /**
+     * 秘钥文件目录名
+     */
+    public static final String KEY_FILE_ROOT="cer";
+
+    /**
      * 菜单类型
      *
      * @author ZhouChenglin

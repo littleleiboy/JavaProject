@@ -212,4 +212,9 @@ public class JacksonUtils {
         return string;
     }
 
+    public static <T> Map<String, Object> xmlToMap(String xmlStr)
+            throws Exception {
+        return xmlMapper.readValue(xmlStr, Map.class);
+    }
+
 }

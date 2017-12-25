@@ -5,7 +5,7 @@ import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
 import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.EncryptUtils;
-import net.chenlin.dp.common.utils.JacksonUtils;
+import net.chenlin.dp.modules.api.service.BaofooApiService;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
 import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.base.service.MemberBankcardService;
@@ -29,7 +29,10 @@ public class AppController extends AbstractController {
     private final static Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @Autowired
-    private XjgjAccApiService apiService;
+    private XjgjAccApiService xjgjService;
+
+    @Autowired
+    private BaofooApiService bfService;
 
     @Autowired
     private MemberInfoService memberInfoService;
@@ -99,7 +102,7 @@ public class AppController extends AbstractController {
                 Map<String, Object> param2 = new HashMap<>();
                 param2.put(XjgjAccApiConstant.FIELD_MEMBER_NO, memberNO);
                 param2.put(XjgjAccApiConstant.FIELD_PASSWORD, pass);
-                Map<String, Object> mapResult2 = apiService.checkMemberPassword(param2);
+                Map<String, Object> mapResult2 = xjgjService.checkMemberPassword(param2);
                 if (mapResult2 != null) {
                     Object result = mapResult2.get(XjgjAccApiConstant.FIELD_RESULT);
                     if (String.valueOf(result) == "1") {//会员账号验证通过
@@ -132,7 +135,7 @@ public class AppController extends AbstractController {
             String memberNO = "";
             Map<String, Object> param1 = new HashMap<>();
             param1.put(XjgjAccApiConstant.FIELD_MOBILE_NUM, mobileNum);
-            Map<String, Object> mapResult1 = apiService.getMemberBaseInfo(param1);
+            Map<String, Object> mapResult1 = xjgjService.getMemberBaseInfo(param1);
             if (mapResult1 != null) {
                 Object objMemberNO = mapResult1.get(XjgjAccApiConstant.FIELD_MEMBER_NO);
                 if (null != objMemberNO || !"".equals(objMemberNO)) {
@@ -148,7 +151,7 @@ public class AppController extends AbstractController {
             Map<String, Object> param2 = new HashMap<>();
             param2.put(XjgjAccApiConstant.FIELD_MEMBER_NO, memberNO);
             param2.put(XjgjAccApiConstant.FIELD_PASSWORD, pass);
-            Map<String, Object> mapResult2 = apiService.checkMemberPassword(param2);
+            Map<String, Object> mapResult2 = xjgjService.checkMemberPassword(param2);
             if (mapResult2 != null) {
                 Object result = mapResult2.get(XjgjAccApiConstant.FIELD_RESULT);
                 if (String.valueOf(result) == "1") {//会员账号验证通过
@@ -185,7 +188,7 @@ public class AppController extends AbstractController {
             String mobile = String.valueOf(objMobile);
             MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByMobile(mobile);
 
-            Map<String, Object> mapResult = apiService.getMemberBaseInfo(params);
+            Map<String, Object> mapResult = xjgjService.getMemberBaseInfo(params);
             if (mapResult != null) {
                 if (memberEntity != null) {//已经绑定APP
                     mapResult.put(MsgConstant.MSG_IS_APP_BOUND, true);
@@ -211,7 +214,7 @@ public class AppController extends AbstractController {
     @RequestMapping("/checkMemberPass")
     public ResultData checkMemberPassword(@RequestBody Map<String, Object> params) {
         try {
-            Map<String, Object> mapResult = apiService.checkMemberPassword(params);
+            Map<String, Object> mapResult = xjgjService.checkMemberPassword(params);
             if (mapResult != null) {
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
@@ -232,7 +235,7 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberAppBind")
     public ResultData memberAppBind(@RequestBody Map<String, Object> params) {
         try {
-            Map<String, Object> mapResult = apiService.memberAppBind(params);
+            Map<String, Object> mapResult = xjgjService.memberAppBind(params);
             return memberAppRegister(1, mapResult, params);
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
@@ -249,7 +252,7 @@ public class AppController extends AbstractController {
     @RequestMapping("/regMember")
     public ResultData regMember(@RequestBody Map<String, Object> params) {
         try {
-            Map<String, Object> mapResult = apiService.regMember(params);
+            Map<String, Object> mapResult = xjgjService.regMember(params);
             return memberAppRegister(0, mapResult, params);
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
@@ -365,24 +368,36 @@ public class AppController extends AbstractController {
         }
     }
 
+    //宝付预绑卡
+    @RequestMapping("/preBindBaofoo")
+    public ResultData preBindBaofoo(Map<String, String> params) {
+        try {
+            Map<String, Object> mapResult = bfService.backTrans(params);
+            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
     /**
      * 会员圈提绑定
      *
      * @param params
      * @return
-     * */
+     */
     @RequestMapping("/memberBindBOC")
-    public ResultData memberBindBOC(@RequestBody Map<String,Object> params){
+    public ResultData memberBindBOC(@RequestBody Map<String, Object> params) {
         try {
-            Map<String,Object> mapResult = apiService.memberBindBOC(params);
-            if(mapResult != null){
-                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+            Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
+            if (mapResult != null) {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
-                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+                return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
             }
-        } catch (Exception e){
-            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
-            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
 
@@ -391,20 +406,19 @@ public class AppController extends AbstractController {
      *
      * @param
      * @return
-     *
-    * */
+     */
     @RequestMapping("/memberUnBindBOC")
-    public ResultData memberUnBindBOC(@RequestBody Map<String,Object> params){
+    public ResultData memberUnBindBOC(@RequestBody Map<String, Object> params) {
         try {
-            Map<String,Object> mapResult = apiService.memberUnBindBOC(params);
-            if(mapResult != null){
-                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
-            } else{
-                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+            Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
+            if (mapResult != null) {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
             }
-        } catch (Exception e){
-            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
-            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
         }
     }
 
@@ -413,23 +427,23 @@ public class AppController extends AbstractController {
      *
      * @param params
      * @return
-     * */
+     */
     @RequestMapping("/memberWithDraw")
-    public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
+    public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
         //Object result = null;
         String accountBalancekey = "accountQty";
         String drawKey = "moneyQty";
         try {
-            Map<String,Object> map = apiService.memberWithDraw(params);
-            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
+            Map<String, Object> map = xjgjService.memberWithDraw(params);
+            Map<String, Object> momenyBalanceMap = xjgjService.searchMemberAccountBalance(params.get("memberNo").toString());
             //TODO 会员圈提之前先判断是否绑定银行卡
-            int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
-            int drawMoney = (int)params.get(drawKey);
-            if(accountBalance <= 0 && drawMoney > accountBalance){
+            int accountBalance = (int) momenyBalanceMap.get(accountBalancekey);
+            int drawMoney = (int) params.get(drawKey);
+            if (accountBalance <= 0 && drawMoney > accountBalance) {
                 return new ResultData("err", false, "账户余额不足！", "");
             }
-            return new ResultData("ok",true,"查询成功",map);
-        } catch (Exception e){
+            return new ResultData("ok", true, "查询成功", map);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
@@ -441,14 +455,13 @@ public class AppController extends AbstractController {
      *
      * @param param
      * @reutn
-     *
-     * */
+     */
     @RequestMapping("/searchMemberAccountBalance")
-    public ResultData searchMemberAccountBalance(@RequestBody String param){
+    public ResultData searchMemberAccountBalance(@RequestBody String param) {
         try {
-            Map<String,Object> mapResult = apiService.searchMemberAccountBalance(param);
-            return  new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
-        } catch (Exception e){
+            Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(param);
+            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
@@ -460,14 +473,13 @@ public class AppController extends AbstractController {
      *
      * @param map
      * @return
-     *
-     * */
+     */
     @RequestMapping("/searchMemberAccountChange")
-    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String,Object> map){
+    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String, Object> map) {
         try {
-            Map<String,Object> mapResult = apiService.searchMemberCostLog(map);
-            return  new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
-        } catch (Exception e){
+            Map<String, Object> mapResult = xjgjService.searchMemberCostLog(map);
+            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
