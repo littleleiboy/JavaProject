@@ -2,15 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="net.chenlin.dp.modules.base.dao.MemberBankcardMapper">
-	
-	<select id="listForPage" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
+
+    <select id="listForPage" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
 		SELECT
 			`id`, 
 			`bank_acc_name`, 
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`member_info_id`, 
+			`member_info_id`,
+			`is_recharge`,
+			`is_withdraw`,
 			`remark`, 
 			`gmt_create`, 
 			`gmt_modified`
@@ -19,14 +21,16 @@
 		ORDER BY
 			id DESC
 	</select>
-	
-	<insert id="save">
+
+    <insert id="save">
 		INSERT INTO member_bankcard (
 			`bank_acc_name`, 
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`member_info_id`, 
+			`member_info_id`,
+			`is_recharge`,
+			`is_withdraw`,
 			`remark`, 
 			`gmt_create`, 
 			`gmt_modified`
@@ -36,21 +40,25 @@
 			#{bankAccCard}, 
 			#{bankCode}, 
 			#{bfBindId}, 
-			#{memberInfoId}, 
+			#{memberInfoId},
+			#{isRecharge},
+			#{isWithdraw},
 			#{remark}, 
 			#{gmtCreate}, 
 			#{gmtModified}
 		)
 	</insert>
-	
-	<select id="getObjectById" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
+
+    <select id="getObjectById" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
 		SELECT
 			`id`, 
 			`bank_acc_name`, 
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`member_info_id`, 
+			`member_info_id`,
+			`is_recharge`,
+			`is_withdraw`,
 			`remark`, 
 			`gmt_create`, 
 			`gmt_modified`
@@ -59,32 +67,34 @@
 		WHERE
 			id = #{id}
 	</select>
-	
-	<update id="update">
-		UPDATE member_bankcard
-	 	<set>
-			<if test="bankAccName != null">`bank_acc_name` = #{bankAccName}, </if>
-			<if test="bankAccCard != null">`bank_acc_card` = #{bankAccCard}, </if>
-			<if test="bankCode != null">`bank_code` = #{bankCode}, </if>
-			<if test="bfBindId != null">`bf_bind_id` = #{bfBindId}, </if>
-			<if test="memberInfoId != null">`member_info_id` = #{memberInfoId}, </if>
-			<if test="remark != null">`remark` = #{remark}, </if>
-			<if test="gmtCreate != null">`gmt_create` = #{gmtCreate}, </if>
-			<if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
-		</set>
-		WHERE
-			id = #{id}
-	</update>
-	
-	<delete id="batchRemove">
-		DELETE
-		FROM
-			member_bankcard
-		WHERE
-			id IN
-		<foreach item="id" collection="array" open="(" separator="," close=")">
-			#{id}
-		</foreach>
-	</delete>
+
+    <update id="update">
+        UPDATE member_bankcard
+        <set>
+            <if test="bankAccName != null">`bank_acc_name` = #{bankAccName},</if>
+            <if test="bankAccCard != null">`bank_acc_card` = #{bankAccCard},</if>
+            <if test="bankCode != null">`bank_code` = #{bankCode},</if>
+            <if test="bfBindId != null">`bf_bind_id` = #{bfBindId},</if>
+            <if test="memberInfoId != null">`member_info_id` = #{memberInfoId},</if>
+            <if test="isRecharge != null">`is_recharge` = #{isRecharge},</if>
+            <if test="isWithdraw != null">`is_withdraw` = #{isWithdraw},</if>
+            <if test="remark != null">`remark` = #{remark},</if>
+            <if test="gmtCreate != null">`gmt_create` = #{gmtCreate},</if>
+            <if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="batchRemove">
+        DELETE
+        FROM
+        member_bankcard
+        WHERE
+        id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>
