@@ -15,7 +15,8 @@
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`remark`, 
+			`remark`,
+			`state`,
 			`gmt_create`
 		FROM
 			trade_log
@@ -34,7 +35,8 @@
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`remark`, 
+			`remark`,
+			`state`,
 			`gmt_create`
 		)
 		VALUES (
@@ -47,7 +49,8 @@
 			#{bankAccCard}, 
 			#{bankCode}, 
 			#{bfBindId}, 
-			#{remark}, 
+			#{remark},
+			#{state},
 			#{gmtCreate}
 		)
 	</insert>
@@ -64,7 +67,8 @@
 			`bank_acc_card`, 
 			`bank_code`, 
 			`bf_bind_id`, 
-			`remark`, 
+			`remark`,
+			`state`,
 			`gmt_create`
 		FROM
 			trade_log
@@ -85,6 +89,7 @@
 			<if test="bankCode != null">`bank_code` = #{bankCode}, </if>
 			<if test="bfBindId != null">`bf_bind_id` = #{bfBindId}, </if>
 			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="state != null">`state` = #{state}, </if>
 			<if test="gmtCreate != null">`gmt_create` = #{gmtCreate}</if>
 		</set>
 		WHERE

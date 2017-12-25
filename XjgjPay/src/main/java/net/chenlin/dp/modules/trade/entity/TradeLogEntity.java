@@ -72,6 +72,11 @@ public class TradeLogEntity implements Serializable {
 	 * 备注
 	 */
 	private String remark;
+
+	/**
+	 * 交易状态(1-成功；2-失败)
+	 */
+	private int state;
 	
 	/**
 	 * 交易时间
@@ -170,7 +175,15 @@ public class TradeLogEntity implements Serializable {
 	public String getRemark() {
 		return remark;
 	}
-	
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+
 	public void setGmtCreate(Date gmtCreate) {
 		this.gmtCreate = gmtCreate;
 	}
