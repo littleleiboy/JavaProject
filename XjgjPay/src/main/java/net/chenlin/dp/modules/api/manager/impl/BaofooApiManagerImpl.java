@@ -11,7 +11,7 @@ import java.util.Map;
 @Component("baofooApiManager")
 public class BaofooApiManagerImpl implements BaofooApiManager {
 
-    @Value("${myprop.api-baofoo-url}")
+    @Value("${myprop.api.baofoo.url}")
     private String apiUrl;
 
     /**

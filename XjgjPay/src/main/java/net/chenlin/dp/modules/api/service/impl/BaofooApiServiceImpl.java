@@ -20,22 +20,22 @@ public class BaofooApiServiceImpl implements BaofooApiService {
     @Autowired
     private BaofooApiManager apiManager;
 
-    @Value("${myprop.baofoo.version}")
+    @Value("${myprop.api.baofoo.version}")
     private String version;
 
-    @Value("${myprop.baofoo.member-id}")
+    @Value("${myprop.api.baofoo.member-id}")
     private String member_id;
 
-    @Value("${myprop.baofoo.terminal-id}")
+    @Value("${myprop.api.baofoo.terminal-id}")
     private String terminal_id;
 
-    @Value("${myprop.baofoo.data-type}")
+    @Value("${myprop.api.baofoo.data-type}")
     private String data_type;
 
-    @Value("${myprop.baofoo.biz-type}")
+    @Value("${myprop.api.baofoo.biz-type}")
     private String biz_type;
 
-    @Value("${myprop.baofoo.pfx-pwd}")
+    @Value("${myprop.api.baofoo.pfx-pwd}")
     private String pfx_pwd;
 
     /**
