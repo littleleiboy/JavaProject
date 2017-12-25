@@ -365,48 +365,112 @@ public class AppController extends AbstractController {
         }
     }
 
+    /**
+     * 会员圈提绑定
+     *
+     * @param params
+     * @return
+     * */
+    @RequestMapping("/memberBindBOC")
+    public ResultData memberBindBOC(@RequestBody Map<String,Object> params){
+        try {
+            Map<String,Object> mapResult = apiService.memberBindBOC(params);
+            if(mapResult != null){
+                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+            } else {
+                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+            }
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        }
+    }
+
+    /**
+     * 会员圈提解绑
+     *
+     * @param
+     * @return
+     *
+    * */
+    @RequestMapping("/memberUnBindBOC")
+    public ResultData memberUnBindBOC(@RequestBody Map<String,Object> params){
+        try {
+            Map<String,Object> mapResult = apiService.memberUnBindBOC(params);
+            if(mapResult != null){
+                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+            } else{
+                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+            }
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+        }
+    }
+
+    /**
+     * 会员圈提
+     *
+     * @param params
+     * @return
+     * */
     @RequestMapping("/memberWithDraw")
-    public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
-        Object result = null;
+    public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
+        //Object result = null;
         String accountBalancekey = "accountQty";
         String drawKey = "moneyQty";
         try {
-            Map<String, Object> map = apiService.memberWithDraw(params);
-            Map<String, Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
-            result = JacksonUtils.mapToBean(map, MemberInfoEntity.class);
-            int accountBalance = (int) momenyBalanceMap.get(accountBalancekey);
-            int drawMoney = (int) params.get(drawKey);
-            if (accountBalance <= 0 && drawMoney > accountBalance) {
+            Map<String,Object> map = apiService.memberWithDraw(params);
+            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
+            //TODO 会员圈提之前先判断是否绑定银行卡
+            int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
+            int drawMoney = (int)params.get(drawKey);
+            if(accountBalance <= 0 && drawMoney > accountBalance){
                 return new ResultData("err", false, "账户余额不足！", "");
             }
-        } catch (Exception e) {
+            return new ResultData("ok",true,"查询成功",map);
+        } catch (Exception e){
             e.printStackTrace();
+            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
-        return new ResultData("ok", true, "查询成功", result);
+
     }
 
+    /**
+     * 查询账户余额
+     *
+     * @param param
+     * @reutn
+     *
+     * */
     @RequestMapping("/searchMemberAccountBalance")
-    public ResultData searchMemberAccountBalance(@RequestBody String param) {
-        Object result = null;
+    public ResultData searchMemberAccountBalance(@RequestBody String param){
         try {
-            Map<String, Object> mapResult = apiService.searchMemberAccountBalance(param);
-            result = JacksonUtils.mapToBean(mapResult, MemberInfoEntity.class);
-        } catch (Exception e) {
+            Map<String,Object> mapResult = apiService.searchMemberAccountBalance(param);
+            return  new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+        } catch (Exception e){
             e.printStackTrace();
+            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
-        return new ResultData("ok", true, "查询成功", result);
     }
 
+
+    /**
+     * 查询一段时间账户余额变动
+     *
+     * @param map
+     * @return
+     *
+     * */
     @RequestMapping("/searchMemberAccountChange")
-    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String, Object> map) {
-        Object result = null;
+    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String,Object> map){
         try {
-            Map<String, Object> mapResult = apiService.searchMemberCostLog(map);
-            result = JacksonUtils.mapToBean(mapResult, MemberInfoEntity.class);
-        } catch (Exception e) {
+            Map<String,Object> mapResult = apiService.searchMemberCostLog(map);
+            return  new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+        } catch (Exception e){
             e.printStackTrace();
+            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
-        return new ResultData("ok", true, "查询成功", result);
     }
 
 }

@@ -41,6 +41,23 @@ public interface XjgjAccApiService {
     Map<String, Object> regMember(Map<String, Object> map) throws Exception;
 
     /**
+     * 会员圈提绑定
+     *
+     * @param
+     * @return
+     *
+    * */
+    Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception;
+
+    /**
+     * 会员圈提解绑
+     *
+     * @param map
+     * @return
+    * */
+    Map<String,Object> memberUnBindBOC(Map<String,Object> map) throws Exception;
+
+    /**
      * 会员圈提
      * @param map
      * @return

@@ -37,20 +37,30 @@ public class XjgjAccApiConstant {
     public static final String METHOD_RECHARGE_RETRY = "memberQCRetryRequest";
 
     /**
+     * 会员圈提绑定
+    * */
+    public static final String METHOD_MEMBER_BIND_BOC = "memberBankBindRequest";
+
+    /**
+     * 会员圈提解绑
+    * */
+    public static final String METHOD_MEMBER_UNBIND_BOC = "memberBankUnBindRequest";
+
+    /**
      * 方法名常量，会员圈提
      */
-    public static final String METHOD_MEMBER_WITH_DRAW = "https://mail.shxjgj.com:443/app/memberQTRequest";
+    public static final String METHOD_MEMBER_WITH_DRAW = "memberQTRequest";
 
 
     /**
      * 账户余额查询
      */
-    public static final String SEARCH_MEMBER_ACCOUNT_BALANCE = "https://mail.shxjgj.com:443/app/memberAccountSearchRequest";
+    public static final String SEARCH_MEMBER_ACCOUNT_BALANCE = "memberAccountSearchRequest";
 
     /**
      * 方法名常量 查询一段时间内账户余额变动
      */
-    public static final String SEARCH_MEMBER_COST_LOG = "https://mail.shxjgj.com:443/app/memberCostLogRequest";
+    public static final String SEARCH_MEMBER_COST_LOG = "memberCostLogRequest";
 
     public static final String FIELD_KEY_STR = "keyStr";
     public static final String FIELD_MESSAGE = "message";

@@ -62,6 +62,29 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
     }
 
     /**
+     * 会员圈提绑定
+     *
+     * @param map
+     * @return
+     *
+    * */
+    @Override
+    public Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception{
+        return apiManager.memberBindBOC(map);
+    }
+
+    /**
+     * 会员圈提解绑
+     *
+     * @param map
+     * @return
+    * */
+    @Override
+    public Map<String,Object> memberUnBindBOC(Map<String, Object> map) throws Exception{
+        return apiManager.memberBindBOC(map);
+    }
+
+    /**
      * 会员圈提
      * 2017-12-15
      * @param map
