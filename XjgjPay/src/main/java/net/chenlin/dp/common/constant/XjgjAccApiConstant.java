@@ -27,6 +27,11 @@ public class XjgjAccApiConstant {
     public static final String METHOD_MEMBER_PASSWORD_CHECK = "memberPasswordCheckRequest";
 
     /**
+     * 圈存绑定
+     * */
+    public static final String METHOD_RECHARGE_BIND = "reChargeBind";
+
+    /**
      * 会员圈存（充值）结算
      */
     public static final String METHOD_RECHARGE = "memberQCRequest";

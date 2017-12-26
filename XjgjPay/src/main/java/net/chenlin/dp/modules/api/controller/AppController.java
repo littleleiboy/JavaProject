@@ -1,6 +1,5 @@
 package net.chenlin.dp.modules.api.controller;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import net.chenlin.dp.common.constant.BaofooApiConstant;
 import net.chenlin.dp.common.constant.MsgConstant;
 import net.chenlin.dp.common.constant.SystemConstant;
@@ -18,15 +17,14 @@ import net.chenlin.dp.modules.sys.controller.AbstractController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.backoff.BackOff;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/app")
@@ -521,6 +519,48 @@ public class AppController extends AbstractController {
     }
 
     /**
+     * 会员圈存（充值）
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/reCharge")
+    public ResultData reCharge(@RequestBody Map<String, Object> params) {
+        try {
+            //TODO 调用宝付接口进行圈存
+
+
+            Map<String, Object> mapResult = xjgjService.recharge(params);
+            if (mapResult != null) {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_recharge_isnull", false, "圈存接口获取信息出错！");
+            }
+
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+        }
+    }
+
+    /**
+     * 会员圈存(充值)失败重试
+     *
+     * @param params
+     * @return 返回结果
+     */
+    @RequestMapping("/retryCharge")
+    public ResultData retryCharge(@RequestBody Map<String, Object> params) {
+        try {
+            Map<String, Object> mapResult = xjgjService.retryRecharge(params);
+            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+        }
+    }
+
+    /**
      * 会员圈提绑定
      *
      * @param params
@@ -529,11 +569,41 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberBindBOC")
     public ResultData memberBindBOC(@RequestBody Map<String, Object> params) {
         try {
-            Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
-            if (mapResult != null) {
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            if (params != null) {
+                Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
+                if (null == memberName || "".equals(memberName)) {
+                    return new ResultData("err_memberName_isnull", false, "会员姓名不能为空！");
+                }
+                Object memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
+                if (null == memberNo || "".equals(memberNo)) {
+                    return new ResultData("err_memberNo_isnull", false, "会员账号不能为空！");
+                }
+                Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//开户姓名
+                if (null == bankName || "".equals(bankName)) {
+                    return new ResultData("err_bankName_isnull", false, "开户姓名不能为空！");
+                }
+                Object idCard = params.get(XjgjAccApiConstant.FIELD_ID_CARD);//身份证号
+                if (null == idCard || "".equals(idCard)) {
+                    return new ResultData("err_idCard_isnull", false, "开户身份证号不能为空！");
+                }
+                Object bankAccountNo = params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);//手机号
+                if (null == bankAccountNo || "".equals(bankAccountNo)) {
+                    return new ResultData("err_bankAccountNo_isnull", false, "中国银行卡号不能为空！");
+                }
+                Object pass = params.get(XjgjAccApiConstant.FIELD_PASSWORD);//会员密码
+                if (null == pass || "".equals(pass)) {
+                    return new ResultData("err_password_isnull", false, "会员密码不能为空！");
+                } else if (!Pattern.matches("^[0-9]{6}", String.valueOf(pass))) {
+                    return new ResultData("err_password_pattern", false, "主卡密码须是6位数字组成");
+                }
+                Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
+                if (mapResult != null) {
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
+                }
             } else {
-                return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
+                return new ResultData("err_no_params", false, "请求参数不能为空！", "");
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
@@ -544,7 +614,7 @@ public class AppController extends AbstractController {
     /**
      * 会员圈提解绑
      *
-     * @param
+     * @param params
      * @return
      */
     @RequestMapping("/memberUnBindBOC")
@@ -570,24 +640,44 @@ public class AppController extends AbstractController {
      */
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
-        //Object result = null;
-        String accountBalancekey = "accountQty";
-        String drawKey = "moneyQty";
         try {
-            Map<String, Object> map = xjgjService.memberWithDraw(params);
-            Map<String, Object> momenyBalanceMap = xjgjService.searchMemberAccountBalance(params.get("memberNo").toString());
-            //TODO 会员圈提之前先判断是否绑定银行卡
-            int accountBalance = (int) momenyBalanceMap.get(accountBalancekey);
-            int drawMoney = (int) params.get(drawKey);
-            if (accountBalance <= 0 && drawMoney > accountBalance) {
-                return new ResultData("err", false, "账户余额不足！", "");
+            if (params != null) {
+                Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//银行名称
+                if (null == bankName || "BOC".equals(bankName)) {
+                    return new ResultData("err_no_bind", false, "圈提之前要先绑定中国银行的银行卡！");
+                }
+                Object drawMoneyQty = params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                if (null == drawMoneyQty || "".equals(drawMoneyQty)) {
+                    return new ResultData("err_moneyQty_isnull", false, "圈提金额不能为空！");
+                }
+                Map<String, Object> map = xjgjService.memberWithDraw(params);
+                Object momenyBalanceMap = xjgjService.searchMemberAccountBalance(XjgjAccApiConstant.FIELD_MEMBER_NO);//查询剩余金额
+                Object isBind = xjgjService.memberBindBOC(params).get(XjgjAccApiConstant.FIELD_BIND_ID);//判断是否绑定成功
+                if (map != null) {
+                    if (momenyBalanceMap != null) {
+                        if (isBind != null) {
+                            float accountBalance = Float.parseFloat(momenyBalanceMap.toString());
+                            float drawMoney = (float) params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                            if (accountBalance <= 0f && drawMoney > accountBalance) {
+                                return new ResultData("err", false, "账户余额不足！", "");
+                            }
+                            return new ResultData("ok", true, "查询成功", map);
+                        } else {
+                            return new ResultData("err_noBind", false, "圈提没有绑定中国银行银行卡，请先绑定！", "");
+                        }
+                    } else {
+                        return new ResultData("err_search_failed", false, "查询余额失败", "");
+                    }
+                } else {
+                    return new ResultData("err_no_response", false, "圈提请求没有响应", "");
+                }
+            } else {
+                return new ResultData("err_params_isnull", false, "请求参数不能为空！", "");
             }
-            return new ResultData("ok", true, "查询成功", map);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
-
     }
 
     /**
@@ -606,7 +696,6 @@ public class AppController extends AbstractController {
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
-
 
     /**
      * 查询一段时间账户余额变动
