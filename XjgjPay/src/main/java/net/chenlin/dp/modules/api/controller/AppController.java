@@ -366,6 +366,73 @@ public class AppController extends AbstractController {
     }
 
     /**
+     * 圈存绑定（绑定宝付通）
+     *
+     * @param params
+     * @return
+     * */
+    @RequestMapping("/bindBaoFuTongBeforeReCharge")
+    public ResultData bindBaoFuTongBeforeReCharge(Map<String,Object> params){
+        try {
+            Map<String,Object> mapResult = apiService.bindBaoFuTongBeforeReCharge(params);
+            return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        }
+    }
+
+    /**
+     * 会员圈存（充值）
+     *
+     * @param params
+     * @return
+     * */
+    @RequestMapping("/reCharge")
+    public ResultData reCharge(@RequestBody Map<String,Object> params){
+        try {
+            if(params != null) {
+                Object bindResult = apiService.bindBaoFuTongBeforeReCharge(params).get(XjgjAccApiConstant.FIELD_BIND_ID);
+                if(bindResult != null){
+                    Map<String, Object> mapResult = apiService.recharge(params);
+                    if(mapResult != null){
+                        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    }else {
+                        return new ResultData("err_recharge_isnull", false, "圈存接口获取信息出错！");
+                    }
+                }else{
+                    return new ResultData("err_noBind", false, "圈存未绑定，请先绑定再圈存");
+                }
+            } else{
+                return new ResultData("err_param_isnull", false, "调用宝付通接口失败！");
+            }
+
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        }
+    }
+
+    /**
+     * 会员圈存(充值)失败重试
+     *
+     * @param params
+     * @return 返回结果
+     *
+     * */
+    @RequestMapping("/retryCharge")
+    public ResultData retryCharge(Map<String,Object> params){
+        try{
+            Map<String,Object> mapResult = apiService.retryRecharge(params);
+            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
+            return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED+e.getMessage(),"");
+        }
+    }
+
+
+    /**
      * 会员圈提绑定
      *
      * @param params
@@ -389,7 +456,7 @@ public class AppController extends AbstractController {
     /**
      * 会员圈提解绑
      *
-     * @param
+     * @param params
      * @return
      *
     * */
@@ -416,19 +483,20 @@ public class AppController extends AbstractController {
      * */
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
-        //Object result = null;
-        String accountBalancekey = "accountQty";
-        String drawKey = "moneyQty";
         try {
             Map<String,Object> map = apiService.memberWithDraw(params);
-            Map<String,Object> momenyBalanceMap = apiService.searchMemberAccountBalance(params.get("memberNo").toString());
-            //TODO 会员圈提之前先判断是否绑定银行卡
-            int accountBalance = (int)momenyBalanceMap.get(accountBalancekey);
-            int drawMoney = (int)params.get(drawKey);
-            if(accountBalance <= 0 && drawMoney > accountBalance){
-                return new ResultData("err", false, "账户余额不足！", "");
+            Object momenyBalanceMap = apiService.searchMemberAccountBalance(XjgjAccApiConstant.FIELD_MEMBER_NO);
+            Object isBind = apiService.memberBindBOC(params).get(XjgjAccApiConstant.FIELD_BIND_ID);
+            if(isBind != null) {
+                float accountBalance = Float.parseFloat(momenyBalanceMap.toString());
+                float drawMoney = (float) params.get(XjgjAccApiConstant.FIELD_MONEY);
+                if (accountBalance <= 0f && drawMoney > accountBalance) {
+                    return new ResultData("err", false, "账户余额不足！", "");
+                }
+                return new ResultData("ok", true, "查询成功", map);
+            }else {
+                return new ResultData("err_noBind", false, "圈提没有绑定银行卡", "");
             }
-            return new ResultData("ok",true,"查询成功",map);
         } catch (Exception e){
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
