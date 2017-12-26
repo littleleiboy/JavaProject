@@ -106,22 +106,6 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     /**
-     * 圈存绑定（宝付通）
-     *
-     * @param map
-     * @return 返回结果
-     * @throws Exception
-     * */
-    @Override
-    public Map<String, Object> bindBaoFuTongBeforeReCharge(Map<String, Object> map) throws Exception{
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_BIND), mapToJsonStr(map));
-        if (!r.isEmpty())
-            return JacksonUtils.jsonToMap(r);
-        else
-            return null;
-    }
-
-    /**
      * 会员圈存(充值)
      *
      * @param map 发送数据

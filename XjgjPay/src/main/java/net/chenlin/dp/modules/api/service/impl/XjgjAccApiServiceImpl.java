@@ -62,18 +62,6 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
     }
 
     /**
-     * 圈存绑定（宝付通）
-     *
-     * @param map
-     * @return 返回结果
-     * @throws Exception
-     * */
-    @Override
-    public Map<String, Object> bindBaoFuTongBeforeReCharge(Map<String, Object> map) throws Exception{
-        return apiManager.bindBaoFuTongBeforeReCharge(map);
-    }
-
-    /**
      * 会员圈存（充值）
      *
      * @param map

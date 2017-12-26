@@ -6,6 +6,7 @@ import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
 import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.EncryptUtils;
+import net.chenlin.dp.common.utils.IPUtils;
 import net.chenlin.dp.common.utils.OrderNumberUtils;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -444,12 +447,12 @@ public class AppController extends AbstractController {
             //宝付确认绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmBinding.getValue());
 
-            Object memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
+            String memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
             if (null == memberNO || "".equals(memberNO)) {
                 return new ResultData("err_memberNO_isnull", false, "会员账号不能为空！");
             }
 
-            Object bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
+            String bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
             if (null == bankCardID || "".equals(bankCardID)) {
                 return new ResultData("err_acc_no_isnull", false, "请求绑定的银行卡号不能为空！");
             }
@@ -476,7 +479,7 @@ public class AppController extends AbstractController {
                     Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
                     if (null != bindId || !"".equals(bindId)) {
                         //保存会员绑定宝付信息
-                        MemberBankcardEntity mbank = memberBankService.getBankcardByCardID(String.valueOf(bankCardID));
+                        MemberBankcardEntity mbank = memberBankService.getBankcardByCardID(bankCardID);
                         Boolean isNew = false;
                         if (mbank != null) {
                             //更新会员的宝付绑定银行卡信息
@@ -496,7 +499,7 @@ public class AppController extends AbstractController {
                         mbank.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
                         mbank.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
 
-                        MemberInfoEntity member = memberInfoService.getMemberInfoByNO(String.valueOf(memberNO));
+                        MemberInfoEntity member = memberInfoService.getMemberInfoByNO(memberNO);
                         if (member != null)
                             mbank.setMemberInfoId(member.getId());
 
@@ -519,7 +522,45 @@ public class AppController extends AbstractController {
     }
 
     /**
-     * 会员圈存（充值）
+     * 圈存（充值）预交易
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/preReCharge")
+    public ResultData preReCharge(HttpServletRequest request, @RequestBody Map<String, String> params) {
+        try {
+            //宝付认证支付类预支付交易
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.preparePay.getValue());
+
+            String txn_amt = params.get(BaofooApiConstant.FIELD_TXN_AMT);//以元为单位的支付金额
+            if (null == txn_amt || "".equals(txn_amt)) {
+                return new ResultData("err_txn_amt_isnull", false, "交易金额不能为空！");
+            }
+            String bind_id = params.get(BaofooApiConstant.FIELD_BIND_ID);//绑定标识
+            if (null == bind_id || "".equals(bind_id)) {
+                return new ResultData("err_bind_id_isnull", false, "绑定标识号不能为空！");
+            }
+
+            BigDecimal txn_amt_num = new BigDecimal(String.valueOf(txn_amt)).multiply(BigDecimal.valueOf(100));//金额转换成分
+            params.put(BaofooApiConstant.FIELD_TXN_AMT, String.valueOf(txn_amt_num.setScale(0)));//以分为单位的支付金额
+            params.put(BaofooApiConstant.FIELD_CLIENT_IP, IPUtils.getIpAddr(request));
+
+            //调用宝付接口
+            Map<String, Object> mapResult = bfService.backTrans(params);
+            if (mapResult != null) {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
+    /**
+     * 确认圈存（充值）交易
      *
      * @param params
      * @return
@@ -528,7 +569,8 @@ public class AppController extends AbstractController {
     public ResultData reCharge(@RequestBody Map<String, Object> params) {
         try {
             //TODO 调用宝付接口进行圈存
-
+            //宝付认证支付类确认支付交易
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmPay.getValue());
 
             Map<String, Object> mapResult = xjgjService.recharge(params);
             if (mapResult != null) {

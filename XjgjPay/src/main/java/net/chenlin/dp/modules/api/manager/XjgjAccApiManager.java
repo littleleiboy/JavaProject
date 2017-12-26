@@ -44,15 +44,6 @@ public interface XjgjAccApiManager {
     Map<String, Object> regMember(Map<String, Object> map) throws Exception;
 
     /**
-     * 圈存绑定（宝付通）
-     *
-     * @param map
-     * @return 返回结果
-     * @throws Exception
-     * */
-    Map<String,Object> bindBaoFuTongBeforeReCharge(Map<String, Object> map) throws Exception;
-
-    /**
      * 会员圈存(充值)
      *
      * @param map 发送数据
