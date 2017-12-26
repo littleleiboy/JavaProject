@@ -7,6 +7,7 @@ import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.EncryptUtils;
 import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
+import net.chenlin.dp.modules.base.entity.MemberBankcardEntity;
 import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.base.service.MemberBankcardService;
 import net.chenlin.dp.modules.base.service.MemberInfoService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/app")
@@ -373,6 +375,7 @@ public class AppController extends AbstractController {
      * */
     @RequestMapping("/bindBaoFuTongBeforeReCharge")
     public ResultData bindBaoFuTongBeforeReCharge(Map<String,Object> params){
+
         try {
             Map<String,Object> mapResult = apiService.bindBaoFuTongBeforeReCharge(params);
             return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
@@ -441,11 +444,41 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberBindBOC")
     public ResultData memberBindBOC(@RequestBody Map<String,Object> params){
         try {
-            Map<String,Object> mapResult = apiService.memberBindBOC(params);
-            if(mapResult != null){
-                return new ResultData("ok",true,MsgConstant.MSG_OPERATION_SUCCESS,mapResult);
-            } else {
-                return new ResultData("err",false,MsgConstant.MSG_OPERATION_FAILED,"");
+            if(params != null) {
+                Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
+                if (null == memberName || "".equals(memberName)) {
+                    return new ResultData("err_memberName_isnull", false, "会员姓名不能为空！");
+                }
+                Object memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
+                if (null == memberNo || "".equals(memberNo)) {
+                    return new ResultData("err_memberNo_isnull", false, "会员账号不能为空！");
+                }
+                Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//开户姓名
+                if (null == bankName || "".equals(bankName)) {
+                    return new ResultData("err_bankName_isnull", false, "开户姓名不能为空！");
+                }
+                Object idCard = params.get(XjgjAccApiConstant.FIELD_ID_CARD);//身份证号
+                if (null == idCard || "".equals(idCard)) {
+                    return new ResultData("err_idCard_isnull", false, "开户身份证号不能为空！");
+                }
+                Object bankAccountNo = params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);//手机号
+                if (null == bankAccountNo || "".equals(bankAccountNo)) {
+                    return new ResultData("err_bankAccountNo_isnull", false, "中国银行卡号不能为空！");
+                }
+                Object pass = params.get(XjgjAccApiConstant.FIELD_PASSWORD);//会员密码
+                if (null == pass || "".equals(pass)) {
+                    return new ResultData("err_password_isnull", false, "会员密码不能为空！");
+                }else if(!Pattern.matches("^[0-9]{6}",String.valueOf(pass))){
+                    return new ResultData("err_password_pattern", false, "主卡密码须是6位数字组成");
+                }
+                Map<String, Object> mapResult = apiService.memberBindBOC(params);
+                if (mapResult != null) {
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
+                }
+            } else{
+                return new ResultData("err_no_params", false, "请求参数不能为空！", "");
             }
         } catch (Exception e){
             logger.error(MsgConstant.MSG_OPERATION_FAILED,e);
@@ -484,18 +517,38 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String,Object> params){
         try {
-            Map<String,Object> map = apiService.memberWithDraw(params);
-            Object momenyBalanceMap = apiService.searchMemberAccountBalance(XjgjAccApiConstant.FIELD_MEMBER_NO);
-            Object isBind = apiService.memberBindBOC(params).get(XjgjAccApiConstant.FIELD_BIND_ID);
-            if(isBind != null) {
-                float accountBalance = Float.parseFloat(momenyBalanceMap.toString());
-                float drawMoney = (float) params.get(XjgjAccApiConstant.FIELD_MONEY);
-                if (accountBalance <= 0f && drawMoney > accountBalance) {
-                    return new ResultData("err", false, "账户余额不足！", "");
+            if(params != null) {
+                Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//银行名称
+                if (null == bankName || "BOC".equals(bankName)) {
+                    return new ResultData("err_no_bind", false, "圈提之前要先绑定中国银行的银行卡！");
                 }
-                return new ResultData("ok", true, "查询成功", map);
-            }else {
-                return new ResultData("err_noBind", false, "圈提没有绑定银行卡", "");
+                Object drawMoneyQty = params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                if (null == drawMoneyQty || "".equals(drawMoneyQty)) {
+                    return new ResultData("err_moneyQty_isnull", false, "圈提金额不能为空！");
+                }
+                Map<String, Object> map = apiService.memberWithDraw(params);
+                Object momenyBalanceMap = apiService.searchMemberAccountBalance(XjgjAccApiConstant.FIELD_MEMBER_NO);//查询剩余金额
+                Object isBind = apiService.memberBindBOC(params).get(XjgjAccApiConstant.FIELD_BIND_ID);//判断是否绑定成功
+                if(map != null) {
+                    if(momenyBalanceMap != null) {
+                        if (isBind != null) {
+                            float accountBalance = Float.parseFloat(momenyBalanceMap.toString());
+                            float drawMoney = (float) params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                            if (accountBalance <= 0f && drawMoney > accountBalance) {
+                                return new ResultData("err", false, "账户余额不足！", "");
+                            }
+                            return new ResultData("ok", true, "查询成功", map);
+                        } else {
+                            return new ResultData("err_noBind", false, "圈提没有绑定中国银行银行卡，请先绑定！", "");
+                        }
+                    } else {
+                        return new ResultData("err_search_failed", false, "查询余额失败", "");
+                    }
+                } else {
+                    return new ResultData("err_no_response", false, "圈提请求没有响应", "");
+                }
+            } else{
+                return new ResultData("err_params_isnull", false, "请求参数不能为空！", "");
             }
         } catch (Exception e){
             e.printStackTrace();
