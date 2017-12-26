@@ -8,16 +8,22 @@ import net.chenlin.dp.common.utils.RSAUtils;
 import net.chenlin.dp.common.utils.SpringContextUtils;
 import net.chenlin.dp.modules.api.manager.BaofooApiManager;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service("baofooApiService")
 public class BaofooApiServiceImpl implements BaofooApiService {
+
+    private final static Logger logger = LoggerFactory.getLogger(BaofooApiServiceImpl.class);
 
     @Autowired
     private BaofooApiManager apiManager;
@@ -43,8 +49,8 @@ public class BaofooApiServiceImpl implements BaofooApiService {
     @Value("${myprop.api.baofoo.pfx-name}")
     private String pfx_name;
 
-//    @Value("${myprop.api.baofoo.cer-name}")
-//    private String cer_name;
+    @Value("${myprop.api.baofoo.cer-name}")
+    private String cer_name;
 
     /**
      * 宝付支付接口调用
@@ -56,13 +62,6 @@ public class BaofooApiServiceImpl implements BaofooApiService {
     @Override
     public Map<String, Object> backTrans(Map<String, String> map) throws Exception {
         if (map != null) {
-            /*String pay_code = request.getParameter("pay_code");//银行卡编码
-            String acc_no = request.getParameter("acc_no");//银行卡卡号
-            String id_card = request.getParameter("id_card");//身份证号码
-            String id_holder = request.getParameter("id_holder");//姓名
-            String mobile = request.getParameter("mobile");//银行预留手机号
-            String trans_id = request.getParameter("trans_id");	//商户订单号*/
-
             String txn_sub_type = map.get(BaofooApiConstant.FIELD_TXN_SUB_TYPE);
 
             Map<String, String> param = new HashMap<>();
@@ -82,7 +81,10 @@ public class BaofooApiServiceImpl implements BaofooApiService {
             data.put(BaofooApiConstant.FIELD_MEMBER_ID, member_id);
             //data.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, "TISN" + System.currentTimeMillis());
             data.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, map.get(BaofooApiConstant.FIELD_TRANS_SERIAL_NO));
-            data.put(BaofooApiConstant.FIELD_TRADE_DATE, map.get(BaofooApiConstant.FIELD_TRADE_DATE));
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            data.put(BaofooApiConstant.FIELD_TRADE_DATE, formatter.format(new Date()));//订单日期
+
             data.put(BaofooApiConstant.FIELD_ADDITIONAL_INFO, map.get(BaofooApiConstant.FIELD_ADDITIONAL_INFO));
             data.put(BaofooApiConstant.FIELD_REQ_RESERVED, map.get(BaofooApiConstant.FIELD_REQ_RESERVED));
 
@@ -91,13 +93,13 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                     data.put(BaofooApiConstant.FIELD_ACC_NO, map.get(BaofooApiConstant.FIELD_ACC_NO));//绑定卡号
                     data.put(BaofooApiConstant.FIELD_TRANS_ID, map.get(BaofooApiConstant.FIELD_TRANS_ID));//商户订单号
                     data.put(BaofooApiConstant.FIELD_ID_CARD_TYPE, map.get(BaofooApiConstant.FIELD_ID_CARD_TYPE));//证件类型固定01（身份证）
-                    data.put(BaofooApiConstant.FIELD_ID_CARD, map.get(BaofooApiConstant.FIELD_ID_CARD));
-                    data.put(BaofooApiConstant.FIELD_ID_HOLDER, map.get(BaofooApiConstant.FIELD_ID_HOLDER));
-                    data.put(BaofooApiConstant.FIELD_MOBILE, map.get(BaofooApiConstant.FIELD_MOBILE));
-                    data.put(BaofooApiConstant.FIELD_ACC_PWD, map.get(BaofooApiConstant.FIELD_ACC_PWD));
-                    data.put(BaofooApiConstant.FIELD_VALID_DATE, map.get(BaofooApiConstant.FIELD_VALID_DATE));
-                    data.put(BaofooApiConstant.FIELD_VALID_NO, map.get(BaofooApiConstant.FIELD_VALID_NO));
-                    data.put(BaofooApiConstant.FIELD_PAY_CODE, map.get(BaofooApiConstant.FIELD_PAY_CODE));
+                    data.put(BaofooApiConstant.FIELD_ID_CARD, map.get(BaofooApiConstant.FIELD_ID_CARD));//身份证号
+                    data.put(BaofooApiConstant.FIELD_ID_HOLDER, map.get(BaofooApiConstant.FIELD_ID_HOLDER));//持卡人姓名
+                    data.put(BaofooApiConstant.FIELD_MOBILE, map.get(BaofooApiConstant.FIELD_MOBILE));//银行卡绑定手机号
+                    //data.put(BaofooApiConstant.FIELD_ACC_PWD, map.get(BaofooApiConstant.FIELD_ACC_PWD));
+                    data.put(BaofooApiConstant.FIELD_VALID_DATE, map.get(BaofooApiConstant.FIELD_VALID_DATE));//卡有效期
+                    data.put(BaofooApiConstant.FIELD_VALID_NO, map.get(BaofooApiConstant.FIELD_VALID_NO));//卡安全码(银行卡背后最后三位数字)
+                    data.put(BaofooApiConstant.FIELD_PAY_CODE, map.get(BaofooApiConstant.FIELD_PAY_CODE));//银行卡编码
                     break;
                 case confirmBinding:
                     data.put(BaofooApiConstant.FIELD_SMS_CODE, map.get(BaofooApiConstant.FIELD_SMS_CODE));////短信验证码
@@ -140,20 +142,37 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                 jsonOrXml = JacksonUtils.beanToXml(dataContent);
             }
 
-            //String pfxpath = BaofooAction.getWebRoot() + "CER\\" + BaofooAction.getConstants().get("pfx.name");//商户私钥
-            //String cerpath = BaofooAction.getWebRoot()+"CER\\"+BaofooAction.getConstants().get("cer.name");//宝付公钥
-
             String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
             String pfxPath = path + "\\" + pfx_name;//商户私钥
-            //String cerPath = path + "\\" + cer_name;//宝付公钥
+            String cerPath = path + "\\" + cer_name;//宝付公钥
 
             String base64str = EncryptUtils.Base64Encode(jsonOrXml);
             String data_content = RSAUtils.encryptByPriPfxFile(base64str, pfxPath, pfx_pwd);
-            param.put("data_content", data_content);
+            param.put(BaofooApiConstant.FIELD_DATA_CONTENT, data_content);
 
-            return apiManager.backTrans(map);
+            //请求宝付接口方法
+            String r = apiManager.backTrans(map);
+            if (!r.isEmpty()) {
+                r = RSAUtils.decryptByPubCerFile(r, cerPath);
+                if (r.isEmpty()) {//判断解密是否正确。如果为空则宝付公钥不正确
+                    logger.info("宝付解密公钥不正确！");
+                    return null;
+                }
+                r = EncryptUtils.Base64Decode(r);
+
+                if (BaofooApiConstant.DataType.XML.getValue().equalsIgnoreCase(map.get(BaofooApiConstant.FIELD_DATA_TYPE))) {
+                    return JacksonUtils.xmlToMap(r);
+                } else {
+                    return JacksonUtils.jsonToMap(r);
+                }
+            } else {
+                logger.info("宝付接口访问出错。");
+                return null;
+            }
+        } else {
+            logger.info("请求参数为空。");
+            return null;
         }
-        return null;
     }
 
 }

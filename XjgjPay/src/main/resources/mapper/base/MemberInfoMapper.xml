@@ -143,7 +143,7 @@
 		FROM
 		member_info
 		WHERE
-		id = #{memberId}
+		`member_id` = #{memberId}
 	</select>
 
     <select id="getMemberInfoByMobile" resultType="net.chenlin.dp.modules.base.entity.MemberInfoEntity">
@@ -167,7 +167,7 @@
 		FROM
 		member_info
 		WHERE
-		id = #{mobile}
+		`mobile` = #{mobile}
 	</select>
 
 </mapper>

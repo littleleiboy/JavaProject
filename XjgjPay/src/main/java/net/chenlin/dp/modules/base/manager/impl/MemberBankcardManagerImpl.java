@@ -22,35 +22,40 @@ import net.chenlin.dp.modules.base.manager.MemberBankcardManager;
 @Component("memberBankcardManager")
 public class MemberBankcardManagerImpl implements MemberBankcardManager {
 
-	@Autowired
-	private MemberBankcardMapper memberBankcardMapper;
-	
+    @Autowired
+    private MemberBankcardMapper memberBankcardMapper;
 
-	@Override
-	public List<MemberBankcardEntity> listMemberBankcard(Page<MemberBankcardEntity> page, Query search) {
-		return memberBankcardMapper.listForPage(page, search);
-	}
 
-	@Override
-	public int saveMemberBankcard(MemberBankcardEntity memberBankcard) {
-		return memberBankcardMapper.save(memberBankcard);
-	}
+    @Override
+    public List<MemberBankcardEntity> listMemberBankcard(Page<MemberBankcardEntity> page, Query search) {
+        return memberBankcardMapper.listForPage(page, search);
+    }
 
-	@Override
-	public MemberBankcardEntity getMemberBankcardById(Long id) {
-		MemberBankcardEntity memberBankcard = memberBankcardMapper.getObjectById(id);
-		return memberBankcard;
-	}
+    @Override
+    public int saveMemberBankcard(MemberBankcardEntity memberBankcard) {
+        return memberBankcardMapper.save(memberBankcard);
+    }
 
-	@Override
-	public int updateMemberBankcard(MemberBankcardEntity memberBankcard) {
-		return memberBankcardMapper.update(memberBankcard);
-	}
+    @Override
+    public MemberBankcardEntity getMemberBankcardById(Long id) {
+        MemberBankcardEntity memberBankcard = memberBankcardMapper.getObjectById(id);
+        return memberBankcard;
+    }
 
-	@Override
-	public int batchRemove(Long[] id) {
-		int count = memberBankcardMapper.batchRemove(id);
-		return count;
-	}
-	
+    @Override
+    public int updateMemberBankcard(MemberBankcardEntity memberBankcard) {
+        return memberBankcardMapper.update(memberBankcard);
+    }
+
+    @Override
+    public int batchRemove(Long[] id) {
+        int count = memberBankcardMapper.batchRemove(id);
+        return count;
+    }
+
+    @Override
+    public MemberBankcardEntity getBankcardByCardID(String bankAccCard) {
+        return memberBankcardMapper.getBankcardByCardID(bankAccCard);
+    }
+
 }

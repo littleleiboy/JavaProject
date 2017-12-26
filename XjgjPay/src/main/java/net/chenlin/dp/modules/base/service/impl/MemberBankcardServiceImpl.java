@@ -59,4 +59,9 @@ public class MemberBankcardServiceImpl implements MemberBankcardService {
 		return CommonUtils.msg(id, count);
 	}
 
+	@Override
+	public MemberBankcardEntity getBankcardByCardID(String bankAccCard) {
+		return  memberBankcardManager.getBankcardByCardID(bankAccCard);
+	}
+
 }

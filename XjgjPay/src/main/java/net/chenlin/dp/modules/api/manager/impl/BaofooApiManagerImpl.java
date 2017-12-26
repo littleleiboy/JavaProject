@@ -15,9 +15,6 @@ public class BaofooApiManagerImpl implements BaofooApiManager {
     @Value("${myprop.api.baofoo.url}")
     private String apiUrl;
 
-    @Value("${myprop.api.baofoo.cer-name}")
-    private String cer_name;
-
     /**
      * 宝付认证支付接口
      *
@@ -26,21 +23,7 @@ public class BaofooApiManagerImpl implements BaofooApiManager {
      * @throws Exception
      */
     @Override
-    public Map<String, Object> backTrans(Map<String, String> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(apiUrl, JacksonUtils.beanToJson(map));
-        if (!r.isEmpty()) {
-            String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
-            String cerPath = path + "\\" + cer_name;//宝付公钥
-            r = RSAUtils.decryptByPubCerFile(r, cerPath);
-            r = EncryptUtils.Base64Decode(r);
-
-            if (BaofooApiConstant.DataType.XML.getValue().equals(map.get(BaofooApiConstant.FIELD_DATA_TYPE))) {
-                return JacksonUtils.xmlToMap(r);
-            } else {
-                return JacksonUtils.jsonToMap(r);
-            }
-        } else {
-            return null;
-        }
+    public String backTrans(Map<String, String> map) throws Exception {
+        return HttpUtils.postRequestSSL(apiUrl, JacksonUtils.beanToJson(map));
     }
 }

@@ -43,6 +43,7 @@ create table `member_bankcard`(
 	`gmt_create` datetime comment '创建时间',
 	`gmt_modified` datetime comment '修改时间',
 	primary key pk_id(`id`),
+	unique key uk_bank_acc_card(`bank_acc_card`),
 	index idx_member_info_id(`member_info_id`)
 ) engine=InnoDB default charset=utf8 comment '会员绑定银行卡信息';
 

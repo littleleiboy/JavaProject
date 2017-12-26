@@ -81,7 +81,7 @@ public class BaofooApiConstant {
     public static final String FIELD_TRANS_SERIAL_NO = "trans_serial_no";
 
     /**
-     * 订单日期
+     * 订单日期(14 位定长。格式：年年年年月月日日时时分分秒秒)
      */
     public static final String FIELD_TRADE_DATE = "trade_date";
 
@@ -184,6 +184,21 @@ public class BaofooApiConstant {
      * 加密数据
      */
     public static final String FIELD_DATA_CONTENT = "data_content";
+
+    /**
+     * 应答码-成功
+     */
+    public static final String RESP_CODE_SUCCESS = "0000";
+
+    /**
+     * 商户订单号不能为空
+     */
+    public static final String MSG_REQUIRE_TRANS_ID = "商户订单号不能为空。";
+
+    /**
+     * 短信验证码不能为空
+     */
+    public static final String MSG_REQUIRE_SMS_CODE = "短信验证码不能为空。";
 
     /**
      * 宝付交易类型

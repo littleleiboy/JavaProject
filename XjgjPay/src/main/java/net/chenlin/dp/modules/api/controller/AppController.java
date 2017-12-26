@@ -1,12 +1,16 @@
 package net.chenlin.dp.modules.api.controller;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import net.chenlin.dp.common.constant.BaofooApiConstant;
 import net.chenlin.dp.common.constant.MsgConstant;
 import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
 import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.EncryptUtils;
+import net.chenlin.dp.common.utils.OrderNumberUtils;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
+import net.chenlin.dp.modules.base.entity.MemberBankcardEntity;
 import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.base.service.MemberBankcardService;
 import net.chenlin.dp.modules.base.service.MemberInfoService;
@@ -14,8 +18,10 @@ import net.chenlin.dp.modules.sys.controller.AbstractController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.backoff.BackOff;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -46,7 +52,7 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      */
-    private Boolean checkAccToken(Map<String, Object> params) {
+    private Boolean checkObjAccToken(Map<String, Object> params) {
         Object objAccToken = params.get(SystemConstant.ACCESS_TOKEN);
         if (objAccToken == null) {
             return false;
@@ -55,6 +61,30 @@ public class AppController extends AbstractController {
         if (null == access_token || "".equals(access_token)) {
             return false;
         }
+        return checkAccessToken(access_token);
+    }
+
+    /**
+     * 验证APP访问口令
+     *
+     * @param params
+     * @return
+     */
+    private Boolean checkStrAccToken(Map<String, String> params) {
+        String access_token = params.get(SystemConstant.ACCESS_TOKEN);
+        if (null == access_token || "".equals(access_token)) {
+            return false;
+        }
+        return checkAccessToken(access_token);
+    }
+
+    /**
+     * 验证APP访问口令
+     *
+     * @param access_token
+     * @return
+     */
+    private Boolean checkAccessToken(String access_token) {
         String[] arr = access_token.split("_");
         if (arr.length < 2) {
             return false;
@@ -80,7 +110,7 @@ public class AppController extends AbstractController {
 
         /*//使用方法：
         //验证访问口令
-        if (!checkAccToken(params)) {
+        if (!checkAccessToken(acc_token)) {
             return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
         }*/
     }
@@ -368,12 +398,122 @@ public class AppController extends AbstractController {
         }
     }
 
-    //宝付预绑卡
+    /**
+     * 绑定宝付申请
+     *
+     * @param params
+     * @return
+     */
     @RequestMapping("/preBindBaofoo")
-    public ResultData preBindBaofoo(Map<String, String> params) {
+    public ResultData preBindBaofoo(@RequestBody Map<String, String> params) {
         try {
+            //宝付预绑卡类交易
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.prepareBinding.getValue());
+            params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
+            params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
+
+            //验证访问口令
+            if (!checkStrAccToken(params)) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            //商户订单号不能为空
+            String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
+            if (null == trans_id || "".equals(trans_id)) {
+                return new ResultData("err_trans_id", false, BaofooApiConstant.MSG_REQUIRE_TRANS_ID);
+            }
+            //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
-            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            if (mapResult != null) {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
+    /**
+     * 确认绑定宝付
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/confirmBindBaofoo")
+    public ResultData confirmBindBaofoo(Map<String, String> params) {
+        try {
+            //宝付确认绑卡类交易
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmBinding.getValue());
+
+            Object memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
+            if (null == memberNO || "".equals(memberNO)) {
+                return new ResultData("err_memberNO_isnull", false, "会员账号不能为空！");
+            }
+
+            Object bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
+            if (null == bankCardID || "".equals(bankCardID)) {
+                return new ResultData("err_acc_no_isnull", false, "请求绑定的银行卡号不能为空！");
+            }
+
+            //验证访问口令
+            if (!checkStrAccToken(params)) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            //商户订单号不能为空
+            String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
+            if (null == trans_id || "".equals(trans_id)) {
+                return new ResultData("err_trans_id", false, BaofooApiConstant.MSG_REQUIRE_TRANS_ID);
+            }
+            //短信验证码不能为空
+            String sms_code = params.get(BaofooApiConstant.FIELD_SMS_CODE);//短信验证码
+            if (null == sms_code || "".equals(sms_code)) {
+                return new ResultData("err_sms_code", false, BaofooApiConstant.MSG_REQUIRE_SMS_CODE);
+            }
+            //调用宝付接口
+            Map<String, Object> mapResult = bfService.backTrans(params);
+            if (mapResult != null) {
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    //宝付接口返回成功消息
+                    Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
+                    if (null != bindId || !"".equals(bindId)) {
+                        //保存会员绑定宝付信息
+                        MemberBankcardEntity mbank = memberBankService.getBankcardByCardID(String.valueOf(bankCardID));
+                        Boolean isNew = false;
+                        if (mbank != null) {
+                            //更新会员的宝付绑定银行卡信息
+                            isNew = false;
+                            mbank.setGmtModified(new Date());
+                        } else {
+                            //新增会员的宝付绑定银行卡信息
+                            isNew = true;
+                            mbank = new MemberBankcardEntity();
+                            mbank.setGmtCreate(new Date());
+                            mbank.setIsWithdraw(0);//默认不可提现(不可圈提)
+                        }
+
+                        mbank.setIsRecharge(1);//可充值(可圈存)
+                        mbank.setBfBindId(String.valueOf(bindId));
+                        mbank.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
+                        mbank.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
+                        mbank.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+
+                        MemberInfoEntity member = memberInfoService.getMemberInfoByNO(String.valueOf(memberNO));
+                        if (member != null)
+                            mbank.setMemberInfoId(member.getId());
+
+                        if (isNew)
+                            memberBankService.saveMemberBankcard(mbank);
+                        else
+                            memberBankService.updateMemberBankcard(mbank);
+                    } else {
+                        return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
+                    }
+                }
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
             return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());

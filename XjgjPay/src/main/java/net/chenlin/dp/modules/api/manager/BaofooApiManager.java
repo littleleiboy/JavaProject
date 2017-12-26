@@ -10,5 +10,5 @@ public interface BaofooApiManager {
      * @return
      * @throws Exception
      */
-    Map<String, Object> backTrans(Map<String, String> map) throws Exception;
+    String backTrans(Map<String, String> map) throws Exception;
 }
