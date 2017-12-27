@@ -436,6 +436,59 @@ public class AppController extends AbstractController {
     }
 
     /**
+     * 圈存解绑
+     *
+     * @param params
+     * @return
+    * */
+    @RequestMapping("/")
+    public ResultData chargeUnbindingRelationshipWithBank(@RequestBody Map<String,String> params){
+        try {
+            //解除绑定关系
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE,BaofooApiConstant.TradeType.cancelBinding.getValue());
+
+            String bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
+            if (null == bankCardID || "".equals(bankCardID)) {
+                return new ResultData("err_acc_no_isnull", false, "请求解绑的银行卡号不能为空！");
+            }
+
+            //验证访问口令
+            if (!checkStrAccToken(params)) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            // 调用宝付接口解除绑定交易
+            Map<String, Object> mapResult = bfService.backTrans(params);
+            if(mapResult != null){
+               if(BaofooApiConstant.FIELD_RESP_CODE.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))){
+                    Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
+                    if(bindId != null || !"".equals(bindId)){
+                        MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByCardID(bankCardID);
+                        if(memberBankcardInfo != null){
+                            //从数据库删除该银行卡的信息
+                            if(memberBankService.removeBankcardInfoByBankcardNo(bankCardID) == true){
+                                return new ResultData("ok", true, "解除绑定关系成功", mapResult);
+                            } else {
+                                return new ResultData("false", false, "解除绑定关系失败", mapResult);
+                            }
+                        }else {
+                            return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                        }
+                    }else {
+                        return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
+                    }
+               }
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+
+        } catch (Exception e){
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
+    /**
      * 确认绑定宝付
      *
      * @param params
@@ -520,6 +573,7 @@ public class AppController extends AbstractController {
             return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
         }
     }
+
 
     /**
      * 圈存（充值）预交易

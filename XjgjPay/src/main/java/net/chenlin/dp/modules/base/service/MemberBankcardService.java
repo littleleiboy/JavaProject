@@ -27,4 +27,6 @@ public interface MemberBankcardService {
 	R batchRemove(Long[] id);
 
     MemberBankcardEntity getBankcardByCardID(String memberId);
+
+    boolean removeBankcardInfoByBankcardNo(String bankAccCard);
 }

@@ -61,6 +61,8 @@ public interface XjgjAccApiManager {
      */
     Map<String, Object> retryRecharge(Map<String, Object> map) throws Exception;
 
+
+
     /**
      * 会员圈提绑定
      *

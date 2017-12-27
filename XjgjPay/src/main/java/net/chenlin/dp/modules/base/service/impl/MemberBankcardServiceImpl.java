@@ -64,4 +64,8 @@ public class MemberBankcardServiceImpl implements MemberBankcardService {
 		return  memberBankcardManager.getBankcardByCardID(bankAccCard);
 	}
 
+	@Override
+	public boolean removeBankcardInfoByBankcardNo(String bankAccCard) {
+		return memberBankcardManager.removeBankcardInfoByBankcardNo(bankAccCard);
+	}
 }

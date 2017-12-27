@@ -97,6 +97,14 @@
         </foreach>
     </delete>
 
+	<delete id="removeBankcardInfoByBankcardNo">
+		DELETE
+		FROM
+		member_bankcard
+		WHERE
+		`bank_acc_card` = #{bankAccCard}
+	</delete>
+
     <select id="getBankcardByCardID" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
 		SELECT
 		`id`,

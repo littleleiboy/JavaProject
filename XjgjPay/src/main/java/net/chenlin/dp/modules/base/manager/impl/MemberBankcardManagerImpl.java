@@ -58,4 +58,8 @@ public class MemberBankcardManagerImpl implements MemberBankcardManager {
         return memberBankcardMapper.getBankcardByCardID(bankAccCard);
     }
 
+    @Override
+    public boolean removeBankcardInfoByBankcardNo(String bankAccCard) {
+        return memberBankcardMapper.removeBankcardInfoByBankcardNo(bankAccCard);
+    }
 }
