@@ -17,7 +17,9 @@ import net.chenlin.dp.modules.sys.entity.DicBankEntity;
 public interface DicBankManager {
 
 	List<DicBankEntity> listDicBank(Page<DicBankEntity> page, Query search);
-	
+
+	List<DicBankEntity> listAll(Query search);
+
 	int saveDicBank(DicBankEntity dicBank);
 	
 	DicBankEntity getDicBankById(Long id);

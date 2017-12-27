@@ -4,23 +4,37 @@
 <mapper namespace="net.chenlin.dp.modules.base.dao.MemberBankcardMapper">
 
     <select id="listForPage" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
-		SELECT
-			`id`, 
-			`bank_acc_name`, 
-			`bank_acc_card`, 
-			`bank_code`, 
-			`bf_bind_id`, 
-			`member_info_id`,
-			`is_recharge`,
-			`is_withdraw`,
-			`remark`, 
-			`gmt_create`, 
-			`gmt_modified`
-		FROM
-			member_bankcard
-		ORDER BY
-			id DESC
-	</select>
+        SELECT
+        `id`,
+        `bank_acc_name`,
+        `bank_acc_card`,
+        `bank_code`,
+        `bf_bind_id`,
+        `member_info_id`,
+        `is_recharge`,
+        `is_withdraw`,
+        `remark`,
+        `gmt_create`,
+        `gmt_modified`
+        FROM
+        member_bankcard
+        <where>
+            <if test="memberInfoId != null">
+                AND `member_info_id` = #{memberInfoId}
+            </if>
+            <if test="isRecharge != null">
+                AND `is_recharge` = #{isRecharge}
+            </if>
+            <if test="isWithdraw != null">
+                AND `is_withdraw` = #{isWithdraw}
+            </if>
+            <if test="bankAccCard != null">
+                AND `bank_acc_card` = #{bankAccCard}
+            </if>
+        </where>
+        ORDER BY
+        id DESC
+    </select>
 
     <insert id="save">
 		INSERT INTO member_bankcard (
@@ -97,7 +111,7 @@
         </foreach>
     </delete>
 
-    <select id="getBankcardByCardID" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
+    <select id="getBankcardByBankCardID" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
 		SELECT
 		`id`,
 		`bank_acc_name`,
@@ -114,6 +128,25 @@
 		member_bankcard
 		WHERE
 		`bank_acc_card` = #{bankAccCard}
+	</select>
+
+    <select id="getBankcardByBfBindID" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
+		SELECT
+		`id`,
+		`bank_acc_name`,
+		`bank_acc_card`,
+		`bank_code`,
+		`bf_bind_id`,
+		`member_info_id`,
+		`is_recharge`,
+		`is_withdraw`,
+		`remark`,
+		`gmt_create`,
+		`gmt_modified`
+		FROM
+		member_bankcard
+		WHERE
+		`bf_bind_id` = #{bfBindId}
 	</select>
 
 </mapper>

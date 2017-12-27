@@ -26,5 +26,7 @@ public interface MemberBankcardManager {
 	
 	int batchRemove(Long[] id);
 
-	MemberBankcardEntity getBankcardByCardID(String bankAccCard);
+	MemberBankcardEntity getBankcardByBankCardID(String bankAccCard);
+
+	MemberBankcardEntity getBankcardByBfBindID(String bfBindId);
 }

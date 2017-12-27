@@ -1,5 +1,6 @@
 package net.chenlin.dp.modules.sys.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,12 @@ public class DicBankServiceImpl implements DicBankService {
 		Page<DicBankEntity> page = new Page<>(query);
 		dicBankManager.listDicBank(page, query);
 		return page;
+	}
+
+	@Override
+	public List<DicBankEntity> listAll(Map<String, Object> params) {
+		Query query = new Query(params);
+		return dicBankManager.listAll(query);
 	}
 
 	@Override

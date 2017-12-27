@@ -15,5 +15,9 @@ import net.chenlin.dp.modules.sys.dao.BaseMapper;
  */
 @Mapper
 public interface MemberBankcardMapper extends BaseMapper<MemberBankcardEntity> {
-    MemberBankcardEntity getBankcardByCardID(String bankAccCard);
+
+    MemberBankcardEntity getBankcardByBankCardID(String bankAccCard);
+
+    MemberBankcardEntity getBankcardByBfBindID(String bfBindId);
+
 }

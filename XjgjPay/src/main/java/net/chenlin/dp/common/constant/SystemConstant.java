@@ -33,7 +33,24 @@ public class SystemConstant {
     /**
      * 秘钥文件目录名
      */
-    public static final String KEY_FILE_ROOT="cer";
+    public static final String KEY_FILE_ROOT = "cer";
+
+    /**
+     * APP会员登录后返回数据KEY：会员信息主键ID
+     */
+    public static final String MEMBER_PK = "member_pk";
+    /**
+     * APP会员登录后返回数据KEY：会员账号
+     */
+    public static final String MEMBER_NO = "member_no";
+    /**
+     * APP会员登录后返回数据KEY：会员名
+     */
+    public static final String MEMBER_NAME = "member_name";
+    /**
+     * APP会员登录后返回数据KEY：会员手机号
+     */
+    public static final String MEMBER_MOBILE = "member_mobile";
 
     /**
      * 菜单类型
@@ -169,6 +186,71 @@ public class SystemConstant {
             return value;
         }
 
+    }
+
+    /**
+     * 交易类型
+     *
+     * @author Andy Wang
+     * @date 2017-12-27
+     */
+    public enum TradeType {
+
+        /**
+         * 充值（圈存）
+         */
+        RECHARGE(1),
+        /**
+         * 提现（圈提）
+         */
+        WITHDRAW(2),
+        /**
+         * 消费
+         */
+        CONSUME(3),
+        /**
+         * 转账
+         */
+        TRANSFER(4),
+        /**
+         * 收款
+         */
+        COLLECT(5);
+
+        private int value;
+
+        TradeType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * 支付方式
+     */
+    public enum PayMode {
+
+        /**
+         * 宝付支付系统
+         */
+        BAOFOO(1),
+        /**
+         * 西郊国际结算系统
+         */
+        XJGJ(2);
+
+        private int value;
+
+        PayMode(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
 }

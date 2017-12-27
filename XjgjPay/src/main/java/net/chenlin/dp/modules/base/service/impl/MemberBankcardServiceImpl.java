@@ -24,44 +24,49 @@ import net.chenlin.dp.modules.base.service.MemberBankcardService;
 @Service("memberBankcardService")
 public class MemberBankcardServiceImpl implements MemberBankcardService {
 
-	@Autowired
-	private MemberBankcardManager memberBankcardManager;
+    @Autowired
+    private MemberBankcardManager memberBankcardManager;
 
-	@Override
-	public Page<MemberBankcardEntity> listMemberBankcard(Map<String, Object> params) {
-		Query query = new Query(params);
-		Page<MemberBankcardEntity> page = new Page<>(query);
-		memberBankcardManager.listMemberBankcard(page, query);
-		return page;
-	}
+    @Override
+    public Page<MemberBankcardEntity> listMemberBankcard(Map<String, Object> params) {
+        Query query = new Query(params);
+        Page<MemberBankcardEntity> page = new Page<>(query);
+        memberBankcardManager.listMemberBankcard(page, query);
+        return page;
+    }
 
-	@Override
-	public R saveMemberBankcard(MemberBankcardEntity role) {
-		int count = memberBankcardManager.saveMemberBankcard(role);
-		return CommonUtils.msg(count);
-	}
+    @Override
+    public R saveMemberBankcard(MemberBankcardEntity role) {
+        int count = memberBankcardManager.saveMemberBankcard(role);
+        return CommonUtils.msg(count);
+    }
 
-	@Override
-	public R getMemberBankcardById(Long id) {
-		MemberBankcardEntity memberBankcard = memberBankcardManager.getMemberBankcardById(id);
-		return CommonUtils.msg(memberBankcard);
-	}
+    @Override
+    public R getMemberBankcardById(Long id) {
+        MemberBankcardEntity memberBankcard = memberBankcardManager.getMemberBankcardById(id);
+        return CommonUtils.msg(memberBankcard);
+    }
 
-	@Override
-	public R updateMemberBankcard(MemberBankcardEntity memberBankcard) {
-		int count = memberBankcardManager.updateMemberBankcard(memberBankcard);
-		return CommonUtils.msg(count);
-	}
+    @Override
+    public R updateMemberBankcard(MemberBankcardEntity memberBankcard) {
+        int count = memberBankcardManager.updateMemberBankcard(memberBankcard);
+        return CommonUtils.msg(count);
+    }
 
-	@Override
-	public R batchRemove(Long[] id) {
-		int count = memberBankcardManager.batchRemove(id);
-		return CommonUtils.msg(id, count);
-	}
+    @Override
+    public R batchRemove(Long[] id) {
+        int count = memberBankcardManager.batchRemove(id);
+        return CommonUtils.msg(id, count);
+    }
 
-	@Override
-	public MemberBankcardEntity getBankcardByCardID(String bankAccCard) {
-		return  memberBankcardManager.getBankcardByCardID(bankAccCard);
-	}
+    @Override
+    public MemberBankcardEntity getBankcardByBankCardID(String bankAccCard) {
+        return memberBankcardManager.getBankcardByBankCardID(bankAccCard);
+    }
+
+    @Override
+    public MemberBankcardEntity getBankcardByBfBindID(String bfBindId) {
+        return memberBankcardManager.getBankcardByBfBindID(bfBindId);
+    }
 
 }

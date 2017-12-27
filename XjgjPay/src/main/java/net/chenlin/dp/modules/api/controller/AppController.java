@@ -4,9 +4,11 @@ import net.chenlin.dp.common.constant.BaofooApiConstant;
 import net.chenlin.dp.common.constant.MsgConstant;
 import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
+import net.chenlin.dp.common.entity.Page;
 import net.chenlin.dp.common.entity.ResultData;
 import net.chenlin.dp.common.utils.EncryptUtils;
 import net.chenlin.dp.common.utils.IPUtils;
+import net.chenlin.dp.common.utils.JacksonUtils;
 import net.chenlin.dp.common.utils.OrderNumberUtils;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
 import net.chenlin.dp.modules.api.service.XjgjAccApiService;
@@ -15,6 +17,9 @@ import net.chenlin.dp.modules.base.entity.MemberInfoEntity;
 import net.chenlin.dp.modules.base.service.MemberBankcardService;
 import net.chenlin.dp.modules.base.service.MemberInfoService;
 import net.chenlin.dp.modules.sys.controller.AbstractController;
+import net.chenlin.dp.modules.sys.service.DicBankService;
+import net.chenlin.dp.modules.trade.entity.TradeLogEntity;
+import net.chenlin.dp.modules.trade.service.TradeLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,12 @@ public class AppController extends AbstractController {
 
     @Autowired
     private MemberBankcardService memberBankService;
+
+    @Autowired
+    private TradeLogService tradeLogService;
+
+    @Autowired
+    private DicBankService dicBankService;
 
     /**
      * 验证APP访问口令
@@ -117,16 +128,16 @@ public class AppController extends AbstractController {
     }
 
     /**
-     * 获取APP访问口令
+     * APP用户登录后获取API访问口令和用户身份信息
      *
      * @param mobileNum
      * @param pass
      * @return
      */
-    @RequestMapping("/getAccToken")
-    public ResultData getAccToken(String mobileNum, String pass) {
+    @RequestMapping("/appLogin")
+    public ResultData appLogin(String mobileNum, String pass) {
         try {
-            MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByNO(String.valueOf(mobileNum));
+            MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByMobile(mobileNum);
             if (memberEntity != null) {
                 //验证会员账号和密码
                 String memberNO = memberEntity.getMemberId();
@@ -141,15 +152,23 @@ public class AppController extends AbstractController {
                         String accToken = memberEntity.getPassword();
                         if (null != accToken || !"".equals(accToken)) {
                             //存在token则直接返回
-                            logger.info("请求获取app token，成功获取并返回。");
-                            return new ResultData("ok", true, accToken);
+                            logger.info("手机号" + mobileNum + "的用户登录APP成功，获取到已存在的token.");
                         } else {
                             //不存在token则生成新的再返回
                             accToken = EncryptUtils.MD5(mobileNum + "|" + pass);
                             memberInfoService.updateMemberInfo(memberEntity);
-                            logger.info("请求获取app token，生成新的值并返回。");
-                            return new ResultData("ok", true, accToken);
+                            logger.info("手机号" + mobileNum + "的用户登录APP成功，获取到新的token.");
                         }
+
+                        //返回的用户身份信息
+                        Map<String, Object> appUser = new HashMap<>();
+                        appUser.put(SystemConstant.MEMBER_PK, memberEntity.getId());
+                        appUser.put(SystemConstant.MEMBER_NO, memberEntity.getMemberId());
+                        appUser.put(SystemConstant.MEMBER_NAME, memberEntity.getMemberName());
+                        appUser.put(SystemConstant.MEMBER_MOBILE, memberEntity.getMobile());
+                        appUser.put(SystemConstant.ACCESS_TOKEN, accToken);
+
+                        return new ResultData("ok", true, accToken, appUser);
                     } else {
                         logger.info("调用结算系统接口验证会员密码，结果：会员密码错误。");
                         return new ResultData("err_password", false, "会员密码错误");
@@ -162,40 +181,6 @@ public class AppController extends AbstractController {
                 logger.info("请求获取app token失败，不是会员。");
                 return new ResultData("err_no_member", false, "还不是会员");
             }
-            /*//通过手机号查询会员账号
-            String memberNO = "";
-            Map<String, Object> param1 = new HashMap<>();
-            param1.put(XjgjAccApiConstant.FIELD_MOBILE_NUM, mobileNum);
-            Map<String, Object> mapResult1 = xjgjService.getMemberBaseInfo(param1);
-            if (mapResult1 != null) {
-                Object objMemberNO = mapResult1.get(XjgjAccApiConstant.FIELD_MEMBER_NO);
-                if (null != objMemberNO || !"".equals(objMemberNO)) {
-                    memberNO = String.valueOf(objMemberNO);
-                } else {
-                    return new ResultData("err_no_member", false, "还不是会员");
-                }
-            } else {
-                return new ResultData("err_remote_1", false, MsgConstant.MSG_REMOTE_ERROR);
-            }
-
-            //验证会员账号和密码
-            Map<String, Object> param2 = new HashMap<>();
-            param2.put(XjgjAccApiConstant.FIELD_MEMBER_NO, memberNO);
-            param2.put(XjgjAccApiConstant.FIELD_PASSWORD, pass);
-            Map<String, Object> mapResult2 = xjgjService.checkMemberPassword(param2);
-            if (mapResult2 != null) {
-                Object result = mapResult2.get(XjgjAccApiConstant.FIELD_RESULT);
-                if (String.valueOf(result) == "1") {//会员账号验证通过
-                    //生成访问token
-                    String accToken = EncryptUtils.MD5(mobileNum + "|" + pass);
-                    return new ResultData("ok", true, accToken);
-                } else {
-                    return new ResultData("err_password", false, "会员密码错误");
-                }
-            } else {
-                return new ResultData("err_remote_2", false, MsgConstant.MSG_REMOTE_ERROR);
-            }
-            */
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
             return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
@@ -479,7 +464,7 @@ public class AppController extends AbstractController {
                     Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
                     if (null != bindId || !"".equals(bindId)) {
                         //保存会员绑定宝付信息
-                        MemberBankcardEntity mbank = memberBankService.getBankcardByCardID(bankCardID);
+                        MemberBankcardEntity mbank = memberBankService.getBankcardByBankCardID(bankCardID);
                         Boolean isNew = false;
                         if (mbank != null) {
                             //更新会员的宝付绑定银行卡信息
@@ -527,8 +512,8 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      */
-    @RequestMapping("/preReCharge")
-    public ResultData preReCharge(HttpServletRequest request, @RequestBody Map<String, String> params) {
+    @RequestMapping("/preRecharge")
+    public ResultData preRecharge(HttpServletRequest request, @RequestBody Map<String, String> params) {
         try {
             //宝付认证支付类预支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.preparePay.getValue());
@@ -542,16 +527,17 @@ public class AppController extends AbstractController {
                 return new ResultData("err_bind_id_isnull", false, "绑定标识号不能为空！");
             }
 
-            BigDecimal txn_amt_num = new BigDecimal(String.valueOf(txn_amt)).multiply(BigDecimal.valueOf(100));//金额转换成分
+            BigDecimal txn_amt_num = new BigDecimal(txn_amt).multiply(BigDecimal.valueOf(100));//金额转换成分
             params.put(BaofooApiConstant.FIELD_TXN_AMT, String.valueOf(txn_amt_num.setScale(0)));//以分为单位的支付金额
             params.put(BaofooApiConstant.FIELD_CLIENT_IP, IPUtils.getIpAddr(request));
 
             //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
+                logger.info(String.format("宝付预支付交易处理成功，申请交易金额：%s 元，宝付业务流水号：%s 。", txn_amt, String.valueOf(mapResult.get(BaofooApiConstant.FIELD_BUSINESS_NO))));
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
-                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+                return new ResultData("err_remote", false, MsgConstant.MSG_OPERATION_FAILED);
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
@@ -565,23 +551,85 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      */
-    @RequestMapping("/reCharge")
-    public ResultData reCharge(@RequestBody Map<String, Object> params) {
+    @RequestMapping("/recharge")
+    public ResultData recharge(@RequestBody Map<String, String> params) {
         try {
-            //TODO 调用宝付接口进行圈存
             //宝付认证支付类确认支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmPay.getValue());
-
-            Map<String, Object> mapResult = xjgjService.recharge(params);
-            if (mapResult != null) {
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-            } else {
-                return new ResultData("err_recharge_isnull", false, "圈存接口获取信息出错！");
+            //String sms_code = params.get(BaofooApiConstant.FIELD_SMS_CODE);//支付短信验证码
+            String business_no = params.get(BaofooApiConstant.FIELD_BUSINESS_NO);//宝付业务流水号
+            if (null == business_no || "".equals(business_no)) {
+                return new ResultData("err_business_no_isnull", false, "支付业务流水号不能为空！");
             }
+            //调用宝付接口
+            Map<String, Object> mapBfResult = bfService.backTrans(params);
+            if (mapBfResult != null) {
+                logger.info("宝付确认支付处理返回结果：" + JacksonUtils.beanToJson(mapBfResult));
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapBfResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    //宝付接口返回成功消息
+                    BigDecimal succAmt = new BigDecimal(String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_SUCC_AMT))).divide(BigDecimal.valueOf(100));//把分转换成元
+                    logger.info(String.format("宝付确认支付交易处理成功，宝付支付业务流水号：%s，成功金额：%s 元。",
+                            mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO),
+                            succAmt));
 
+                    //保存交易记录
+                    TradeLogEntity trade = new TradeLogEntity();
+                    trade.setTransSn(String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)));//圈存交易流水号和宝付支付流水号一致
+                    trade.setTransType(SystemConstant.TradeType.RECHARGE.getValue());
+                    trade.setSellerOrderId(OrderNumberUtils.generateInTime());
+                    trade.setAmtMoney(succAmt);
+                    trade.setPayModeId(SystemConstant.PayMode.BAOFOO.getValue());
+
+                    String bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
+                    if (null != null || !"".equals(bindId)) {
+                        MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
+                        if (bankCard != null) {
+                            trade.setBankAccName(bankCard.getBankAccName());
+                            trade.setBankAccCard(bankCard.getBankAccCard());
+                            trade.setBankCode(bankCard.getBankCode());
+                        }
+                        trade.setBfBindId(bindId);
+                    }
+                    trade.setGmtCreate(new Date());
+
+                    //再调用西郊结算系统接口记录圈存交易
+                    Map<String, Object> xjParams = new HashMap<>();
+                    xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NO, params.get(XjgjAccApiConstant.FIELD_MEMBER_NO));
+                    xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
+                    xjParams.put(XjgjAccApiConstant.FIELD_REQUEST_NO, params.get(XjgjAccApiConstant.FIELD_REQUEST_NO));
+                    xjParams.put(XjgjAccApiConstant.FIELD_PASSWORD, params.get(XjgjAccApiConstant.FIELD_PASSWORD));
+                    xjParams.put(XjgjAccApiConstant.FIELD_MONEY, params.get(XjgjAccApiConstant.FIELD_MONEY));
+                    Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
+                    if (mapXjResult != null) {
+                        if ("1".equals(mapXjResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
+                            trade.setState(1);//交易成功
+                            tradeLogService.saveTradeLog(trade);
+
+                            logger.info("宝付确认支付成功！西郊国际结算处理成功！交易流水号："
+                                    + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
+                            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
+                        } else {
+                            trade.setState(2);//交易失败(宝付交易成功，推送给结算系统失败)
+                            tradeLogService.saveTradeLog(trade);
+
+                            logger.info("宝付确认支付成功！西郊国际结算处理失败！交易流水号："
+                                    + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
+                            return new ResultData("err_xj", false, "支付成功，结算处理失败。" + String.valueOf(mapXjResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapBfResult);
+                        }
+                    } else {
+                        trade.setState(2);//交易失败(宝付交易成功，推送给结算系统失败)
+                        tradeLogService.saveTradeLog(trade);
+                        return new ResultData("err_remote_xj", false, MsgConstant.MSG_REMOTE_ERROR);
+                    }
+                } else {
+                    return new ResultData("err_response_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+                }
+            } else {
+                return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
 
@@ -754,6 +802,29 @@ public class AppController extends AbstractController {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
+    }
+
+    /**
+     * 银行列表（供客户端选择的银行列表）
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/listBank")
+    public ResultData listBank(@RequestBody Map<String, Object> params) {
+        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, dicBankService.listAll(params));
+    }
+
+    /**
+     * 会员交易银行卡列表
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/listMemberBankcard")
+    public ResultData listMemberBankcard(@RequestBody Map<String, Object> params) {
+        Page<MemberBankcardEntity> pageData = memberBankService.listMemberBankcard(params);
+        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, pageData);
     }
 
 }

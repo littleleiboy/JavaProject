@@ -54,8 +54,13 @@ public class MemberBankcardManagerImpl implements MemberBankcardManager {
     }
 
     @Override
-    public MemberBankcardEntity getBankcardByCardID(String bankAccCard) {
-        return memberBankcardMapper.getBankcardByCardID(bankAccCard);
+    public MemberBankcardEntity getBankcardByBankCardID(String bankAccCard) {
+        return memberBankcardMapper.getBankcardByBankCardID(bankAccCard);
+    }
+
+    @Override
+    public MemberBankcardEntity getBankcardByBfBindID(String bfBindId){
+        return memberBankcardMapper.getBankcardByBfBindID(bfBindId);
     }
 
 }

@@ -32,6 +32,11 @@ public class DicBankManagerImpl implements DicBankManager {
 	}
 
 	@Override
+	public List<DicBankEntity> listAll(Query search) {
+		return dicBankMapper.list(search);
+	}
+
+	@Override
 	public int saveDicBank(DicBankEntity dicBank) {
 		return dicBankMapper.save(dicBank);
 	}

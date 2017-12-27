@@ -1,5 +1,6 @@
 package net.chenlin.dp.modules.sys.service;
 
+import java.util.List;
 import java.util.Map;
 
 import net.chenlin.dp.common.entity.Page;
@@ -17,7 +18,9 @@ import net.chenlin.dp.modules.sys.entity.DicBankEntity;
 public interface DicBankService {
 
 	Page<DicBankEntity> listDicBank(Map<String, Object> params);
-	
+
+	List<DicBankEntity> listAll(Map<String, Object> params);
+
 	R saveDicBank(DicBankEntity dicBank);
 	
 	R getDicBankById(Long id);
