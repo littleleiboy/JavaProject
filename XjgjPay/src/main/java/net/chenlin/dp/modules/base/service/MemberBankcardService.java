@@ -28,5 +28,7 @@ public interface MemberBankcardService {
 
     MemberBankcardEntity getBankcardByCardID(String memberId);
 
+	MemberBankcardEntity getMemberBankInfoByNO(String memberNO);
+
     boolean removeBankcardInfoByBankcardNo(String bankAccCard);
 }

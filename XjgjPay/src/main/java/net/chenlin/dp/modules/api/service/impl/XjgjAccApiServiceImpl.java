@@ -106,7 +106,7 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
     * */
     @Override
     public Map<String,Object> memberUnBindBOC(Map<String, Object> map) throws Exception{
-        return apiManager.memberBindBOC(map);
+        return apiManager.memberUnBindBOC(map);
     }
 
     /**

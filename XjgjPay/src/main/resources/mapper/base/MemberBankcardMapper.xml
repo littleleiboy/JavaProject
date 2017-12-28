@@ -124,4 +124,23 @@
 		`bank_acc_card` = #{bankAccCard}
 	</select>
 
+	<select id="getMemberBankInfoByNO" resultType="net.chenlin.dp.modules.base.entity.MemberBankcardEntity">
+		SELECT
+		`id`,
+		`bank_acc_name`,
+		`bank_acc_card`,
+		`bank_code`,
+		`bf_bind_id`,
+		`member_info_id`,
+		`is_recharge`,
+		`is_withdraw`,
+		`remark`,
+		`gmt_create`,
+		`gmt_modified`
+		FROM
+		member_bankcard
+		WHERE
+		`member_id` = #{memberId}
+	</select>
+
 </mapper>

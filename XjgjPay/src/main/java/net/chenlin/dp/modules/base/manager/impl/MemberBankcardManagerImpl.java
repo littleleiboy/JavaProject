@@ -59,6 +59,11 @@ public class MemberBankcardManagerImpl implements MemberBankcardManager {
     }
 
     @Override
+    public MemberBankcardEntity  getMemberBankInfoByNO(String memberNO){
+        return memberBankcardMapper.getMemberBankInfoByNO(memberNO);
+    }
+
+    @Override
     public boolean removeBankcardInfoByBankcardNo(String bankAccCard) {
         return memberBankcardMapper.removeBankcardInfoByBankcardNo(bankAccCard);
     }

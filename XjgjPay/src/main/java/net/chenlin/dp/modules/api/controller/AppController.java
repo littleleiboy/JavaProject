@@ -694,7 +694,34 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
-                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    //保存圈提绑定信息到数据库
+                    MemberBankcardEntity memberBankInfo = memberBankService.getMemberBankInfoByNO(String.valueOf(memberNo));
+                    if(memberBankInfo != null){
+                        MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByCardID(String.valueOf(bankAccountNo));
+                        Boolean isNew = false;
+                        if(mBankcardInfo != null){
+                            isNew = false;
+                            mBankcardInfo.setGmtModified(new Date());
+                            memberBankService.updateMemberBankcard(mBankcardInfo);
+                            return new ResultData("err", false, "该银行卡已经绑定过", "");
+                        } else {
+                            isNew = true;
+                            mBankcardInfo = new MemberBankcardEntity();
+                            mBankcardInfo.setGmtModified(new Date());
+                            mBankcardInfo.setIsRecharge(1);
+                            mBankcardInfo.setIsWithdraw(1);//可提现
+                            mBankcardInfo.setBfBindId( mapResult.get(XjgjAccApiConstant.FIELD_BIND_ID).toString());
+                            mBankcardInfo.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
+                            mBankcardInfo.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
+                            mBankcardInfo.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                            memberBankService.saveMemberBankcard(mBankcardInfo);
+                            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                        }
+
+                    } else{
+                        return new ResultData("err", false, "查询不到该会员信息，请先注册", "");
+                    }
+                    //return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {
                     return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
                 }
@@ -718,6 +745,7 @@ public class AppController extends AbstractController {
         try {
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
+
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
                 return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
