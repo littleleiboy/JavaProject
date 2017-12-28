@@ -149,4 +149,12 @@
 		`bf_bind_id` = #{bfBindId}
 	</select>
 
+    <delete id="removeBankcardInfoByBankcardNo">
+		DELETE
+		FROM
+		member_bankcard
+		WHERE
+		`bank_acc_card` = #{bankAccCard}
+	</delete>
+
 </mapper>

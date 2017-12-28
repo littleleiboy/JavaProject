@@ -393,6 +393,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/preBindBaofoo")
     public ResultData preBindBaofoo(@RequestBody Map<String, String> params) {
         try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             //宝付预绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.prepareBinding.getValue());
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
@@ -421,6 +426,64 @@ public class AppController extends AbstractController {
     }
 
     /**
+     * 圈存解绑
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/")
+    public ResultData chargeUnbindingRelationshipWithBank(@RequestBody Map<String, String> params) {
+        try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
+            //解除绑定关系
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.cancelBinding.getValue());
+
+            String bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
+            if (null == bankCardID || "".equals(bankCardID)) {
+                return new ResultData("err_acc_no_isnull", false, "请求解绑的银行卡号不能为空！");
+            }
+
+            //验证访问口令
+            if (!checkStrAccToken(params)) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            // 调用宝付接口解除绑定交易
+            Map<String, Object> mapResult = bfService.backTrans(params);
+            if (mapResult != null) {
+                if (BaofooApiConstant.FIELD_RESP_CODE.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
+                    if (bindId != null || !"".equals(bindId)) {
+                        MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(bankCardID);
+                        if (memberBankcardInfo != null) {
+                            //从数据库删除该银行卡的信息
+                            if (memberBankService.removeBankcardInfoByBankcardNo(bankCardID) == true) {
+                                return new ResultData("ok", true, "解除绑定关系成功", mapResult);
+                            } else {
+                                return new ResultData("false", false, "解除绑定关系失败", mapResult);
+                            }
+                        } else {
+                            return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                        }
+                    } else {
+                        return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
+                    }
+                }
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+        }
+    }
+
+    /**
      * 确认绑定宝付
      *
      * @param params
@@ -429,6 +492,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/confirmBindBaofoo")
     public ResultData confirmBindBaofoo(Map<String, String> params) {
         try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             //宝付确认绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmBinding.getValue());
 
@@ -506,6 +574,7 @@ public class AppController extends AbstractController {
         }
     }
 
+
     /**
      * 圈存（充值）预交易
      *
@@ -515,6 +584,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/preRecharge")
     public ResultData preRecharge(HttpServletRequest request, @RequestBody Map<String, String> params) {
         try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             //宝付认证支付类预支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.preparePay.getValue());
 
@@ -554,6 +628,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/recharge")
     public ResultData recharge(@RequestBody Map<String, String> params) {
         try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             //宝付认证支付类确认支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmPay.getValue());
             //String sms_code = params.get(BaofooApiConstant.FIELD_SMS_CODE);//支付短信验证码
@@ -642,6 +721,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/retryCharge")
     public ResultData retryCharge(@RequestBody Map<String, Object> params) {
         try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             Map<String, Object> mapResult = xjgjService.retryRecharge(params);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
@@ -659,6 +743,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberBindBOC")
     public ResultData memberBindBOC(@RequestBody Map<String, Object> params) {
         try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             if (params != null) {
                 Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
                 if (null == memberName || "".equals(memberName)) {
@@ -688,7 +777,25 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
-                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    //保存圈提绑定信息到数据库
+                    MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
+                    if (mBankcardInfo != null) {
+                        mBankcardInfo.setGmtModified(new Date());
+                        memberBankService.updateMemberBankcard(mBankcardInfo);
+                        return new ResultData("err", false, "该银行卡已经绑定过", "");
+                    } else {
+                        mBankcardInfo = new MemberBankcardEntity();
+                        mBankcardInfo.setGmtModified(new Date());
+                        mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
+                        mBankcardInfo.setIsWithdraw(1);//可提现
+                        mBankcardInfo.setBfBindId(mapResult.get(XjgjAccApiConstant.FIELD_BIND_ID).toString());
+                        mBankcardInfo.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
+                        mBankcardInfo.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
+                        mBankcardInfo.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        memberBankService.saveMemberBankcard(mBankcardInfo);
+                        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    }
+                    //return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {
                     return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
                 }
@@ -710,6 +817,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberUnBindBOC")
     public ResultData memberUnBindBOC(@RequestBody Map<String, Object> params) {
         try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
@@ -731,6 +843,11 @@ public class AppController extends AbstractController {
     @RequestMapping("/memberWithDraw")
     public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
         try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+
             if (params != null) {
                 Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//银行名称
                 if (null == bankName || "BOC".equals(bankName)) {
@@ -773,13 +890,18 @@ public class AppController extends AbstractController {
     /**
      * 查询账户余额
      *
-     * @param param
+     * @param params
      * @reutn
      */
     @RequestMapping("/searchMemberAccountBalance")
-    public ResultData searchMemberAccountBalance(@RequestBody String param) {
+    public ResultData searchMemberAccountBalance(@RequestBody Map<String, String> params) {
         try {
-            Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(param);
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            String memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);
+            Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(memberNo);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
             e.printStackTrace();
@@ -796,6 +918,10 @@ public class AppController extends AbstractController {
     @RequestMapping("/searchMemberAccountChange")
     public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String, Object> map) {
         try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(map.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
             Map<String, Object> mapResult = xjgjService.searchMemberCostLog(map);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
@@ -823,6 +949,10 @@ public class AppController extends AbstractController {
      */
     @RequestMapping("/listMemberBankcard")
     public ResultData listMemberBankcard(@RequestBody Map<String, Object> params) {
+        //验证token
+        if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+        }
         Page<MemberBankcardEntity> pageData = memberBankService.listMemberBankcard(params);
         return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, pageData);
     }
