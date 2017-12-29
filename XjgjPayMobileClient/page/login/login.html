@@ -154,7 +154,7 @@
 						});
 					}, false);
 					forgetButton.addEventListener('tap', function(event) {
-						$.openWindow({
+						/*$.openWindow({
 							url: 'forget_password.html',
 							id: 'forget_password',
 							preload: true,
@@ -167,7 +167,8 @@
 							waiting: {
 								autoShow: false
 							}
-						});
+						});*/
+						plus.nativeUI.toast('请在西郊国际结算系统后台或至柜台重置密码');
 					}, false);
 					//
 					window.addEventListener('resize', function() {

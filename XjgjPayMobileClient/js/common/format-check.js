@@ -21,12 +21,16 @@ var FormatCheck = function() {
 	/**
 	 * 验证[0-9]数字
 	 */
-	var isDigits = function(str) {
+	this.isDigit = function(str) {
 		str = str || '';
 		return(/^\d+$/.test(str));
 	}
 
-	var isURL = function(str_url) {
+	/**
+	 * 验证网址
+	 * @param {Object} str_url
+	 */
+	this.isURL = function(str_url) {
 		var strRegex = "^((https|http|ftp|rtsp|mms)?://)" +
 			"?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
 			+
