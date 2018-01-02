@@ -11,15 +11,10 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<h1 class="mui-title">圈提</h1>
+			<h1 class="mui-title">圈提绑定</h1>
 		</header>
 		<div class="mui-content">				
 			<form class="mui-input-group">
-				<ul class="mui-table-view mui-table-view-radio">
-					<li class="mui-table-view-cell mui-selected">
-						<a class="mui-navigate-right" id="BOC">中国银行</a>
-					</li>
-				</ul>
 				<div class="mui-input-row">
 					<label>会员姓名</label>
 					<input id="memberName" type="text" class="mui-input-clear" placeholder="会员姓名" />
@@ -29,22 +24,28 @@
 					<input id="memberNo" type="text" class="mui-input-clear" placeholder="1000000000000" />
 				</div>
 				<div class="mui-input-row">
+					<label>开户姓名</label>
+					<input id="bankName" type="text" class="mui-input-clear" placeholder="开卡姓名" />
+				</div>
+				<div class="mui-input-row">
+					<label>开户身份证号</label>
+					<input id="IDCardNo" type="text" class="mui-input-clear" placeholder="321320200812120000" />
+				</div>
+				<div class="mui-input-row">
+					<label>中国银行卡号</label>
+					<input id="bankAccoutnNo" type="text" class="mui-input-clear" placeholder="6210000000000" />
+				</div>
+				<div class="mui-input-row">
 					<label>主卡密码</label>
 					<input id="passWord" type="password" class="mui-input-clear" placeholder="******" />
 				</div>
-				<div class="mui-input-row">
-					<label>圈提金额</label>
-					<input id="withDrawQty" type="text" class="mui-input-clear" placeholder="请输入圈提金额">
-				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='btnReg' class="mui-btn mui-btn-block mui-btn-primary">确认圈提</button>
+				<button id='btnBind' class="mui-btn mui-btn-block mui-btn-primary">确认绑定</button>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
-		<script src="../../js/module/withdrawal.js"></script>
 		<script type="text/javascript">
-			//Todo 判断圈提是否绑定
 			(function($, doc) {
 				$.init();
 				$.plusReady(function() {

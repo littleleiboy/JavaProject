@@ -13,8 +13,17 @@ var F
 			var memberName = document.getElementById('memberName').value.trim();
 			var memberNo = document.getElementById('memberNo').value.trim();
 			var passWord = document.getElementById('passWord').value.trim();
-			var withDrawQty = document.getElementById('withDrawQty').value.trim()
-			if(withDrawQty <= 0){
+			var withDrawQty = document.getElementById('withDrawQty').value.trim();
+			if(memberName == null ||memberName == ''){
+				mui.confirm("会员姓名不能为空")
+			}
+			else if(memberNo == null || memberNo ==''){
+				mui.confirm("会员账号不能为空")
+			}
+			else if(passWord == null || passWord==''){
+				mui.confirm("主卡密码不能为空")
+			}
+			else if(withDrawQty <= 0){
 				mui.confirm("圈提金额不能为0")
 			}
 			mui.ajax(url,{
