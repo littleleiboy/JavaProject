@@ -154,9 +154,7 @@
 						if(action === 1) { //绑定
 							mui.post(common.getServiceUrl('memberAppBind'), regInfo, function(result) {
 								if(result.success) {
-									//TODO 保存会员识别信息至本地配置
-									
-									plus.nativeUI.toast('绑定成功！');
+									plus.nativeUI.toast('绑定成功！请登录');
 									toLogin();
 								} else {
 									plus.nativeUI.toast(result.msg);
@@ -179,8 +177,6 @@
 							}
 							mui.post(common.getServiceUrl('regMember'), regInfo, function(result) {
 								if(result.success) {
-									//TODO 保存会员识别信息至本地配置
-									
 									plus.nativeUI.toast('注册成功！请至柜台领取实体会员卡');
 									toLogin();
 								} else {
