@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">圈提绑定</h1>
+		</header>
+		<div class="mui-content">				
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>会员姓名</label>
+					<input id="memberName" type="text" class="mui-input-clear" placeholder="会员姓名" />
+				</div>
+				<div class="mui-input-row">
+					<label>会员账号</label>
+					<input id="memberNo" type="text" class="mui-input-clear" placeholder="1000000000000" />
+				</div>
+				<div class="mui-input-row">
+					<label>开户姓名</label>
+					<input id="bankName" type="text" class="mui-input-clear" placeholder="开卡姓名" />
+				</div>
+				<div class="mui-input-row">
+					<label>开户身份证号</label>
+					<input id="IDCardNo" type="text" class="mui-input-clear" placeholder="321320200812120000" />
+				</div>
+				<div class="mui-input-row">
+					<label>中国银行卡号</label>
+					<input id="bankAccoutnNo" type="text" class="mui-input-clear" placeholder="6210000000000" />
+				</div>
+				<div class="mui-input-row">
+					<label>主卡密码</label>
+					<input id="passWord" type="password" class="mui-input-clear" placeholder="******" />
+				</div>
+			</form>
+			<div class="mui-content-padded">
+				<button id='btnBind' class="mui-btn mui-btn-block mui-btn-primary">确认绑定</button>
+			</div>
+		</div>
+		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					
+					
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>
