@@ -171,7 +171,7 @@ public class AppController extends AbstractController {
                         return new ResultData("ok", true, accToken, appUser);
                     } else {
                         logger.info("调用结算系统接口验证会员密码，结果：会员密码错误。");
-                        return new ResultData("err_password", false, "会员密码错误");
+                        return new ResultData("err_password", false, "账号或密码错误");
                     }
                 } else {
                     logger.info("调用结算系统接口验证会员密码，结果：远程接口出错。");
