@@ -47,7 +47,7 @@
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
 		<script src="../../lib/mui/js/mui.enterfocus.js"></script>
-		<script src="../../lib/security/md5.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script src="../../js/login/login.js"></script>
 		<script>
 			(function($, doc) {
@@ -114,11 +114,10 @@
 					var forgetButton = doc.getElementById('forgetPassword');
 					loginButton.addEventListener('tap', function(event) {
 						var loginInfo = {
-							mobile: accountBox.value,
-							pwd: passwordBox.value,
-							token: hex_md5(mobile + '|' + pwd)
+							mobileNum: accountBox.value,
+							pass: passwordBox.value
 						};
-						app.login(loginInfo, function(err) {
+						app.login(common.getServiceUrl('appLogin'), loginInfo, common.localSettingsKey, function(err) {
 							if(err) {
 								plus.nativeUI.toast(err);
 								return;
@@ -168,7 +167,7 @@
 								autoShow: false
 							}
 						});*/
-						plus.nativeUI.toast('请在西郊国际结算系统后台或至柜台重置密码');
+						plus.nativeUI.toast('请在西郊国际结算系统或至柜台重置密码');
 					}, false);
 					//
 					window.addEventListener('resize', function() {

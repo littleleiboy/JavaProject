@@ -7,27 +7,35 @@
 	/**
 	 * 用户登录
 	 **/
-	owner.login = function(loginInfo, callback) {
+	owner.login = function(url, loginInfo, localSettingsKey, callback) {
 		callback = callback || $.noop;
 		loginInfo = loginInfo || {};
-		loginInfo.mobile = loginInfo.mobile || '';
-		loginInfo.pwd = loginInfo.pwd || '';
-		loginInfo.token = loginInfo.token || '';
+		loginInfo.mobileNum = loginInfo.mobileNum || '';
+		loginInfo.pass = loginInfo.pass || '';
 
-		//TODO 请求登录验证
-		var authed = false;
-
-		if(authed) {
-			return owner.createState(loginInfo, callback);
-		} else {
-			return callback('用户名或密码错误');
+		if(loginInfo.mobileNum.length == 0) {
+			return callback('请输入绑定的手机号');
 		}
+		if(loginInfo.pass.length == 0) {
+			return callback('请输入密码');
+		}
+
+		mui.post(url, loginInfo, function(result) {
+			if(result.success) {
+				return owner.createState(result.data, callback);
+			} else {
+				return callback(result.msg);
+			}
+		}, 'json');
 	};
 
-	owner.createState = function(loginInfo, callback) {
+	owner.createState = function(loginData, callback) {
 		var state = owner.getState();
-		state.mobile = loginInfo.mobile;
-		state.token = loginInfo.token;
+		state.member_pk = loginData.member_pk;
+		state.member_no = loginData.member_no;
+		state.member_name = loginData.member_name;
+		state.member_mobile = loginData.member_mobile;
+		state.access_token = loginData.access_token;
 		owner.setState(state);
 		return callback();
 	};
@@ -36,7 +44,7 @@
 	 * 获取当前状态
 	 **/
 	owner.getState = function() {
-		var stateText = localStorage.getItem('local_state') || '{}';
+		var stateText = localStorage.getItem(localSettingsKey) || '{}';
 		return JSON.parse(stateText);
 	};
 
@@ -45,8 +53,24 @@
 	 **/
 	owner.setState = function(state) {
 		state = state || {};
-		localStorage.setItem('local_state', JSON.stringify(state));
+		localStorage.setItem(localSettingsKey, JSON.stringify(state));
 	};
+
+	/**
+	 * 获取登录本地配置
+	 **/
+	owner.setSettings = function(settings) {
+		settings = settings || {};
+		localStorage.setItem('login_settings', JSON.stringify(settings));
+	}
+
+	/**
+	 * 设置登录本地配置
+	 **/
+	owner.getSettings = function() {
+		var settingsText = localStorage.getItem('login_settings') || "{}";
+		return JSON.parse(settingsText);
+	}
 
 	/**
 	 * 找回密码

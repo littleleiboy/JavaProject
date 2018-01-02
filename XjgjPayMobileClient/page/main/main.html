@@ -145,23 +145,19 @@
 				<span class="mui-icon mui-icon-info"></span>
 				<span class="mui-tab-label">关于</span>
 			</a>
-			
+
 		</nav>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
-		<script src="../../js/login/login.js"></script>
 		<script>
 			(function($, doc) {
 				$.init();
 
-				//----------begin: 顶部标题栏-------------------
-				var settings = app.getSettings();
-				//var account = doc.getElementById('account');
-				//
 				window.addEventListener('show', function() {
 					//var state = app.getState();
-					//account.innerText = state.mobile;
 				}, false);
+
+				//----------begin: 顶部标题栏-------------------
 				$.plusReady(function() {
 					//设置
 					var settingPage = $.preload({
@@ -169,7 +165,7 @@
 						url: '../module/setting.html'
 					});
 					var settingButton = doc.getElementById('setting');
-					//settingButton.style.display = settings.autoLogin ? 'block' : 'none';
+
 					settingButton.addEventListener('tap', function(event) {
 						settingPage.show();
 					});
@@ -210,6 +206,8 @@
 						var id = this.getAttribute('id');
 						switch(id) {
 							case 'aRecharge': //圈存
+								//TODO 先验证会员是否已绑定圈存（是否开通圈存业务）
+								
 								pageRecharge.show();
 								break;
 							case 'aWithdrawal': //圈提
@@ -239,7 +237,7 @@
 						"url": '../module/about.html'
 					});
 					$('.mui-bar-tab').on('tap', 'a', function() {
-						document.location.href=this.href;
+						document.location.href = this.href;
 						var title = doc.querySelector('.mui-title');
 						var id = this.getAttribute('id');
 						switch(id) {
