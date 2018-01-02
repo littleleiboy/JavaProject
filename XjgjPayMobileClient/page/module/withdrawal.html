@@ -42,9 +42,16 @@
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
-		<script src="../../js/Module/withdrawal.js"></script>
+		<script src="../../js/module/withdrawal.js"></script>
 		<script type="text/javascript">
-			mui.init(); 
+			//Todo 判断圈提是否绑定
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					
+					
+				});
+			}(mui, document));
 		</script>
 	</body>
 
