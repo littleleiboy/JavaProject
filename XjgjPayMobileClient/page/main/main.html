@@ -149,16 +149,27 @@
 		</nav>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script>
 			(function($, doc) {
 				$.init();
 
-				window.addEventListener('show', function() {
-					//var state = app.getState();
-				}, false);
-
 				//----------begin: 顶部标题栏-------------------
 				$.plusReady(function() {
+					window.addEventListener('show', function() {
+						//do sth.
+					}, false);
+
+					var localSettings = common.getSettings();
+					if(common.isEmptyObject(localSettings)) {
+						plus.nativeUI.toast('请登录');
+						$.openWindow({
+							url: '../login/login.html',
+							id: 'login'
+						});
+						return;
+					}
+
 					//设置
 					var settingPage = $.preload({
 						id: 'setting',
@@ -206,9 +217,26 @@
 						var id = this.getAttribute('id');
 						switch(id) {
 							case 'aRecharge': //圈存
-								//TODO 先验证会员是否已绑定圈存（是否开通圈存业务）
-								
-								pageRecharge.show();
+								//验证会员是否有绑定的圈存银行卡
+								mui.post(common.getServiceUrl('hasMemberBankcard'), {
+									memberInfoId: localSettings.member_pk,
+									isRecharge: 1
+								}, function(result) {
+									if(result.success) {
+										if(result.code == 'yes') {
+											//去圈存
+											pageRecharge.show();
+										} else {
+											plus.nativeUI.toast('请先绑定用于圈存的银行卡');
+											//去绑定圈存
+											mui.openWindow({
+												url: '../module/recharge_binding.html'
+											});
+										}
+									} else {
+										plus.nativeUI.toast(common.msg.msgServerErr());
+									}
+								}, 'json');
 								break;
 							case 'aWithdrawal': //圈提
 								pageWidthdrawal.show();
