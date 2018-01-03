@@ -1,5 +1,7 @@
 package net.chenlin.dp.modules.base.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,14 @@ public class MemberBankcardServiceImpl implements MemberBankcardService {
     }
 
     @Override
+    public List<MemberBankcardEntity> listMemberBankcard(Map<String, Object> params, int defaultRowCount) {
+        Query query = new Query(params);
+        Page<MemberBankcardEntity> page = new Page<>(1, defaultRowCount, query);
+        memberBankcardManager.listMemberBankcard(page, query);
+        return page.getRows();
+    }
+
+    @Override
     public R saveMemberBankcard(MemberBankcardEntity role) {
         int count = memberBankcardManager.saveMemberBankcard(role);
         return CommonUtils.msg(count);
@@ -69,8 +79,9 @@ public class MemberBankcardServiceImpl implements MemberBankcardService {
         return memberBankcardManager.getBankcardByBfBindID(bfBindId);
     }
 
-	@Override
-	public boolean removeBankcardInfoByBankcardNo(String bankAccCard) {
-		return memberBankcardManager.removeBankcardInfoByBankcardNo(bankAccCard);
-	}
+    @Override
+    public boolean removeBankcardInfoByBankcardNo(String bankAccCard) {
+        return memberBankcardManager.removeBankcardInfoByBankcardNo(bankAccCard);
+    }
+
 }

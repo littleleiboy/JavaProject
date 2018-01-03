@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -953,8 +954,35 @@ public class AppController extends AbstractController {
         if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
             return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
         }
-        Page<MemberBankcardEntity> pageData = memberBankService.listMemberBankcard(params);
-        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, pageData);
+        List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(params, 1000);
+        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, listData);
+    }
+
+
+    /**
+     * 是否存在符合条件的银行卡信息
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/hasMemberBankcard")
+    public ResultData hasMemberBankcard(@RequestBody Map<String, Object> params) {
+        //验证token
+        if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+        }
+        String yesMsg = "存在符合条件的银行卡信息";
+        String noMsg = "不存在符合条件的银行卡信息";
+        List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(params, 1);
+        if (listData != null) {
+            if (listData.size() == 0) {
+                return new ResultData("no", true, noMsg, listData);
+            } else {
+                return new ResultData("yes", true, yesMsg, listData);
+            }
+        } else {
+            return new ResultData("no", true, noMsg);
+        }
     }
 
 }

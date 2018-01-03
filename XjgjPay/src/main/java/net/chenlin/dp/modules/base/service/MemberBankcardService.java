@@ -1,5 +1,6 @@
 package net.chenlin.dp.modules.base.service;
 
+import java.util.List;
 import java.util.Map;
 
 import net.chenlin.dp.common.entity.Page;
@@ -17,7 +18,9 @@ import net.chenlin.dp.modules.base.entity.MemberBankcardEntity;
 public interface MemberBankcardService {
 
 	Page<MemberBankcardEntity> listMemberBankcard(Map<String, Object> params);
-	
+
+	List<MemberBankcardEntity> listMemberBankcard(Map<String, Object> params, int defaultRowCount);
+
 	R saveMemberBankcard(MemberBankcardEntity memberBankcard);
 	
 	R getMemberBankcardById(Long id);
@@ -26,9 +29,10 @@ public interface MemberBankcardService {
 	
 	R batchRemove(Long[] id);
 
-    MemberBankcardEntity getBankcardByBankCardID(String memberId);
+    MemberBankcardEntity getBankcardByBankCardID(String bankAccCard);
 
 	MemberBankcardEntity getBankcardByBfBindID(String bfBindId);
 
 	boolean removeBankcardInfoByBankcardNo(String bankAccCard);
+
 }

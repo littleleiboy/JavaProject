@@ -86,6 +86,21 @@ public class Page<T> extends RowBounds {
         this.calcLimit();
     }
 
+    public Page(int defaultPageNo, int defaultPageSize, Query search) {
+        if (search.getAsInt("pageNumber") != null)
+            this.pageNo = search.getAsInt("pageNumber");
+        else
+            this.pageNo = defaultPageNo;
+
+        if (search.getAsInt("pageSize") != null)
+            this.pageSize = search.getAsInt("pageSize");
+        else
+            this.pageSize = defaultPageSize;
+
+        this.calcOffset();
+        this.calcLimit();
+    }
+
     /**
      * 获得当前页的页号,序号从1开始,默认为1.
      */
