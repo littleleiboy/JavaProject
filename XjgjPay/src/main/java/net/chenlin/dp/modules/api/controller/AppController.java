@@ -661,7 +661,7 @@ public class AppController extends AbstractController {
                     trade.setPayModeId(SystemConstant.PayMode.BAOFOO.getValue());
 
                     String bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
-                    if (null != null || !"".equals(bindId)) {
+                    if (null != bindId || !"".equals(bindId)) {
                         MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
                         if (bankCard != null) {
                             trade.setBankAccName(bankCard.getBankAccName());
@@ -864,11 +864,27 @@ public class AppController extends AbstractController {
                 if (map != null) {
                     if (momenyBalanceMap != null) {
                         if (isBind != null) {
-                            float accountBalance = Float.parseFloat(momenyBalanceMap.toString());
-                            float drawMoney = (float) params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
-                            if (accountBalance <= 0f && drawMoney > accountBalance) {
+                            BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.toString());
+                            BigDecimal drawMoney =  new BigDecimal( String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY))).divide(BigDecimal.valueOf(100));//圈提金额
+                            if (drawMoney.compareTo(accountBalance) > 0) {
                                 return new ResultData("err", false, "账户余额不足！", "");
                             }
+                            //TODO  圈提记录保存到数据库
+                            TradeLogEntity trade = new TradeLogEntity();
+                            trade.setTransSn(String.valueOf(map.get(XjgjAccApiConstant.FIELD_BIND_ID)));//流水号待定
+                            trade.setTransType(SystemConstant.TradeType.WITHDRAW.getValue());
+                            trade.setSellerOrderId(OrderNumberUtils.generateInTime());
+                            trade.setAmtMoney(drawMoney);
+                            trade.setPayModeId(SystemConstant.PayMode.XJGJ.getValue());
+                            MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(String.valueOf(isBind));
+                            if(bankCard != null) {
+                                trade.setBankAccName(bankCard.getBankAccName());
+                                trade.setBankAccCard(bankCard.getBankAccCard());
+                                trade.setBankCode(bankCard.getBankCode());
+                                trade.setBfBindId(String.valueOf(isBind));
+                            }
+                            trade.setGmtCreate(new Date());
+                            tradeLogService.saveTradeLog(trade);
                             return new ResultData("ok", true, "查询成功", map);
                         } else {
                             return new ResultData("err_noBind", false, "圈提没有绑定中国银行银行卡，请先绑定！", "");
