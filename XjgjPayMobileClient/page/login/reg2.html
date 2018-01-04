@@ -94,7 +94,7 @@
 						plus.nativeUI.toast('您已经绑定过，请登录');
 						toLogin();
 						action = 0;
-						return;
+						return false;
 					} else {
 						if(memberInfo.ifHasMember == 1) { //已经是会员，还未绑定
 							title.innerHTML = '会员绑定';
@@ -120,26 +120,26 @@
 						if(common.isNullOrEmpty(txtName.value)) {
 							plus.nativUI.toast('请填写姓名');
 							txtName.focus();
-							return;
+							return false;
 						}
 						if(common.isNullOrEmpty(txtMemberNO.value)) {
 							plus.nativeUI.toast('请填写要绑定的会员账号');
 							txtMemberNO.focus();
-							return;
+							return false;
 						}
 						if(common.isNullOrEmpty(txtIdCard.value)) {
 							plus.nativeUI.toast('请填写身份证号码');
 							txtIdCard.focus();
-							return;
+							return false;
 						}
 						if(common.isNullOrEmpty(txtPwd.value)) {
 							plus.nativeUI.toast('请填写密码');
 							txtPwd.focus();
-							return;
+							return false;
 						} else if(common.isDigit(txtPwd.value) == false && txtPwd.value.length != 6) {
 							plus.nativeUI.toast('密码格式为6位数字');
 							txtPwd.focus();
-							return;
+							return false;
 						}
 						//获取表单数据
 						var regInfo = {
@@ -163,19 +163,19 @@
 						} else if(action === 2) { //注册
 							if(txtPwdConfirm.value != regInfo.password) {
 								plus.nativeUI.toast('两次输入的密码不一致');
-								return;
+								return false;
 							}
 							if(common.isNullOrEmpty(txtAddr.value)) {
 								plus.nativeUI.toast('请填写会员地址');
 								txtAddr.focus();
-								return;
+								return false;
 							}
 							if(common.isNullOrEmpty(txtToAddr.value)) {
 								plus.nativeUI.toast('请填写商品去向地址');
 								txtToAddr.focus();
-								return;
+								return false;
 							}
-							mui.post(common.getServiceUrl('regMember'), regInfo, function(result) {
+							$.post(common.getServiceUrl('regMember'), regInfo, function(result) {
 								if(result.success) {
 									plus.nativeUI.toast('注册成功！请至柜台领取实体会员卡');
 									toLogin();

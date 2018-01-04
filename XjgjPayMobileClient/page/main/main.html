@@ -212,13 +212,14 @@
 						"url": '../module/bank.html'
 					});
 
-					$mui('.mui-table-view-cell').on('tap', 'a', function() {
+					$('.mui-table-view-cell').on('tap', 'a', function() {
 						var title = doc.querySelector('.mui-title');
 						var id = this.getAttribute('id');
 						switch(id) {
 							case 'aRecharge': //圈存
 								//验证会员是否有绑定的圈存银行卡
-								mui.post(common.getServiceUrl('hasMemberBankcard'), {
+								$.post(common.getServiceUrl('hasMemberBankcard'), {
+									access_token: localSettings.access_token,
 									memberInfoId: localSettings.member_pk,
 									isRecharge: 1
 								}, function(result) {

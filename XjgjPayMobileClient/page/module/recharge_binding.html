@@ -18,71 +18,174 @@
 		<div class="mui-content">
 			<form class="mui-input-group">
 				<button id='showBankPicker' class="mui-btn mui-btn-block" type='button'>请选择发卡银行 ...</button>
-				<div id='bankResult' class="ui-alert"></div>
+				<!--<div id='bankResult' class="ui-alert"></div>-->
+				<div class="mui-input-row">
+					<label>银行卡</label>
+					<input id='acc_no' type="text" class="mui-input-clear mui-input" placeholder="绑定圈存的银行卡号">
+				</div>
+				<div class="mui-input-row">
+					<label>身份证</label>
+					<input id='id_card' type="text" class="mui-input-clear mui-input" placeholder="身份证号码">
+				</div>
+				<div class="mui-input-row">
+					<label>手机号</label>
+					<input id='mobile' type="text" class="mui-input-clear mui-input" placeholder="手机号码" readonly="readonly">
+				</div>
+				<div class="mui-input-row">
+					<label>姓名</label>
+					<input id='id_holder' type="text" class="mui-input-clear mui-input" placeholder="账户姓名">
+				</div>
+				<div class="mui-input-row">
+					<input id='sms_code' type="text" class="mui-input-clear mui-input" placeholder="短信验证码" style="width: 60%;float: left;">
+					<button id='btnGetSms' class="mui-btn" data-loading-text="60秒后重新获取" style="width: 38%">获取验证码</button>
+				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='btnReg' class="mui-btn mui-btn-block mui-btn-primary">确认绑定圈存</button>
+				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary">申请绑定圈存</button>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
 		<script src="../../lib/mui/js/mui.picker.js"></script>
 		<script src="../../lib/mui/js/mui.poppicker.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script type="text/javascript">
 			(function($, doc) {
-				//for ..in 遍历方式  
-				function getPickerData(){  
-					// for in 遍历需要两个形参 ，index表示数组的下标(可以自定义)，arr表示要遍历的数组  
-					for(var index in arr){  
-						console.log(arr[index]);  
-		  
-					} 
-				}  
-		
 				$.init();
-				$.ready(function() {
+
+				function toLogin() {
+					plus.nativeUI.toast('请登录');
+					$.openWindow({
+						url: '../login/login.html',
+						id: 'login'
+					});
+				}
+				$.plusReady(function() {
+					var localSettings = common.getSettings();
+					if(common.isEmptyObject(localSettings)) {
+						toLogin();
+						return false;
+					}
+					var mobile = doc.getElementById('mobile');
+					mobile.value = localSettings.mobile;
+
+					var sms_code = doc.getElementById('sms_code');
+					var btnGetSms = doc.getElementById('btnGetSms');
+					var btnSubmit = doc.getElementById('btnSubmit');
+					var acc_no = doc.getElementById('acc_no');
+					var id_card = doc.getElementById('id_card');
+					var id_holder = doc.getElementById('id_holder');
+					//id_holder.value = localSettings.member_name;
+
+					//------begin: 银行列表选择器------
+					var bank = {};
 					var bankPicker = new $.PopPicker();
-					bankPicker.setData([{
-						value: 'ywj',
-						text: '董事长 叶文洁'
-					}, {
-						value: 'aaa',
-						text: '总经理 艾AA'
-					}, {
-						value: 'lj',
-						text: '罗辑'
-					}, {
-						value: 'ymt',
-						text: '云天明'
-					}, {
-						value: 'shq',
-						text: '史强'
-					}, {
-						value: 'zhbh',
-						text: '章北海'
-					}, {
-						value: 'zhy',
-						text: '庄颜'
-					}, {
-						value: 'gyf',
-						text: '关一帆'
-					}, {
-						value: 'zhz',
-						text: '智子'
-					}, {
-						value: 'gezh', 
-						text: '歌者'
-					}]);
+
+					var pickerData = new Array();
+					$.post(common.getServiceUrl('listBank'), {}, function(result) {
+						if(result.success) {
+							for(var i in result.data) {
+								var item = {
+									value: result.data.bankId,
+									text: result.data.bankName
+								};
+								pickerData[i] = item;
+							}
+							bankPicker.setData(pickerData);
+						}
+					}, 'json');
+
 					var showBankPickerButton = doc.getElementById('showBankPicker');
-					var bankResult = doc.getElementById('bankResult');
+					//var bankResult = doc.getElementById('bankResult');
 					showBankPickerButton.addEventListener('tap', function(event) {
 						bankPicker.show(function(items) {
-							bankResult.innerText = JSON.stringify(items[0]);
+							bank = JSON.stringify(items[0]);
+							//bankResult.innerText = bank;
 							//返回 false 可以阻止选择框的关闭
 							//return false;
 						});
 					}, false);
-					
-			})(mui, document);
+					//------end: 银行列表选择器------
+
+					//	------begin: 提交预绑卡申请并获取短信验证码------
+					btnGetSms.addEventListener('tap', function() {
+						btnGetSms.disabled = true;
+
+						var count = 60;
+						var timer = setInterval(function() {
+							if(count === 0) {
+								clearInterval(timer);
+								btnGetSms.disabled = false;
+								btnGetSms.innerHTML = '获取验证码';
+							} else {
+								btnGetSms.innerHTML = count + '秒后重新获取';
+								count--;
+							}
+						}, 1000);
+
+						//获取验证码之前验证表单
+						if(common.isNullOrEmpty(localSettings.member_mobile)) {
+							toLogin();
+							return false;
+						}
+						if(common.isNullOrEmpty(bank.value)) {
+							plus.nativeUI.toast('请选择发卡银行');
+							return false;
+						}
+						if(common.isNullOrEmpty(acc_no.value)) {
+							plus.nativeUI.toast('请填写银行卡号');
+							return false;
+						}
+						if(common.isNullOrEmpty(id_card.value)) {
+							plus.nativeUI.toast('请填写身份证号码');
+							return false;
+						}
+						if(common.isNullOrEmpty(id_holder.value)) {
+							plus.nativeUI.toast('请填写账户姓名');
+							return false;
+						}
+
+						var data = {};
+						//调用短信接口发送验证码
+						$.post(common.getServiceUrl('preBindBaofoo'), {
+							access_token: localSettings.access_token,
+							mobile: mobile.value,
+							acc_no: acc_no.value,
+							id_card: id_card.value,
+							id_holder: id_holder.value,
+							pay_code: bank.value
+						}, function(result) {
+							if(result.success) {
+								data = result.data;
+							} else {
+								plus.nativeUI.toast(result.msg);
+							}
+							clearInterval(timer);
+							btnGetSms.disabled = false;
+							btnGetSms.innerHTML = '获取验证码';
+						}, 'json');
+					});
+					//	------end: 提交预绑卡申请并获取短信验证码------
+
+					//------begin: 申请绑定圈存------
+					btnSubmit.addEventListener('tap', function() {
+						if(common.isNullOrEmpty(sms_code.value)) {
+							plus.nativUI.toast('请输入短信验证码');
+							return false;
+						}
+						data.sms_code = sms_code.value;
+						$.post(common.getServiceUrl('confirmBindBaofoo'),data,function(result){
+							if(result.success) {
+								plus.nativeUI.toast(result.msg);
+								//进入预加载的圈存界面
+								plus.webview.getWebviewById('pageRecharge').show();
+							}else{
+								plus.nativeUI.toast(result.msg);
+							}
+						})
+					});
+					//------end: 申请绑定圈存------
+				});
+			}(mui, document));
 		</script>
 	</body>
 

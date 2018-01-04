@@ -75,7 +75,7 @@
 						var fc = new FormatCheck();
 						if(!fc.isMobileNum(mobileNum.value)) {
 							plus.nativeUI.toast('手机号格式不正确');
-							return;
+							return false;
 						}
 
 						// 查询会员基本信息

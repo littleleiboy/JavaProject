@@ -404,15 +404,11 @@ public class AppController extends AbstractController {
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
             params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
 
-            //验证访问口令
-            if (!checkStrAccToken(params)) {
-                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
-            //商户订单号不能为空
+            /*//商户订单号不能为空
             String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
             if (null == trans_id || "".equals(trans_id)) {
                 return new ResultData("err_trans_id", false, BaofooApiConstant.MSG_REQUIRE_TRANS_ID);
-            }
+            }*/
             //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
