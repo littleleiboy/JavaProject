@@ -44,6 +44,10 @@ myprop:
                 bfb0aebe0aa35d2aa9db2a15aaf02609
             app-url: #结算系统接口url
                 https://124.74.156.50:8443/app/
+            jks-name:
+                xjgj_jsxt_truststore.jks
+            jks-pwd:
+                XjgjD208
         baofoo:
             url: #宝付支付接口url
                 https://vgw.baofoo.com/cutpayment/api/backTransRequest

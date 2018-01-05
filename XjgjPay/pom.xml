@@ -38,6 +38,7 @@
 		<shiro-version>1.3.2</shiro-version>
 		<quartz-version>2.2.3</quartz-version>
         <httpclient-version>4.5.3</httpclient-version>
+		<httpmime-version>4.5.4</httpmime-version>
         <nekohtml-version>1.9.22</nekohtml-version>
         <velocity-version>1.7</velocity-version>
 		<jackson-dataformat-version>2.8.10</jackson-dataformat-version>
@@ -153,7 +154,12 @@
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
-		    <version>${httpclient-version}</version><!--$NO-MVN-MAN-VER$-->
+		    <version>${httpclient-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>${httpmime-version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>net.sourceforge.nekohtml</groupId>

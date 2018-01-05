@@ -151,7 +151,7 @@ public class BaofooApiServiceImpl implements BaofooApiService {
             param.put(BaofooApiConstant.FIELD_DATA_CONTENT, data_content);
 
             //请求宝付接口方法
-            String r = apiManager.backTrans(map);
+            String r = apiManager.backTrans(param);
             if (!r.isEmpty()) {
                 r = RSAUtils.decryptByPubCerFile(r, cerPath);
                 if (r.isEmpty()) {//判断解密是否正确。如果为空则宝付公钥不正确

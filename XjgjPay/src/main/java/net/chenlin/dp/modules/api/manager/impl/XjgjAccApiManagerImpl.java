@@ -1,9 +1,11 @@
 package net.chenlin.dp.modules.api.manager.impl;
 
+import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
 import net.chenlin.dp.common.utils.DynamicTokenUtils;
 import net.chenlin.dp.common.utils.HttpUtils;
 import net.chenlin.dp.common.utils.JacksonUtils;
+import net.chenlin.dp.common.utils.SpringContextUtils;
 import net.chenlin.dp.modules.api.manager.XjgjAccApiManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,12 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
 
     @Value("${myprop.api.jsxt.app-url}")
     private String urlPerfix;
+
+    @Value("${myprop.api.jsxt.jks-name}")
+    private String jksName;
+
+    @Value("${myprop.api.jsxt.jks-pwd}")
+    private String jksPassword;
 
     private String getApiUrl(String method) {
         return urlPerfix + method;
@@ -41,6 +49,12 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
         }
     }
 
+    private String postSSL(String apiUrl, String data) {
+        String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
+        String jksFilePath = path + "\\" + jksName;
+        return HttpUtils.postRequestSSL(apiUrl, data, jksFilePath, jksPassword);
+    }
+
     /**
      * 查询会员基本信息
      *
@@ -50,7 +64,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> getMemberBaseInfo(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BASE_INFO), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_GET_MEMBER_BASE_INFO), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -66,7 +80,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> checkMemberPassword(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_PASSWORD_CHECK), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_PASSWORD_CHECK), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -82,7 +96,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> memberAppBind(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_APP_BIND), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_APP_BIND), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -98,7 +112,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> regMember(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_REG), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_REG), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -114,7 +128,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> recharge(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -130,7 +144,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      */
     @Override
     public Map<String, Object> retryRecharge(Map<String, Object> map) throws Exception {
-        String r = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map));
+        String r = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_RECHARGE_RETRY), mapToJsonStr(map));
         if (!r.isEmpty())
             return JacksonUtils.jsonToMap(r);
         else
@@ -139,11 +153,9 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
 
     /**
      * 会员圈提绑定
-     *
-     *
-    * */
-    public Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception{
-        return JacksonUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_BIND_BOC), mapToJsonStr(map)));
+     */
+    public Map<String, Object> memberBindBOC(Map<String, Object> map) throws Exception {
+        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_BIND_BOC), mapToJsonStr(map)));
     }
 
     /**
@@ -151,10 +163,10 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      *
      * @param map
      * @return
-    * */
-    public Map<String,Object> memberUnBindBOC(Map<String,Object> map) throws Exception{
-        String returnString = HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_UNBIND_BOC), mapToJsonStr(map));
-        if(!returnString.isEmpty()){
+     */
+    public Map<String, Object> memberUnBindBOC(Map<String, Object> map) throws Exception {
+        String returnString = postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_UNBIND_BOC), mapToJsonStr(map));
+        if (!returnString.isEmpty()) {
             return JacksonUtils.jsonToMap(returnString);
         } else {
             return null;
@@ -163,29 +175,32 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
 
     /**
      * 会员圈提
+     *
      * @param map 发送的数据
      * @return 返回值
-     * */
-    public Map<String,Object> memberWithDraw(Map<String, Object> map) throws Exception{
-        return JacksonUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_WITH_DRAW), mapToJsonStr(map)));
+     */
+    public Map<String, Object> memberWithDraw(Map<String, Object> map) throws Exception {
+        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.METHOD_MEMBER_WITH_DRAW), mapToJsonStr(map)));
     }
 
     /**
-     *查询会员账户余额
+     * 查询会员账户余额
+     *
      * @param memberNo 发送数据
      * @return 返回结果
-     * */
-    public Map<String,Object> searchMemberAccountBalance(String memberNo) throws Exception{
-        return JacksonUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), memberNo));
+     */
+    public Map<String, Object> searchMemberAccountBalance(String memberNo) throws Exception {
+        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), memberNo));
     }
 
     /**
      * 查询一段时间内账户变动记录
+     *
      * @param map 参数
      * @return 返回结果
-     * */
-    public Map<String,Object> searchMemberCostLog(Map<String, Object> map) throws Exception{
-        return JacksonUtils.jsonToMap(HttpUtils.postRequestSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_COST_LOG), mapToJsonStr(map)));
+     */
+    public Map<String, Object> searchMemberCostLog(Map<String, Object> map) throws Exception {
+        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_COST_LOG), mapToJsonStr(map)));
     }
 
 

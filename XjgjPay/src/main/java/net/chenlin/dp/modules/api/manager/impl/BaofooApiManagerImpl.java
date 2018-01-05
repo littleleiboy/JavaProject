@@ -24,6 +24,6 @@ public class BaofooApiManagerImpl implements BaofooApiManager {
      */
     @Override
     public String backTrans(Map<String, String> map) throws Exception {
-        return HttpUtils.postRequestSSL(apiUrl, JacksonUtils.beanToJson(map));
+        return HttpUtils.postIgnoreSSL(apiUrl, JacksonUtils.beanToJson(map));
     }
 }

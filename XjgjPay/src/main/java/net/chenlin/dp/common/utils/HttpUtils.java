@@ -3,14 +3,12 @@ package net.chenlin.dp.common.utils;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -28,7 +26,7 @@ import javax.net.ssl.*;
 
 /**
  * Http请求帮助类
- * Andy 2017-12-13
+ * Andy.Wang 2018-1-5
  */
 public final class HttpUtils {
 
@@ -96,14 +94,14 @@ public final class HttpUtils {
     }
 
     /**
-     * 描述:  发起https请求并获取结果
+     * 发起https请求并获取结果（忽略客户端验证SSL证书）
      *
      * @param requestUrl    请求地址
      * @param requestMethod 请求方式（GET/POST）
-     * @param str           提交的数据
-     * @return
+     * @param data           提交的数据
+     * @return 响应结果
      */
-    public static String requestSSL(String requestUrl, String requestMethod, String str) {
+    public static String requestIgnoreSSL(String requestUrl, String requestMethod, String data) {
         StringBuffer buffer = new StringBuffer();
         try {
             // 创建SSLContext对象，并使用我们指定的信任管理器初始化
@@ -113,41 +111,7 @@ public final class HttpUtils {
             // 从上述SSLContext对象中得到SSLSocketFactory对象
             SSLSocketFactory ssf = sslContext.getSocketFactory();
 
-            URL url = new URL(requestUrl);
-            HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
-            httpUrlConn.setSSLSocketFactory(ssf);
-
-            httpUrlConn.setDoOutput(true);
-            httpUrlConn.setDoInput(true);
-            httpUrlConn.setUseCaches(false);
-
-            // 设置请求方式（GET/POST）
-            httpUrlConn.setRequestMethod(requestMethod);
-
-            if ("GET".equalsIgnoreCase(requestMethod))
-                httpUrlConn.connect();
-
-            // 当有数据需要提交时
-            if (null != str) {
-                OutputStream outputStream = httpUrlConn.getOutputStream();
-                // 注意编码格式，防止中文乱码
-                outputStream.write(str.getBytes("utf-8"));
-                outputStream.close();
-            }
-
-            // 将返回的输入流转换成字符串
-            InputStream inputStream = httpUrlConn.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            String strRead = null;
-            while ((strRead = bufferedReader.readLine()) != null) {
-                buffer.append(strRead);
-            }
-            bufferedReader.close();
-            inputStreamReader.close();
-            inputStream.close();
-            httpUrlConn.disconnect();
+            httpsRequest(requestUrl, requestMethod, data, buffer, ssf);
         } catch (ConnectException ce) {
             //System.out.println("API server connection error." + ce.getMessage());
             logger.error("API server connection error.", ce);
@@ -159,25 +123,96 @@ public final class HttpUtils {
     }
 
     /**
-     * 发起https post请求并获取结果
-     *
-     * @param requestUrl
-     * @param str
-     * @return
+     * 发起https请求并获取结果（客户端单向验证SSL证书）
+     * @param requestUrl 请求URL
+     * @param requestMethod 请求方式（GET/POST）
+     * @param data 提交的数据
+     * @param keyStorePath 证书文件路径
+     * @param keyPassword 证书秘钥
+     * @return 响应结果
      */
-    public static String postRequestSSL(String requestUrl, String str) {
-        return requestSSL(requestUrl, "POST", str);
+    public static String requestOneWaySSL(String requestUrl, String requestMethod, String data, String keyStorePath, String keyPassword) {
+        StringBuffer buffer = new StringBuffer();
+        try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            FileInputStream instream = new FileInputStream(new File(keyStorePath));
+            try {
+                trustStore.load(instream, keyPassword.toCharArray());
+            } finally {
+                instream.close();
+            }
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(trustStore);
+
+            SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
+            // 从上述SSLContext对象中得到SSLSocketFactory对象
+            SSLSocketFactory socketFactory = sslContext.getSocketFactory();
+
+            httpsRequest(requestUrl, requestMethod, data, buffer, socketFactory);
+        } catch (ConnectException ce) {
+            //System.out.println("API server connection error." + ce.getMessage());
+            logger.error("API server connection error.", ce);
+        } catch (Exception e) {
+            //System.out.println("Https request error." + e.getMessage());
+            logger.error("Https request error.", e);
+        }
+        return buffer.toString();
     }
 
-    /**
-     * 发起https get请求并获取结果
-     *
-     * @param requestUrl
-     * @param str
-     * @return
-     */
-    public static String getRequestSSL(String requestUrl, String str) {
-        return requestSSL(requestUrl, "GET", str);
+    //发起https请求
+    private static void httpsRequest(String requestUrl, String requestMethod, String data, StringBuffer buffer, SSLSocketFactory socketFactory) throws IOException {
+        URL url = new URL(requestUrl);
+        HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
+        httpUrlConn.setSSLSocketFactory(socketFactory);
+
+        httpUrlConn.setDoOutput(true);
+        httpUrlConn.setDoInput(true);
+        httpUrlConn.setUseCaches(false);
+
+        // 设置请求方式（GET/POST）
+        httpUrlConn.setRequestMethod(requestMethod);
+
+        if ("GET".equalsIgnoreCase(requestMethod))
+            httpUrlConn.connect();
+
+        // 当有数据需要提交时
+        if (null != data) {
+            OutputStream outputStream = httpUrlConn.getOutputStream();
+            // 注意编码格式，防止中文乱码
+            outputStream.write(data.getBytes("utf-8"));
+            outputStream.close();
+        }
+
+        // 将返回的输入流转换成字符串
+        InputStream inputStream = httpUrlConn.getInputStream();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+        String strRead = null;
+        while ((strRead = bufferedReader.readLine()) != null) {
+            buffer.append(strRead);
+        }
+        bufferedReader.close();
+        inputStreamReader.close();
+        inputStream.close();
+        httpUrlConn.disconnect();
+    }
+
+    public static String postIgnoreSSL(String requestUrl, String data) {
+        return requestIgnoreSSL(requestUrl, "POST", data);
+    }
+
+    public static String getIgnoreSSL(String requestUrl, String data) {
+        return requestIgnoreSSL(requestUrl, "GET", data);
+    }
+
+    public static String postRequestSSL(String requestUrl, String data, String keyStorePath, String keyPassword) {
+        return requestOneWaySSL(requestUrl, "POST", data, keyStorePath, keyPassword);
+    }
+
+    public static String getRequestSSL(String requestUrl, String data, String keyStorePath, String keyPassword) {
+        return requestOneWaySSL(requestUrl, "GET", data, keyStorePath, keyPassword);
     }
 
 	/*
@@ -211,6 +246,6 @@ class MyX509TrustManager implements X509TrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
+        return null;
     }
 }
