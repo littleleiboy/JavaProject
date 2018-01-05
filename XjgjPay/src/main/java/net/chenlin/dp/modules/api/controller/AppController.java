@@ -585,7 +585,6 @@ public class AppController extends AbstractController {
             if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
-
             //宝付认证支付类预支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.preparePay.getValue());
 
@@ -977,8 +976,8 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      */
-    @RequestMapping("/hasMemberBankcard")
-    public ResultData hasMemberBankcard(@RequestBody Map<String, Object> params) {
+    @RequestMapping("/getFirstMemberBankcard")
+    public ResultData getFirstMemberBankcard(@RequestBody Map<String, Object> params) {
         //验证token
         if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
             return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
@@ -988,9 +987,9 @@ public class AppController extends AbstractController {
         List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(params, 1);
         if (listData != null) {
             if (listData.size() == 0) {
-                return new ResultData("no", true, noMsg, listData);
+                return new ResultData("no", true, noMsg, listData.get(0));
             } else {
-                return new ResultData("yes", true, yesMsg, listData);
+                return new ResultData("yes", true, yesMsg, listData.get(0));
             }
         } else {
             return new ResultData("no", true, noMsg);

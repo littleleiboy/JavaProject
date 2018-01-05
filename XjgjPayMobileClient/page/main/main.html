@@ -218,7 +218,7 @@
 						switch(id) {
 							case 'aRecharge': //圈存
 								//验证会员是否有绑定的圈存银行卡
-								$.post(common.getServiceUrl('hasMemberBankcard'), {
+								$.post(common.getServiceUrl('getFirstMemberBankcard'), {
 									access_token: localSettings.access_token,
 									memberInfoId: localSettings.member_pk,
 									isRecharge: 1
