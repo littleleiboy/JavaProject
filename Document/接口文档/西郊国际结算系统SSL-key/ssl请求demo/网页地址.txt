@@ -1,0 +1,12 @@
+http://blog.csdn.net/self_examination/article/details/47071345
+
+
+密码 XjgjD208
+
+西郊国际王慧超:
+
+请在windows/system32/drivers/etc/hosts这个文件里面加一个
+124.74.156.50   xjgjapp.com
+
+然后访问地址用
+https://xjgjapp.com:8443/app/memberSearchRequest
