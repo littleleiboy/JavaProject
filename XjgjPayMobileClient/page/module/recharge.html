@@ -53,6 +53,21 @@
 						id: 'login'
 					});
 				}
+
+				function toTradeResult(title, description, data) {
+					var webview = mui.openWindow({
+						url: 'trade_result.html',
+						extras: {
+							r_type: 'recharge',
+							r_title: title,
+							r_description: description,
+							r_trans_serial_no: data.trans_serial_no,
+							r_trans_id: data.trans_id,
+							r_time: data.trade_date
+						}
+					});
+				}
+
 				$.plusReady(function() {
 					var localSettings = common.getSettings();
 					if(common.isEmptyObject(localSettings)) {
@@ -116,7 +131,7 @@
 							return false;
 						}
 
-						//TODO  请求结算系统验证主卡密码
+						//请求结算系统验证主卡密码
 						$.post(common.getServiceUrl('checkMemberPass'), {
 							access_token: localSettings.access_token,
 							memberNo: localSettings.member_no,
@@ -154,11 +169,13 @@
 						}
 						data.sms_code = sms_code.value;
 						$.post(common.getServiceUrl('recharge'), data, function(result) {
+							var r_msg;
 							if(result.success) {
 								plus.nativeUI.toast(result.msg);
-								//TODO 圈存成功后，转向交易结果页面
+								toTradeResult('交易处理成功', '圈存交易成功！', result.data);
 							} else {
 								plus.nativeUI.toast(result.msg);
+								toTradeResult('交易处理失败', '圈存交易遇到错误。' + result.msg, result.data);
 							}
 						})
 					});

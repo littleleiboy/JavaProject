@@ -172,12 +172,16 @@
 							return false;
 						}
 						data.sms_code = sms_code.value;
-						$.post(common.getServiceUrl('confirmBindBaofoo'),data,function(result){
+						$.post(common.getServiceUrl('confirmBindBaofoo'), data, function(result) {
 							if(result.success) {
 								plus.nativeUI.toast(result.msg);
-								//进入预加载的圈存界面
-								plus.webview.getWebviewById('pageRecharge').show();
-							}else{
+								//去圈存
+								$.openWindow({
+									url: 'recharge.html',
+									id: 'pageRecharge'
+								});
+								$.back();//关闭当前窗体
+							} else {
 								plus.nativeUI.toast(result.msg);
 							}
 						})

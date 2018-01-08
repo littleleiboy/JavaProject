@@ -153,7 +153,13 @@
 		<script>
 			(function($, doc) {
 				$.init();
-
+				//打开圈存界面
+				function toRecharge() {
+					$.openWindow({
+						url: '../module/recharge.html',
+						id: 'pageRecharge'
+					});
+				}
 				//----------begin: 顶部标题栏-------------------
 				$.plusReady(function() {
 					window.addEventListener('show', function() {
@@ -199,10 +205,6 @@
 					//----------end: 轮播图片-------------------
 
 					//----------begin: 九宫格菜单-------------------
-					var pageRecharge = $.preload({
-						"id": 'pageRecharge',
-						"url": '../module/recharge.html'
-					});
 					var pageWidthdrawal = $.preload({
 						"id": 'pageWidthdrawal',
 						"url": '../module/withdrawal.html'
@@ -226,7 +228,7 @@
 									if(result.success) {
 										if(result.code == 'yes') {
 											//去圈存
-											pageRecharge.show();
+											toRecharge();
 										} else {
 											plus.nativeUI.toast('请先绑定用于圈存的银行卡');
 											//去绑定圈存

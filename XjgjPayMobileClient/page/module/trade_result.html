@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">交易结果</h1>
+		</header>
+		<div class="mui-content" style="margin-left: 20px;margin-top: 20px;">
+			<h3>
+				<span class="mui-icon mui-icon-chat" style="font-size: 1em;"></span>
+				<span id="r_title">交易结果</span>
+			</h3>
+			<ul>
+				<li>描述：<span id="r_description"></span></li>
+				<li>交易流水号：<span id="r_trans_serial_no"></span></li>
+				<li>订单号：<span id="r_trans_id"></span></li>
+				<li>订单发送时间：<span id="r_time"></span></li>
+			</ul>
+			<button type="button" class='mui-btn mui-action-back'>关闭</button>
+		</div>
+		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				mui.init();
+				$.plusReady(function() {
+					var currentWebview = plus.webview.currentWebview();
+					doc.getElementById('r_title').innerHTML = currentWebview.r_title;
+					doc.getElementById('r_description').innerHTML = currentWebview.r_description;
+					doc.getElementById('r_trans_serial_no').innerHTML = currentWebview.r_trans_serial_no;
+					doc.getElementById('r_trans_id').innerHTML = currentWebview.r_trans_id;
+					doc.getElementById('r_time').innerHTML = currentWebview.r_time;
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>
