@@ -2,10 +2,7 @@ package net.chenlin.dp.modules.api.manager.impl;
 
 import net.chenlin.dp.common.constant.SystemConstant;
 import net.chenlin.dp.common.constant.XjgjAccApiConstant;
-import net.chenlin.dp.common.utils.DynamicTokenUtils;
-import net.chenlin.dp.common.utils.HttpUtils;
-import net.chenlin.dp.common.utils.JacksonUtils;
-import net.chenlin.dp.common.utils.SpringContextUtils;
+import net.chenlin.dp.common.utils.*;
 import net.chenlin.dp.modules.api.manager.XjgjAccApiManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -50,8 +47,7 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     private String postSSL(String apiUrl, String data) {
-        String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
-        String jksFilePath = path + "\\" + jksName;
+        String jksFilePath = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\" + jksName;
         return HttpUtils.postRequestSSL(apiUrl, data, jksFilePath, jksPassword);
     }
 

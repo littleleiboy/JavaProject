@@ -2,10 +2,7 @@ package net.chenlin.dp.modules.api.service.impl;
 
 import net.chenlin.dp.common.constant.BaofooApiConstant;
 import net.chenlin.dp.common.constant.SystemConstant;
-import net.chenlin.dp.common.utils.JacksonUtils;
-import net.chenlin.dp.common.utils.EncryptUtils;
-import net.chenlin.dp.common.utils.RSAUtils;
-import net.chenlin.dp.common.utils.SpringContextUtils;
+import net.chenlin.dp.common.utils.*;
 import net.chenlin.dp.modules.api.manager.BaofooApiManager;
 import net.chenlin.dp.modules.api.service.BaofooApiService;
 import org.slf4j.Logger;
@@ -142,9 +139,9 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                 jsonOrXml = JacksonUtils.beanToXml(dataContent);
             }
 
-            String path = SpringContextUtils.getRealPath(SystemConstant.KEY_FILE_ROOT);
-            String pfxPath = path + "\\" + pfx_name;//商户私钥
-            String cerPath = path + "\\" + cer_name;//宝付公钥
+            String path = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\";
+            String pfxPath = path + pfx_name;//商户私钥
+            String cerPath = path + cer_name;//宝付公钥
 
             String base64str = EncryptUtils.Base64Encode(jsonOrXml);
             String data_content = RSAUtils.encryptByPriPfxFile(base64str, pfxPath, pfx_pwd);

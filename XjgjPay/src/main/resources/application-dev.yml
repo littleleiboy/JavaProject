@@ -39,7 +39,7 @@ myprop:
             app-key: #结算系统访问口令生成密钥
                 bfb0aebe0aa35d2aa9db2a15aaf02609
             app-url: #结算系统接口url
-                https://124.74.156.50:8443/app/
+                https://xjgjapp.com:8443/app/
             jks-name:
                 xjgj_jsxt_truststore.jks
             jks-pwd:

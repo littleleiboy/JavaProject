@@ -48,16 +48,4 @@ public class SpringContextUtils implements ApplicationContextAware {
         return applicationContext.getType(name);
     }
 
-    /**
-     * 得到web目录的绝对路径
-     *
-     * @param dir
-     * @return
-     */
-    public static String getRealPath(String dir) {
-        WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
-        ServletContext servletContext = webApplicationContext.getServletContext();
-        return servletContext.getRealPath(dir);
-    }
-
 }
