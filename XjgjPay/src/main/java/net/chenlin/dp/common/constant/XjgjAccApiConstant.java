@@ -72,9 +72,9 @@ public class XjgjAccApiConstant {
     public static final String FIELD_MEMBER_TYPE = "memberType";
     public static final String FIELD_BIND_ID = "bind_id";
     public static final String FIELD_IS_QT_BINDED = "ifQtBinded";
-    public static final String FIELD_ID_CARD = "idCardNo";
+    public static final String FIELD_ID_CARD = "IDCardNo";
     public static final String FIELD_PASSWORD = "password";
-    public static final String FIELD_BANK_ACCOUNT = "bankAccount";
+    public static final String FIELD_BANK_ACCOUNT = "bankAccountNo";
     public static final String FIELD_MEMBER_CARD_NO = "mCardNo2";
     public static final String FIELD_MEMBER_ADDRESS="memberAddress";
     public static final String FIELD_TO_CORP_ADDRESS = "toCorpAddress";

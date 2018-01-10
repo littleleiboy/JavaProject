@@ -457,7 +457,7 @@ public class AppController extends AbstractController {
                         MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(bankCardID);
                         if (memberBankcardInfo != null) {
                             //从数据库删除该银行卡的信息
-                            if (memberBankService.removeBankcardInfoByBankcardNo(bankCardID) == true) {
+                            if (true ==  memberBankService.removeBankcardInfoByBankcardNo(bankCardID) ) {
                                 return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                             } else {
                                 return new ResultData("false", false, "解除绑定关系失败", mapResult);
@@ -749,7 +749,7 @@ public class AppController extends AbstractController {
                 if (null == memberName || "".equals(memberName)) {
                     return new ResultData("err_memberName_isnull", false, "会员姓名不能为空！");
                 }
-                Object memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
+                Object memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号
                 if (null == memberNo || "".equals(memberNo)) {
                     return new ResultData("err_memberNo_isnull", false, "会员账号不能为空！");
                 }
@@ -761,7 +761,7 @@ public class AppController extends AbstractController {
                 if (null == idCard || "".equals(idCard)) {
                     return new ResultData("err_idCard_isnull", false, "开户身份证号不能为空！");
                 }
-                Object bankAccountNo = params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);//手机号
+                Object bankAccountNo = params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);//中国银行卡号
                 if (null == bankAccountNo || "".equals(bankAccountNo)) {
                     return new ResultData("err_bankAccountNo_isnull", false, "中国银行卡号不能为空！");
                 }
@@ -773,25 +773,28 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
+                    if(mapResult.get("result") != "0"){
                     //保存圈提绑定信息到数据库
                     MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
                     if (mBankcardInfo != null) {
                         mBankcardInfo.setGmtModified(new Date());
                         memberBankService.updateMemberBankcard(mBankcardInfo);
-                        return new ResultData("err", false, "该银行卡已经绑定过", "");
+                        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                     } else {
                         mBankcardInfo = new MemberBankcardEntity();
-                        mBankcardInfo.setGmtModified(new Date());
+                        mBankcardInfo.setGmtCreate(new Date());
                         mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
                         mBankcardInfo.setIsWithdraw(1);//可提现
-                        mBankcardInfo.setBfBindId(mapResult.get(XjgjAccApiConstant.FIELD_BIND_ID).toString());
-                        mBankcardInfo.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
-                        mBankcardInfo.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
-                        mBankcardInfo.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        mBankcardInfo.setMemberInfoId(Long.valueOf(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MEMBER_NO))).longValue());
+                        mBankcardInfo.setBankAccCard(params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
+                        mBankcardInfo.setBankAccName(params.get(XjgjAccApiConstant.FIELD_BANK_NAME).toString());
+                        mBankcardInfo.setBankCode("BOC");
                         memberBankService.saveMemberBankcard(mBankcardInfo);
                         return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                     }
-                    //return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    } else{
+                        return new ResultData("err", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult.get("message").toString());
+                    }
                 } else {
                     return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
                 }
@@ -820,7 +823,12 @@ public class AppController extends AbstractController {
 
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                if(mapResult.get("result") != "0"){
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, mapResult.get("message").toString());
+                }
+
             } else {
                 return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
             }
@@ -833,54 +841,58 @@ public class AppController extends AbstractController {
     /**
      * 会员圈提
      *
-     * @param params
+     * @param Params
      * @return
      */
     @RequestMapping("/memberWithDraw")
-    public ResultData memberWithDraw(@RequestBody Map<String, Object> params) {
+    public ResultData memberWithDraw(@RequestBody Map<String, Object> Params) {
         try {
             //验证token
-            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            if (!checkAccessToken(String.valueOf(Params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
 
-            if (params != null) {
-                Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//银行名称
-                if (null == bankName || "BOC".equals(bankName)) {
-                    return new ResultData("err_no_bind", false, "圈提之前要先绑定中国银行的银行卡！");
+            if (Params != null) {
+                Object bankName = Params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//银行名称
+                if (null == bankName || ! "BOC".equals(bankName)) {
+                    return new ResultData("err_no_bind", false, "圈提只能使用中国银行的银行卡！");
                 }
-                Object drawMoneyQty = params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                Object drawMoneyQty = Params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
                 if (null == drawMoneyQty || "".equals(drawMoneyQty)) {
                     return new ResultData("err_moneyQty_isnull", false, "圈提金额不能为空！");
                 }
-                Map<String, Object> map = xjgjService.memberWithDraw(params);
-                Object momenyBalanceMap = xjgjService.searchMemberAccountBalance(XjgjAccApiConstant.FIELD_MEMBER_NO);//查询剩余金额
-                Object isBind = xjgjService.memberBindBOC(params).get(XjgjAccApiConstant.FIELD_BIND_ID);//判断是否绑定成功
-                if (map != null) {
-                    if (momenyBalanceMap != null) {
-                        if (isBind != null) {
-                            BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.toString());
-                            BigDecimal drawMoney =  new BigDecimal( String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY))).divide(BigDecimal.valueOf(100));//圈提金额
-                            if (drawMoney.compareTo(accountBalance) > 0) {
+
+                Params.put("requestNo",OrderNumberUtils.generateInTime());
+                Map<String,Object> newMap = new HashMap<>();
+                newMap.put("memberNo",Params.get("memberNo").toString());
+                Map<String, Object> map =null;// xjgjService.memberWithDraw(params);
+                Map<String, Object> momenyBalanceMap = xjgjService.searchMemberAccountBalance(newMap);//查询剩余金额
+                List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(Params, 1);//判断圈提是否绑定成功
+
+                if (map == null) {
+                    if (momenyBalanceMap.get("result") != "0") {
+                        if (listData.size() != 0) {
+                            BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.get(XjgjAccApiConstant.FIELD_ACCOUNT_QTY).toString());
+                            BigDecimal drawMoney =  new BigDecimal( String.valueOf(Params.get(XjgjAccApiConstant.FIELD_MONEY)));//圈提金额
+                            if (drawMoney.compareTo(accountBalance) > 0 ) {
                                 return new ResultData("err", false, "账户余额不足！", "");
                             }
-                            //TODO  圈提记录保存到数据库
+                            if(drawMoney.equals(BigDecimal.ZERO)){
+                                return new ResultData("err", false, "圈提金额不能为0！", "");
+                            }
+                            //  圈提记录保存到交易记录数据库
                             TradeLogEntity trade = new TradeLogEntity();
-                            trade.setTransSn(String.valueOf(map.get(XjgjAccApiConstant.FIELD_BIND_ID)));//流水号待定
+                            trade.setTransSn(OrderNumberUtils.generateInTime());
                             trade.setTransType(SystemConstant.TradeType.WITHDRAW.getValue());
-                            trade.setSellerOrderId(OrderNumberUtils.generateInTime());
+                            //trade.setSellerOrderId(OrderNumberUtils.generateInTime());
                             trade.setAmtMoney(drawMoney);
                             trade.setPayModeId(SystemConstant.PayMode.XJGJ.getValue());
-                            MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(String.valueOf(isBind));
-                            if(bankCard != null) {
-                                trade.setBankAccName(bankCard.getBankAccName());
-                                trade.setBankAccCard(bankCard.getBankAccCard());
-                                trade.setBankCode(bankCard.getBankCode());
-                                trade.setBfBindId(String.valueOf(isBind));
-                            }
+                            trade.setBankAccName(listData.get(0).getBankAccName());
+                            trade.setBankAccCard(listData.get(0).getBankAccCard());
+                            trade.setBankCode(listData.get(0).getBankCode());
                             trade.setGmtCreate(new Date());
                             tradeLogService.saveTradeLog(trade);
-                            return new ResultData("ok", true, "查询成功", map);
+                            return new ResultData("ok", true, "圈提成功", map);
                         } else {
                             return new ResultData("err_noBind", false, "圈提没有绑定中国银行银行卡，请先绑定！", "");
                         }
@@ -894,7 +906,7 @@ public class AppController extends AbstractController {
                 return new ResultData("err_params_isnull", false, "请求参数不能为空！", "");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
@@ -906,15 +918,18 @@ public class AppController extends AbstractController {
      * @reutn
      */
     @RequestMapping("/searchMemberAccountBalance")
-    public ResultData searchMemberAccountBalance(@RequestBody Map<String, String> params) {
+    public ResultData searchMemberAccountBalance(@RequestBody Map<String, Object> params) {
         try {
             //验证token
-            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
-            String memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);
-            Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(memberNo);
-            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
+            if(mapResult.get("result") != "0") {
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else{
+                return new ResultData("err", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult.get("message").toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
@@ -927,15 +942,19 @@ public class AppController extends AbstractController {
      * @param map
      * @return
      */
-    @RequestMapping("/searchMemberAccountChange")
-    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String, Object> map) {
+    @RequestMapping("/searchMemberAccountChangeByPeriodOfTime")
+    public ResultData searchMemberAccountChangeByPeriodOfTime(@RequestBody Map<String, Object> map) {
         try {
             //验证token
             if (!checkAccessToken(String.valueOf(map.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
             Map<String, Object> mapResult = xjgjService.searchMemberCostLog(map);
-            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            if(mapResult.get("result") != "0"){
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
+                return new ResultData("err", false, MsgConstant.MSG_OPERATION_SUCCESS, mapResult.get("message").toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
