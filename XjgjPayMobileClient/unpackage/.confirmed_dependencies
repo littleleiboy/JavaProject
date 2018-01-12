@@ -1,1 +1,31 @@
-null
+{
+	"page/main/main.html": {
+		"refer": [
+			"page/login/login.html",
+			"page/module/about.html",
+			"page/module/person.html",
+			"page/module/setting.html",
+			"page/module/withdrawal.html",
+			"page/module/barcode.html",
+			"page/module/website.html"
+		],
+		"resources": []
+	},
+	"page/login/login.html": {
+		"refer": [
+			"page/main/main.html",
+			"page/login/reg1.html"
+		],
+		"resources": []
+	},
+	"page/login/reg1.html": {
+		"refer": [
+			"page/login/reg2.html"
+		]
+	},
+	"page/module/person.html": {
+		"refer": [
+			"page/main/main.html"
+		]
+	}
+}

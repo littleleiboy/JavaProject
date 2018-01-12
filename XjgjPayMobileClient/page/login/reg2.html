@@ -20,7 +20,7 @@
 					<label>姓名</label>
 					<input id='txtName' type="text" class="mui-input-clear mui-input" placeholder="真实姓名">
 				</div>
-				<div class="mui-input-row">
+				<div class="mui-input-row" id="divMemberNO">
 					<label>账号</label>
 					<input id='txtMemberNO' type="text" class="mui-input-clear mui-input" placeholder="要绑定的会员账号">
 				</div>
@@ -32,7 +32,7 @@
 					<label>密码</label>
 					<input id='txtPwd' type="password" class="mui-input-clear mui-input" placeholder="格式为6位数字">
 				</div>
-				<div class="mui-input-row" style="display: none;">
+				<div class="mui-input-row" style="display: none;" id="divPwdConfirm">
 					<label>确认</label>
 					<input id='txtPwdConfirm' type="password" class="mui-input-clear mui-input" placeholder="确认密码">
 				</div>
@@ -40,11 +40,11 @@
 					<label>邮箱</label>
 					<input id='txtEmail' type="email" class="mui-input-clear mui-input" placeholder="电子邮箱">
 				</div>-->
-				<div class="mui-input-row" style="display: none;">
+				<div class="mui-input-row" style="display: none;" id="divAddr">
 					<label>会员地址</label>
 					<input id='txtAddr' type="text" class="mui-input-clear mui-input" placeholder="会员地址">
 				</div>
-				<div class="mui-input-row" style="display: none">
+				<div class="mui-input-row" style="display: none" id="divToAddr">
 					<label>商品去向</label>
 					<input id='txtToAddr' type="text" class="mui-input-clear mui-input" placeholder="商品去向地址">
 				</div>
@@ -54,6 +54,7 @@
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script>
 			(function($, doc) {
 				$.init();
@@ -84,10 +85,14 @@
 					var txtIdCard = doc.getElementById('txtIdCard');
 					var txtPwd = doc.getElementById('txtPwd');
 					var txtPwdConfirm = doc.getElementById('txtPwdConfirm');
+					var divPwdConfirm = doc.getElementById('divPwdConfirm');
 					var txtMemberNO = doc.getElementById('txtMemberNO');
+					var divMemberNO = doc.getElementById('divMemberNO');
 					//var txtEmail = doc.getElementById('txtEmail');
 					var txtAddr = doc.getElementById('txtAddr');
+					var divAddr = doc.getElementById('divAddr');
 					var txtToAddr = doc.getElementById('txtToAddr');
+					var divToAddr = doc.getElementById('divToAddr');
 					var action = 0;
 
 					if(memberInfo.is_app_bound) { //是会员且已经绑定
@@ -96,33 +101,41 @@
 						action = 0;
 						return false;
 					} else {
-						if(memberInfo.ifHasMember == 1) { //已经是会员，还未绑定
+						if(memberInfo.ifHasMember == 1 || memberInfo.ifHasMember == 2) { //已经是会员，还未绑定
 							title.innerHTML = '会员绑定';
 							btnReg.innerHTML = '绑定';
 							txtName.value = memberInfo.memberName;
 							txtMemberNO.value = memberInfo.memberNo;
+							common.hide(divAddr);
+							common.hide(divToAddr);
+							common.show(divMemberNO);
+							common.hide(divPwdConfirm);
 							plus.nativeUI.toast('您已经是会员，请绑定APP');
 							action = 1;
 						} else if(memberInfo.ifHasMember == 0) { //不是会员，还未注册
 							title.innerHTML = '会员注册';
 							btnReg.innerHTML = '注册';
-							common.show(txtPwdConfirm);
-							common.show(txtAddr);
-							common.show(txtToAddr);
-							common.hide(txtMemberNO);
+							common.show(divAddr);
+							common.show(divToAddr);
+							common.hide(divMemberNO);
+							common.show(divPwdConfirm);
 							plus.nativeUI.toast('您还不是会员，请注册');
 							action = 2;
+						} else {
+							plus.nativeUI.toast('服务出错(jsxt),' + memberInfo.message);
+							action = 0;
+							return false;
 						}
 					}
 
 					//会员注册或绑定
 					btnReg.addEventListener('tap', function(event) {
 						if(common.isNullOrEmpty(txtName.value)) {
-							plus.nativUI.toast('请填写姓名');
+							plus.nativeUI.toast('请填写姓名');
 							txtName.focus();
 							return false;
 						}
-						if(common.isNullOrEmpty(txtMemberNO.value)) {
+						if(action === 1 && common.isNullOrEmpty(txtMemberNO.value)) {
 							plus.nativeUI.toast('请填写要绑定的会员账号');
 							txtMemberNO.focus();
 							return false;
@@ -141,6 +154,20 @@
 							txtPwd.focus();
 							return false;
 						}
+						if(action === 2 && txtPwdConfirm.value != txtPwd.value) {
+							plus.nativeUI.toast('两次输入的密码不一致');
+							return false;
+						}
+						if(action === 2 && common.isNullOrEmpty(txtAddr.value)) {
+							plus.nativeUI.toast('请填写会员地址');
+							txtAddr.focus();
+							return false;
+						}
+						if(action === 2 && common.isNullOrEmpty(txtToAddr.value)) {
+							plus.nativeUI.toast('请填写商品去向地址');
+							txtToAddr.focus();
+							return false;
+						}
 						//获取表单数据
 						var regInfo = {
 							memberNo: txtMemberNO.value,
@@ -152,37 +179,23 @@
 							toCorpAddress: txtToAddr.value
 						};
 						if(action === 1) { //绑定
-							mui.post(common.getServiceUrl('memberAppBind'), regInfo, function(result) {
+							common.postJSON(common.getServiceUrl('memberAppBind'), regInfo, function(result) {
 								if(result.success) {
 									plus.nativeUI.toast('绑定成功！请登录');
 									toLogin();
 								} else {
 									plus.nativeUI.toast(result.msg);
 								}
-							}, 'json');
+							});
 						} else if(action === 2) { //注册
-							if(txtPwdConfirm.value != regInfo.password) {
-								plus.nativeUI.toast('两次输入的密码不一致');
-								return false;
-							}
-							if(common.isNullOrEmpty(txtAddr.value)) {
-								plus.nativeUI.toast('请填写会员地址');
-								txtAddr.focus();
-								return false;
-							}
-							if(common.isNullOrEmpty(txtToAddr.value)) {
-								plus.nativeUI.toast('请填写商品去向地址');
-								txtToAddr.focus();
-								return false;
-							}
-							$.post(common.getServiceUrl('regMember'), regInfo, function(result) {
+							common.postJSON(common.getServiceUrl('regMember'), regInfo, function(result) {
 								if(result.success) {
 									plus.nativeUI.toast('注册成功！请至柜台领取实体会员卡');
 									toLogin();
 								} else {
 									plus.nativeUI.toast(result.msg);
 								}
-							}, 'json');
+							});
 						}
 					});
 				});

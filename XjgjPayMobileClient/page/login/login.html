@@ -56,6 +56,7 @@
 				});
 				$.plusReady(function() {
 					plus.screen.lockOrientation("portrait-primary");
+					app.localSettingsKey = common.localSettingsKey;
 					var settings = app.getSettings();
 					var state = app.getState();
 					var mainPage = plus.webview.getWebviewById("main");
@@ -84,7 +85,7 @@
 						}, 20);
 					};
 					//检查 "登录状态/锁屏状态" 开始
-					if(settings.autoLogin && state.token && settings.gestures) {
+					if(settings.autoLogin && state.access_token && settings.gestures) {
 						$.openWindow({
 							url: 'unlock.html',
 							id: 'unlock',
@@ -95,7 +96,7 @@
 								autoShow: false
 							}
 						});
-					} else if(settings.autoLogin && state.token) {
+					} else if(settings.autoLogin && state.access_token) {
 						toMain();
 					} else {
 						app.setState(null);
@@ -117,7 +118,7 @@
 							mobileNum: accountBox.value,
 							pass: passwordBox.value
 						};
-						app.login(common.getServiceUrl('appLogin'), loginInfo, common.localSettingsKey, function(err) {
+						app.login(common.getServiceUrl('appLogin'), loginInfo, function(err) {
 							if(err) {
 								plus.nativeUI.toast(err);
 								return;
@@ -169,11 +170,7 @@
 						});*/
 						plus.nativeUI.toast('请在西郊国际结算系统或至柜台重置密码');
 					}, false);
-					//
-					window.addEventListener('resize', function() {
-						oauthArea.style.display = document.body.clientHeight > 400 ? 'block' : 'none';
-					}, false);
-					//
+					//再按一次退出应用
 					var backButtonPress = 0;
 					$.back = function(event) {
 						backButtonPress++;

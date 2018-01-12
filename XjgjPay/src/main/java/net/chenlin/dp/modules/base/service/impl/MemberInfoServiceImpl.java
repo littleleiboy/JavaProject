@@ -39,14 +39,12 @@ public class MemberInfoServiceImpl implements MemberInfoService {
 
     @Override
     public MemberInfoEntity getMemberInfoByNO(String memberNO) {
-        memberInfoManager.getMemberInfoByNO(memberNO);
-        return null;
+        return memberInfoManager.getMemberInfoByNO(memberNO);
     }
 
     @Override
-    public MemberInfoEntity getMemberInfoByMobile(String memberNO) {
-        memberInfoManager.getMemberInfoByMobile(memberNO);
-        return null;
+    public MemberInfoEntity getMemberInfoByMobile(String mobile) {
+        return memberInfoManager.getMemberInfoByMobile(mobile);
     }
 
     @Override

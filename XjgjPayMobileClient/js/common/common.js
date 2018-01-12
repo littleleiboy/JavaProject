@@ -6,7 +6,7 @@ var common = {
 	 * 获取APP服务URL
 	 */
 	"getServiceUrl": function(method) {
-		return 'http://localhost:8080/api/app/' + method;
+		return 'http://1637344my0.imwork.net/api/app/' + method;
 	},
 	"localSettingsKey": "local_settings",
 	/**
@@ -64,5 +64,52 @@ var common = {
 	 */
 	"hide": function(obj) {
 		obj.style.display = "none";
+	},
+	/**
+	 * 以POST方式请求服务器资源
+	 * @param {Object} url 请求接口或资源的URL
+	 * @param {Object} data JSON类型的数据
+	 * @param {Object} success 响应成功的处理函数
+	 * @param {Object} [error] 响应失败的处理函数
+	 */
+	"postJSON": function() {
+		var url = arguments[0];
+		var data = arguments[1];
+		var success = arguments[2];
+		var error = arguments[3] || function(xhr, type, errorThrown) {
+			console.log(type);
+			plus.nativeUI.toast(common.msg.msgServerErr());
+		}
+
+		mui.ajax(url, {
+			data: data,
+			dataType: 'json',
+			type: 'post',
+			timeout: 600000,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			success: success,
+			error: error
+		});
+	},
+	/**
+	 * 输出APP接口返回的ResultData实体的json结构数据
+	 */
+	"getResultDataString": function(result) {
+		var str = "";
+		for(var k in result) {
+			if(k == "data") {
+				str = str + "data = {\n";
+				for(var sk in result.data) {
+					str = str + "  " + sk + " = " + result.data[sk] + "\n";
+				}
+				str = str + "}\n";
+			} else {
+				str = str + k + " = " + result[k] + "\n";
+			}
+		}
+		//console.log(str);
+		return str;
 	}
 }

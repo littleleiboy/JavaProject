@@ -11,7 +11,7 @@
 		<link href="../../lib/mui/css/mui-icons-extra.css" rel="stylesheet" />
 		<style>
 			.mui-slider {
-				height: 13em;
+				height: 12em;
 			}
 		</style>
 	</head>
@@ -220,7 +220,8 @@
 						switch(id) {
 							case 'aRecharge': //圈存
 								//验证会员是否有绑定的圈存银行卡
-								$.post(common.getServiceUrl('getFirstMemberBankcard'), {
+								console.log('localSettings.access_token=' + localSettings.access_token);
+								common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
 									access_token: localSettings.access_token,
 									memberInfoId: localSettings.member_pk,
 									isRecharge: 1
@@ -237,9 +238,9 @@
 											});
 										}
 									} else {
-										plus.nativeUI.toast(common.msg.msgServerErr());
+										plus.nativeUI.toast(result.msg);
 									}
-								}, 'json');
+								});
 								break;
 							case 'aWithdrawal': //圈提
 								pageWidthdrawal.show();
@@ -261,15 +262,14 @@
 					});
 					var pageWebsite = $.preload({
 						"id": 'pageWebsite',
-						"url": 'http://www.xjgj.com/'
+						"url": '../module/website.html'
 					});
 					var pageAbout = $.preload({
 						"id": 'pageAbout',
 						"url": '../module/about.html'
 					});
 					$('.mui-bar-tab').on('tap', 'a', function() {
-						document.location.href = this.href;
-						var title = doc.querySelector('.mui-title');
+						//document.location.href = this.href;
 						var id = this.getAttribute('id');
 						switch(id) {
 							case 'tpHome':
@@ -282,7 +282,6 @@
 								break;
 							case 'tpWebsite':
 								pageWebsite.show();
-								title.innerHTML = '西郊国际';
 								break;
 							case 'tpAbout':
 								pageAbout.show();

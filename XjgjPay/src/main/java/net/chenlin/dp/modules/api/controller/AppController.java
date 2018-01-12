@@ -149,7 +149,7 @@ public class AppController extends AbstractController {
                 Map<String, Object> mapResult2 = xjgjService.checkMemberPassword(param2);
                 if (mapResult2 != null) {
                     Object result = mapResult2.get(XjgjAccApiConstant.FIELD_RESULT);
-                    if (String.valueOf(result) == "1") {//会员账号验证通过
+                    if ("1".equals(result)) {//会员账号验证通过
                         //获取访问token
                         String accToken = memberEntity.getPassword();
                         if (null != accToken || !"".equals(accToken)) {
@@ -208,8 +208,13 @@ public class AppController extends AbstractController {
 
             Map<String, Object> mapResult = xjgjService.getMemberBaseInfo(params);
             if (mapResult != null) {
-                if (memberEntity != null) {//已经绑定APP
-                    mapResult.put(MsgConstant.MSG_IS_APP_BOUND, true);
+                if (memberEntity != null) {
+                    //有会员账号才算已绑定APP
+                    String memberNo = memberEntity.getMemberId();
+                    if (null != memberNo && !"".equals(memberNo))
+                        mapResult.put(MsgConstant.MSG_IS_APP_BOUND, true);
+                    else
+                        mapResult.put(MsgConstant.MSG_IS_APP_BOUND, false);
                 } else {
                     mapResult.put(MsgConstant.MSG_IS_APP_BOUND, false);
                 }
