@@ -27,7 +27,8 @@
 			id DESC
 	</select>
 
-    <insert id="save">
+    <insert id="save" parameterType="net.chenlin.dp.modules.base.entity.MemberInfoEntity" useGeneratedKeys="true"
+            keyProperty="id">
 		INSERT INTO member_info (
 			`member_id`, 
 			`member_type`, 
@@ -42,25 +43,23 @@
 			`remark`,
 			`member_address`,
 			`to_corp_address`, 
-			`gmt_create`, 
-			`gmt_modified`
+			`gmt_create`
 		)
 		VALUES (
 			#{memberId}, 
 			#{memberType}, 
 			#{memberName}, 
-			#{cardId}, 
+			#{cardId},
 			#{mobile},
-			#{password}
-			#{email}, 
-			#{idCard}, 
+			#{password},
+			#{email},
+			#{idCard},
 			#{idCardType}, 
-			#{isAvailable}, 
+			#{isAvailable},
 			#{remark},
 			#{memberAddress},
 			#{toCorpAddress},
-			#{gmtCreate}, 
-			#{gmtModified}
+			now()
 		)
 	</insert>
 
@@ -79,8 +78,7 @@
 			`is_available`, 
 			`remark`,
 			`member_address`,
-			`to_corp_address`, 
-			`gmt_create`, 
+			`to_corp_address`,
 			`gmt_modified`
 		FROM
 			member_info
@@ -104,8 +102,7 @@
             <if test="remark != null">`remark` = #{remark},</if>
             <if test="memberAddress !=null ">`member_address` = #{memberAddress}</if>
             <if test="toCorpAddress != null">`to_corp_address` = #{toCorpAddress},</if>
-            <if test="gmtCreate != null">`gmt_create` = #{gmtCreate},</if>
-            <if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
+            `gmt_modified` = now()
         </set>
         WHERE
         id = #{id}

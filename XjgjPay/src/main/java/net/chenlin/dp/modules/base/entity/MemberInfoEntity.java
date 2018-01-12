@@ -1,6 +1,7 @@
 package net.chenlin.dp.modules.base.entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 
 
@@ -69,7 +70,7 @@ public class MemberInfoEntity implements Serializable {
     /**
      * 可用标识(0-不可用;1-可用)
      */
-    private Integer isAvailable;
+    private Byte isAvailable;
 
     /**
      * 备注
@@ -89,12 +90,12 @@ public class MemberInfoEntity implements Serializable {
     /**
      * 创建时间
      */
-    private Date gmtCreate;
+    private Timestamp gmtCreate;
 
     /**
      * 修改时间
      */
-    private Date gmtModified;
+    private Timestamp gmtModified;
 
 
     public MemberInfoEntity() {
@@ -181,11 +182,11 @@ public class MemberInfoEntity implements Serializable {
         return idCardType;
     }
 
-    public void setIsAvailable(Integer isAvailable) {
+    public void setIsAvailable(Byte isAvailable) {
         this.isAvailable = isAvailable;
     }
 
-    public Integer getIsAvailable() {
+    public Byte getIsAvailable() {
         return isAvailable;
     }
 
@@ -213,7 +214,7 @@ public class MemberInfoEntity implements Serializable {
         return toCorpAddress;
     }
 
-    public void setGmtCreate(Date gmtCreate) {
+    public void setGmtCreate(Timestamp gmtCreate) {
         this.gmtCreate = gmtCreate;
     }
 
@@ -221,7 +222,7 @@ public class MemberInfoEntity implements Serializable {
         return gmtCreate;
     }
 
-    public void setGmtModified(Date gmtModified) {
+    public void setGmtModified(Timestamp gmtModified) {
         this.gmtModified = gmtModified;
     }
 

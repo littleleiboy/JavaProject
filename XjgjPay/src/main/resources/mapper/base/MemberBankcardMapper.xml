@@ -46,8 +46,7 @@
 			`is_recharge`,
 			`is_withdraw`,
 			`remark`, 
-			`gmt_create`, 
-			`gmt_modified`
+			`gmt_create`
 		)
 		VALUES (
 			#{bankAccName}, 
@@ -58,8 +57,7 @@
 			#{isRecharge},
 			#{isWithdraw},
 			#{remark}, 
-			#{gmtCreate}, 
-			#{gmtModified}
+			NOW()
 		)
 	</insert>
 
@@ -93,8 +91,7 @@
             <if test="isRecharge != null">`is_recharge` = #{isRecharge},</if>
             <if test="isWithdraw != null">`is_withdraw` = #{isWithdraw},</if>
             <if test="remark != null">`remark` = #{remark},</if>
-            <if test="gmtCreate != null">`gmt_create` = #{gmtCreate},</if>
-            <if test="gmtModified != null">`gmt_modified` = #{gmtModified}</if>
+            `gmt_modified` = NOW()
         </set>
         WHERE
         id = #{id}

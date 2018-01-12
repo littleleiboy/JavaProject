@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -183,8 +184,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_no_member", false, "还不是会员");
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -217,8 +218,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -238,8 +239,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR, "");
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -255,8 +256,8 @@ public class AppController extends AbstractController {
             Map<String, Object> mapResult = xjgjService.memberAppBind(params);
             return memberAppRegister(1, mapResult, params);
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -272,8 +273,8 @@ public class AppController extends AbstractController {
             Map<String, Object> mapResult = xjgjService.regMember(params);
             return memberAppRegister(0, mapResult, params);
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("e1", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -332,11 +333,9 @@ public class AppController extends AbstractController {
                         Date now = new Date();
                         if (memberEntity == null) {
                             memberEntity = new MemberInfoEntity();
-                            memberEntity.setGmtCreate(now);
                             isNew = true;
                         } else {
                             isNew = false;
-                            memberEntity.setGmtModified(now);
                         }
 
                         memberEntity.setMemberId(String.valueOf(memberNO));
@@ -348,17 +347,25 @@ public class AppController extends AbstractController {
 
                         String accToken = EncryptUtils.MD5(mobileNum + "|" + pass);
                         memberEntity.setPassword(accToken);
+                        memberEntity.setEmail("");
 
-                        if (null != mCardNO || !"".equals(mCardNO))
+                        if (null != mCardNO && !"".equals(mCardNO))
                             memberEntity.setCardId(String.valueOf(mCardNO));
+                        else
+                            memberEntity.setCardId("");
 
-                        if (null != memberAddr || !"".equals(memberAddr))
+                        if (null != memberAddr && !"".equals(memberAddr))
                             memberEntity.setMemberAddress(String.valueOf(memberAddr));
+                        else
+                            memberEntity.setMemberAddress("");
 
-                        if (null != toCorpAddr || !"".equals(toCorpAddr))
+                        if (null != toCorpAddr && !"".equals(toCorpAddr))
                             memberEntity.setToCorpAddress(String.valueOf(toCorpAddr));
+                        else
+                            memberEntity.setToCorpAddress("");
 
-                        memberEntity.setIsAvailable(1);
+                        memberEntity.setIsAvailable(new Byte("1"));
+                        memberEntity.setRemark("");
 
                         if (isNew) {
                             memberInfoService.saveMemberInfo(memberEntity);
@@ -371,7 +378,6 @@ public class AppController extends AbstractController {
                         logger.error(String.valueOf(message));
                         return new ResultData("err_remote_response", false, String.valueOf(message), mapResult);
                     }
-
                 } else {
                     logger.error(MsgConstant.MSG_REMOTE_ERROR);
                     return new ResultData("err_remote_err", false, MsgConstant.MSG_REMOTE_ERROR);
@@ -380,8 +386,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_param_isnull", false, "请求参数不能为空！");
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -417,8 +423,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -475,8 +481,8 @@ public class AppController extends AbstractController {
             }
 
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -566,8 +572,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -610,8 +616,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_remote", false, MsgConstant.MSG_OPERATION_FAILED);
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage());
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -703,8 +709,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err_exception", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -725,8 +731,8 @@ public class AppController extends AbstractController {
             Map<String, Object> mapResult = xjgjService.retryRecharge(params);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -799,8 +805,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_no_params", false, "请求参数不能为空！", "");
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -825,8 +831,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
             }
         } catch (Exception e) {
-            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
-            return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -860,7 +866,7 @@ public class AppController extends AbstractController {
                     if (momenyBalanceMap != null) {
                         if (isBind != null) {
                             BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.toString());
-                            BigDecimal drawMoney =  new BigDecimal( String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY))).divide(BigDecimal.valueOf(100));//圈提金额
+                            BigDecimal drawMoney = new BigDecimal(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY))).divide(BigDecimal.valueOf(100));//圈提金额
                             if (drawMoney.compareTo(accountBalance) > 0) {
                                 return new ResultData("err", false, "账户余额不足！", "");
                             }
@@ -872,7 +878,7 @@ public class AppController extends AbstractController {
                             trade.setAmtMoney(drawMoney);
                             trade.setPayModeId(SystemConstant.PayMode.XJGJ.getValue());
                             MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(String.valueOf(isBind));
-                            if(bankCard != null) {
+                            if (bankCard != null) {
                                 trade.setBankAccName(bankCard.getBankAccName());
                                 trade.setBankAccCard(bankCard.getBankAccCard());
                                 trade.setBankCode(bankCard.getBankCode());
@@ -894,8 +900,8 @@ public class AppController extends AbstractController {
                 return new ResultData("err_params_isnull", false, "请求参数不能为空！", "");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("e1", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -937,8 +943,8 @@ public class AppController extends AbstractController {
             Map<String, Object> mapResult = xjgjService.searchMemberCostLog(map);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("e1", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 

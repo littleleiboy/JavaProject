@@ -3,7 +3,6 @@
  */
 
 $(function () {
-    alert('member');
 	initialPage();
 	getGrid();
 });

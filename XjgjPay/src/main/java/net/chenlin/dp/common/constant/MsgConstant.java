@@ -26,6 +26,11 @@ public class MsgConstant {
     public static final String MSG_REMOTE_ERROR = "操作失败，远程服务出现错误！";
 
     /**
+     * 操作失败，后台处理错误
+     */
+    public static final String MSG_SERVER_ERROR = "操作失败，后台处理错误！";
+
+    /**
      * 删除时，提示有子节点无法删除
      */
     public static final String MSG_HAS_CHILD = "操作失败，当前所选数据有子节点数据！";
