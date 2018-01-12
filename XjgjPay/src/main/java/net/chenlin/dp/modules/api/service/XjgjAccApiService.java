@@ -90,7 +90,7 @@ public interface XjgjAccApiService {
      * @return
      * 2017-12-15
      * */
-    Map<String,Object> searchMemberAccountBalance(String memberNo) throws Exception;
+    Map<String,Object> searchMemberAccountBalance(Map<String, Object> memberNo) throws Exception;
 
     /**
      * 一段时间内会员账户变动查询

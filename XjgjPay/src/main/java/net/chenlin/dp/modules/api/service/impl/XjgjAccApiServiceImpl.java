@@ -128,7 +128,7 @@ public class XjgjAccApiServiceImpl implements XjgjAccApiService {
      * @throws Exception
     * */
     @Override
-    public Map<String, Object> searchMemberAccountBalance(String memberNo) throws Exception {
+    public Map<String, Object> searchMemberAccountBalance(Map<String, Object> memberNo) throws Exception {
         return apiManager.searchMemberAccountBalance(memberNo);
     }
 

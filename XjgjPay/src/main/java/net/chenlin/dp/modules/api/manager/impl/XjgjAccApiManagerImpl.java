@@ -185,8 +185,8 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
      * @param memberNo 发送数据
      * @return 返回结果
      */
-    public Map<String, Object> searchMemberAccountBalance(String memberNo) throws Exception {
-        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), memberNo));
+    public Map<String, Object> searchMemberAccountBalance(Map<String, Object> memberNo) throws Exception {
+        return JacksonUtils.jsonToMap(postSSL(getApiUrl(XjgjAccApiConstant.SEARCH_MEMBER_ACCOUNT_BALANCE), mapToJsonStr(memberNo)));
     }
 
     /**
