@@ -406,9 +406,9 @@ public class AppController extends AbstractController {
     public ResultData preBindBaofoo(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
 
             //宝付预绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.prepareBinding.getValue());
@@ -439,40 +439,39 @@ public class AppController extends AbstractController {
      * @param params
      * @return
      */
-    @RequestMapping("/")
-    public ResultData chargeUnbindingRelationshipWithBank(@RequestBody Map<String, String> params) {
+    @RequestMapping("/cancelBinding")
+    public ResultData cancelBinding(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
 
             //解除绑定关系
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.cancelBinding.getValue());
 
-            String bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
-            if (null == bankCardID || "".equals(bankCardID)) {
+            params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
+
+            String acc_no = params.get(BaofooApiConstant.FIELD_ACC_NO);
+            if (null == acc_no || "".equals(acc_no)) {
                 return new ResultData("err_acc_no_isnull", false, "请求解绑的银行卡号不能为空！");
             }
 
             //验证访问口令
-            if (!checkStrAccToken(params)) {
+            /*if (!checkStrAccToken(params)) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
             // 调用宝付接口解除绑定交易
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
-                if (BaofooApiConstant.FIELD_RESP_CODE.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
-                    Object bindId = mapResult.get(BaofooApiConstant.FIELD_BIND_ID);
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    Object bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
                     if (bindId != null || !"".equals(bindId)) {
-                        MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(bankCardID);
+                        MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(acc_no);
                         if (memberBankcardInfo != null) {
                             //从数据库删除该银行卡的信息
-                            if (memberBankService.removeBankcardInfoByBankcardNo(bankCardID) == true) {
-                                return new ResultData("ok", true, "解除绑定关系成功", mapResult);
-                            } else {
-                                return new ResultData("false", false, "解除绑定关系失败", mapResult);
-                            }
+                            memberBankService.removeBankcardInfoByBankcardNo(acc_no);
+                            return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                         } else {
                             return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
                         }
@@ -480,7 +479,7 @@ public class AppController extends AbstractController {
                         return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
                     }
                 }
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             } else {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             }
@@ -498,15 +497,18 @@ public class AppController extends AbstractController {
      * @return
      */
     @RequestMapping("/confirmBindBaofoo")
-    public ResultData confirmBindBaofoo(Map<String, String> params) {
+    public ResultData confirmBindBaofoo(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
 
             //宝付确认绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmBinding.getValue());
+
+            params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
+            //params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
 
             String memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
             if (null == memberNO || "".equals(memberNO)) {
@@ -519,9 +521,9 @@ public class AppController extends AbstractController {
             }
 
             //验证访问口令
-            if (!checkStrAccToken(params)) {
+            /*if (!checkStrAccToken(params)) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
             //商户订单号不能为空
             String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
             if (null == trans_id || "".equals(trans_id)) {
@@ -554,11 +556,12 @@ public class AppController extends AbstractController {
                             mbank.setIsWithdraw(0);//默认不可提现(不可圈提)
                         }
 
+                        mbank.setMemberInfoId(Long.valueOf(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MEMBER_NO))).longValue());
                         mbank.setIsRecharge(1);//可充值(可圈存)
                         mbank.setBfBindId(String.valueOf(bindId));
-                        mbank.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
-                        mbank.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
-                        mbank.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        mbank.setBankAccCard(bankCardID);
+                        mbank.setBankAccName(params.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
+                        mbank.setBankCode(params.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
 
                         MemberInfoEntity member = memberInfoService.getMemberInfoByNO(memberNO);
                         if (member != null)
