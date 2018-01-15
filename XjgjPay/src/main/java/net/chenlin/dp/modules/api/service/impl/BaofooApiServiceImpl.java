@@ -72,12 +72,15 @@ public class BaofooApiServiceImpl implements BaofooApiService {
             //String trade_date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());//交易日期
             Map<String, Object> data = new HashMap<>();
 
+            data.put(BaofooApiConstant.FIELD_VERSION, version);
             data.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, txn_sub_type);
             data.put(BaofooApiConstant.FIELD_BIZ_TYPE, biz_type);
             data.put(BaofooApiConstant.FIELD_TERMINAL_ID, terminal_id);
             data.put(BaofooApiConstant.FIELD_MEMBER_ID, member_id);
             //data.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, "TISN" + System.currentTimeMillis());
             data.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, map.get(BaofooApiConstant.FIELD_TRANS_SERIAL_NO));
+            //
+            data.put(BaofooApiConstant.FIELD_TXN_TYPE, BaofooApiConstant.TradeType.backTransaction.getValue());
 
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
             data.put(BaofooApiConstant.FIELD_TRADE_DATE, formatter.format(new Date()));//订单日期
@@ -129,14 +132,14 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                     break;
             }
 
-            Map<Object, Object> dataContent = new HashMap<>();
-            dataContent.put(BaofooApiConstant.FIELD_DATA_CONTENT, data);
+            /*Map<Object, Object> dataContent = new HashMap<>();
+            dataContent.put(BaofooApiConstant.FIELD_DATA_CONTENT, data);*/
 
-            String jsonOrXml;
+            String jsonOrXml ;
             if (BaofooApiConstant.DataType.JSON.getValue().equalsIgnoreCase(data_type)) {
-                jsonOrXml = JacksonUtils.beanToJson(dataContent);
+                jsonOrXml = JacksonUtils.beanToJson(data);
             } else {
-                jsonOrXml = JacksonUtils.beanToXml(dataContent);
+                jsonOrXml = JacksonUtils.beanToXml(data);
             }
 
             String path = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\";
