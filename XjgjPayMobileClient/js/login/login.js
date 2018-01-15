@@ -40,7 +40,7 @@
 		state.member_no = loginData.member_no;
 		state.member_name = loginData.member_name;
 		state.member_mobile = loginData.member_mobile;
-		state.access_token = loginData.member_mobile + '_' + oginData.access_token;
+		state.access_token = loginData.member_mobile + '_' + loginData.access_token;
 		owner.setState(state);
 		return callback();
 	};

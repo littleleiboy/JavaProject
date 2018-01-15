@@ -7,7 +7,8 @@
 			"page/module/setting.html",
 			"page/module/withdrawal.html",
 			"page/module/barcode.html",
-			"page/module/website.html"
+			"page/module/website.html",
+			"page/module/recharge.html"
 		],
 		"resources": []
 	},
@@ -24,6 +25,11 @@
 		]
 	},
 	"page/module/person.html": {
+		"refer": [
+			"page/main/main.html"
+		]
+	},
+	"page/module/recharge.html": {
 		"refer": [
 			"page/main/main.html"
 		]

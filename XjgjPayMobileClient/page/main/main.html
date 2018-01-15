@@ -182,18 +182,16 @@
 						url: '../module/setting.html'
 					});
 					var settingButton = doc.getElementById('setting');
-
 					settingButton.addEventListener('tap', function(event) {
 						settingPage.show();
 					});
 					//扫码
-					var scanPage = $.preload({
-						id: 'scan',
-						url: '../module/barcode.html'
-					});
 					var scanButton = doc.getElementById('scan');
 					scanButton.addEventListener('tap', function(event) {
-						scanPage.show();
+						$.openWindow({
+							id: 'scan',
+							url: '../module/barcode.html'
+						});
 					});
 					//----------end: 顶部标题栏-------------------
 
@@ -220,20 +218,22 @@
 						switch(id) {
 							case 'aRecharge': //圈存
 								//验证会员是否有绑定的圈存银行卡
-								console.log('localSettings.access_token=' + localSettings.access_token);
+								console.log(common.getServiceUrl('getFirstMemberBankcard'));
 								common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
 									access_token: localSettings.access_token,
 									memberInfoId: localSettings.member_pk,
 									isRecharge: 1
 								}, function(result) {
+									console.log(result.success);
 									if(result.success) {
+										console.log(result.code);
 										if(result.code == 'yes') {
 											//去圈存
 											toRecharge();
 										} else {
 											plus.nativeUI.toast('请先绑定用于圈存的银行卡');
 											//去绑定圈存
-											mui.openWindow({
+											$.openWindow({
 												url: '../module/recharge_binding.html'
 											});
 										}
