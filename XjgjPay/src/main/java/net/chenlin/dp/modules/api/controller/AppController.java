@@ -105,7 +105,7 @@ public class AppController extends AbstractController {
         }
         String mobileNum = arr[0];
         String accToken = arr[1];
-        MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByNO(String.valueOf(mobileNum));
+        MemberInfoEntity memberEntity = memberInfoService.getMemberInfoByMobile(String.valueOf(mobileNum));
         if (memberEntity != null) {
             //验证会员账号和密码
             String pwd = memberEntity.getPassword();
@@ -1019,10 +1019,10 @@ public class AppController extends AbstractController {
         String noMsg = "不存在符合条件的银行卡信息";
         List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(params, 1);
         if (listData != null) {
-            if (listData.size() == 0) {
-                return new ResultData("no", true, noMsg, listData.get(0));
-            } else {
+            if (listData.size() > 0) {
                 return new ResultData("yes", true, yesMsg, listData.get(0));
+            } else {
+                return new ResultData("no", true, noMsg);
             }
         } else {
             return new ResultData("no", true, noMsg);
