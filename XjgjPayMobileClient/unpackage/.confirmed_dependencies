@@ -8,7 +8,8 @@
 			"page/module/withdrawal.html",
 			"page/module/barcode.html",
 			"page/module/website.html",
-			"page/module/recharge.html"
+			"page/module/recharge.html",
+			"page/module/recharge_binding.html"
 		],
 		"resources": []
 	},

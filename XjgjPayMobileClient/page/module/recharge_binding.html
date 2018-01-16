@@ -17,10 +17,12 @@
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group">
-				<button id='showBankPicker' class="mui-btn mui-btn-block" type='button'>请选择发卡银行 ...</button>
-				<!--<div id='bankResult' class="ui-alert"></div>-->
 				<div class="mui-input-row">
-					<label>银行卡</label>
+					<label>银行</label>
+					<input id='bank' type="text" class="mui-input" placeholder="请选择发卡银行" readonly="readonly">
+				</div>
+				<div class="mui-input-row">
+					<label>银行账号</label>
 					<input id='acc_no' type="text" class="mui-input-clear mui-input" placeholder="绑定圈存的银行卡号">
 				</div>
 				<div class="mui-input-row">
@@ -66,42 +68,37 @@
 						return false;
 					}
 					var mobile = doc.getElementById('mobile');
-					mobile.value = localSettings.mobile;
+					mobile.value = localSettings.member_mobile;
 
 					var sms_code = doc.getElementById('sms_code');
 					var btnGetSms = doc.getElementById('btnGetSms');
 					var btnSubmit = doc.getElementById('btnSubmit');
+					var bank = doc.getElementById('bank');
 					var acc_no = doc.getElementById('acc_no');
 					var id_card = doc.getElementById('id_card');
 					var id_holder = doc.getElementById('id_holder');
-					//id_holder.value = localSettings.member_name;
 
 					//------begin: 银行列表选择器------
-					var bank = {};
+					var bankItem = {};
 					var bankPicker = new $.PopPicker();
 
-					var pickerData = new Array();
-					$.post(common.getServiceUrl('listBank'), {}, function(result) {
+					common.postJSON(common.getServiceUrl('listBank'), {}, function(result) {
 						if(result.success) {
+							var pickerData = new Array();
 							for(var i in result.data) {
-								var item = {
-									value: result.data.bankId,
-									text: result.data.bankName
+								pickerData[i] = {
+									value: result.data[i].bankId,
+									text: result.data[i].bankName
 								};
-								pickerData[i] = item;
 							}
 							bankPicker.setData(pickerData);
 						}
-					}, 'json');
+					});
 
-					var showBankPickerButton = doc.getElementById('showBankPicker');
-					//var bankResult = doc.getElementById('bankResult');
-					showBankPickerButton.addEventListener('tap', function(event) {
+					bank.addEventListener('tap', function(event) {
 						bankPicker.show(function(items) {
-							bank = JSON.stringify(items[0]);
-							//bankResult.innerText = bank;
-							//返回 false 可以阻止选择框的关闭
-							//return false;
+							//console.log(JSON.stringify(items[0]));
+							bank.value = items[0].text;
 						});
 					}, false);
 					//------end: 银行列表选择器------
@@ -180,7 +177,7 @@
 									url: 'recharge.html',
 									id: 'pageRecharge'
 								});
-								$.back();//关闭当前窗体
+								$.back(); //关闭当前窗体
 							} else {
 								plus.nativeUI.toast(result.msg);
 							}

@@ -92,24 +92,5 @@ var common = {
 			success: success,
 			error: error
 		});
-	},
-	/**
-	 * 输出APP接口返回的ResultData实体的json结构数据
-	 */
-	"getResultDataString": function(result) {
-		var str = "";
-		for(var k in result) {
-			if(k == "data") {
-				str = str + "data = {\n";
-				for(var sk in result.data) {
-					str = str + "  " + sk + " = " + result.data[sk] + "\n";
-				}
-				str = str + "}\n";
-			} else {
-				str = str + k + " = " + result[k] + "\n";
-			}
-		}
-		//console.log(str);
-		return str;
 	}
 }

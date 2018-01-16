@@ -79,12 +79,9 @@
 						}
 
 						// 查询会员基本信息
-						//console.log('Clicked next step.  request: ' + common.getServiceUrl('getMemberBaseInfo'));
-						//console.log("parameter: mobile=" + mobileNum.value);
 						common.postJSON(common.getServiceUrl('getMemberBaseInfo'), {
 							mobileNum: mobileNum.value
 						}, function(result) {
-							//console.log("response: " + common.getResultDataString(result));
 							if(result.success) {
 								//获取返回信息
 								$.openWindow({

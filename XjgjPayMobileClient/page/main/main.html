@@ -218,15 +218,12 @@
 						switch(id) {
 							case 'aRecharge': //圈存
 								//验证会员是否有绑定的圈存银行卡
-								console.log(common.getServiceUrl('getFirstMemberBankcard'));
 								common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
 									access_token: localSettings.access_token,
 									memberInfoId: localSettings.member_pk,
 									isRecharge: 1
 								}, function(result) {
-									console.log(result.success);
 									if(result.success) {
-										console.log(result.code);
 										if(result.code == 'yes') {
 											//去圈存
 											toRecharge();
