@@ -154,4 +154,10 @@
 		`bank_acc_card` = #{bankAccCard}
 	</delete>
 
+	<update id="updateMemberBankInfo" >
+		UPDATE member_bankcard
+		SET `bf_bind_id` = '' , `is_recharge` = 0
+		WHERE `id` = #{id}
+	</update>
+
 </mapper>

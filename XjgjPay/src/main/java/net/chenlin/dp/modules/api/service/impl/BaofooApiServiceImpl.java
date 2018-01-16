@@ -112,7 +112,7 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                     data.put(BaofooApiConstant.FIELD_ACC_NO, map.get(BaofooApiConstant.FIELD_ACC_NO));//卡号
                     break;
                 case preparePay:
-                    BigDecimal txn_amt_num = new BigDecimal(map.get(BaofooApiConstant.FIELD_TXN_AMT)).multiply(BigDecimal.valueOf(100));//金额转换成分
+                    BigDecimal txn_amt_num = new BigDecimal(map.get(BaofooApiConstant.FIELD_TXN_AMT));//金额转换成分
                     String txn_amt = String.valueOf(txn_amt_num.setScale(0));//支付金额
                     data.put(BaofooApiConstant.FIELD_TXN_AMT, txn_amt);//金额以分为单位(整型数据)并把元转换成分
 

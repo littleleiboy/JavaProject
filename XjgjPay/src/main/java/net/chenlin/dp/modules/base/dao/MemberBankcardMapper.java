@@ -21,4 +21,6 @@ public interface MemberBankcardMapper extends BaseMapper<MemberBankcardEntity> {
     MemberBankcardEntity getBankcardByBfBindID(String bfBindId);
 
     boolean removeBankcardInfoByBankcardNo(String bankAccCard);
+
+    boolean updateMemberBankInfo(long id);
 }
