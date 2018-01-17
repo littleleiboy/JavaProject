@@ -15,18 +15,9 @@
 		</header>
 		<div class="mui-content">
 			<form class="mui-input-group">
-				<ul class="mui-table-view mui-table-view-radio">
-					<li class="mui-table-view-cell mui-selected">
-						<a class="mui-navigate-right" id="BOC">中国银行</a>
-					</li>
-				</ul>
 				<div class="mui-input-row">
-					<label>账户姓名</label>
-					<input id="memberName" type="text" class="mui-input-clear" placeholder="会员姓名" />
-				</div>
-				<div class="mui-input-row">
-					<label>会员账号</label>
-					<input id="memberNo" type="text" class="mui-input-clear" placeholder="1000000000000" />
+					<label>银行卡号</label>
+					<input id="accNo" type="text" class="mui-input-clear" placeholder="请核对银行账号" readonly="readonly">
 				</div>
 				<div class="mui-input-row">
 					<label>圈提金额</label>
@@ -34,21 +25,112 @@
 				</div>
 				<div class="mui-input-row">
 					<label>主卡密码</label>
-					<input id="passWord" type="password" class="mui-input-clear" placeholder="******" />
+					<input id="memberPass" type="password" class="mui-input-clear" placeholder="******" />
 				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='btnReg' class="mui-btn mui-btn-block mui-btn-primary">确认圈提</button>
+				<button id='btnWithdraw' class="mui-btn mui-btn-block mui-btn-primary">确认圈提</button>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
-		<script src="../../js/module/withdrawal.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script type="text/javascript">
-			//Todo 判断圈提是否绑定
 			(function($, doc) {
 				$.init();
+				
+				function toLogin() {
+					plus.nativeUI.toast('请登录');
+					$.openWindow({
+						url: '../login/login.html',
+						id: 'login'
+					});
+				}
+				
+				function toTradeResult(title, description, data) {
+					var webview = mui.openWindow({
+						url: 'trade_result.html',
+						extras: {
+							r_type: 'withdraw',
+							r_title: title,
+							r_description: description,
+							r_trans_serial_no: data.trans_serial_no,
+							r_trans_id: data.trans_id,
+							r_time: data.trade_date
+						}
+					});
+				}
+				
 				$.plusReady(function() {
-
+					var localSettings = common.getSettings();
+					if(common.isEmptyObject(localSettings)) {
+						toLogin();
+						return false;
+					}
+					
+					var accNo = doc.getElementById('accNo');
+					var money = doc.getElementById('withDrawQty');
+					var memberPass = doc.getElementById('memberPass');
+					var bindAcc = {};
+					var data = {};
+					
+					window.addEventListener('show', function() {
+						//加载已绑定的圈提银行卡
+						$.post(common.getServiceUrl('getFirstMemberBankcard'), {
+							access_token: localSettings.access_token,
+							memberInfoId: localSettings.member_pk,
+							isWithdraw: 1
+						}, function(result) {
+							if(result.success) {
+								bindAcc = result.data;
+								accNo.value = bindAcc.bankAccCard;
+								accName.value = bindAcc.bankAccName;
+							} else {
+								plus.nativeUI.toast(common.msg.msgServerErr());
+							}
+						}, 'json');
+					}, false);
+					
+					//确定圈提之前验证表单
+					if(common.isDigit(money.value)) {
+							plus.nativeUI.toast('请输入圈提金额');
+							return false;
+						}
+					if(common.isNullOrEmpty(memberPass.value)) {
+						plus.nativeUI.toast('请输入主卡密码');
+						return false;
+						}
+						
+					//请求结算系统验证主卡密码
+						$.post(common.getServiceUrl('checkMemberPass'), {
+							access_token: localSettings.access_token,
+							memberNo: localSettings.member_no,
+							password: memberPass.value
+						}, function(result) {
+							if(result.success) {
+								data = result.data;
+							} else {
+								plus.nativeUI.toast(result.message);
+								return false;
+							}
+						}, 'json');
+						
+						
+						//------begin: 确认圈提交易------
+					btnWithdraw.addEventListener('tap', function() {
+						
+						$.post(common.getServiceUrl('memberWithDraw'), data, function(result) {
+							var r_msg;
+							if(result.success) {
+								plus.nativeUI.toast(result.msg);
+								toTradeResult('交易处理成功', '圈提交易成功！', result.data);
+							} else {
+								plus.nativeUI.toast(result.msg);
+								toTradeResult('交易处理失败', '圈提交易遇到错误。' + result.msg, result.data);
+							}
+						})
+					});
+					//------end: 确认圈提交易------
+						
 				});
 			}(mui, document));
 		</script>
