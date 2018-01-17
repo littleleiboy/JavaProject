@@ -406,9 +406,9 @@ public class AppController extends AbstractController {
     public ResultData preBindBaofoo(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             //宝付预绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.prepareBinding.getValue());
@@ -500,9 +500,9 @@ public class AppController extends AbstractController {
     public ResultData confirmBindBaofoo(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             //宝付确认绑卡类交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmBinding.getValue());
@@ -510,24 +510,28 @@ public class AppController extends AbstractController {
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
             //params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
 
-            String memberNO = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员账号（会员编号）
-            if (null == memberNO || "".equals(memberNO)) {
-                return new ResultData("err_memberNO_isnull", false, "会员账号不能为空！");
+            String memberPK = params.get(SystemConstant.MEMBER_PK);//会员账号（会员编号）
+            if (null == memberPK || "".equals(memberPK)) {
+                return new ResultData("err_memberPK_isnull", false, "会员标识不能为空！");
             }
+            Long memberId = Long.valueOf(memberPK);
 
             String bankCardID = params.get(BaofooApiConstant.FIELD_ACC_NO);
             if (null == bankCardID || "".equals(bankCardID)) {
                 return new ResultData("err_acc_no_isnull", false, "请求绑定的银行卡号不能为空！");
             }
-
-            //验证访问口令
-            /*if (!checkStrAccToken(params)) {
-                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
             //商户订单号不能为空
             String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
             if (null == trans_id || "".equals(trans_id)) {
                 return new ResultData("err_trans_id", false, BaofooApiConstant.MSG_REQUIRE_TRANS_ID);
+            }
+            String accName = params.get(BaofooApiConstant.FIELD_ID_HOLDER);
+            if (null == accName || "".equals(accName)) {
+                return new ResultData("err_id_holder", false, "银行账户姓名不能为空");
+            }
+            String payCode = params.get(BaofooApiConstant.FIELD_PAY_CODE);
+            if (null == payCode || "".equals(payCode)) {
+                return new ResultData("err_id_paycode", false, "银行编号不能为空");
             }
             //短信验证码不能为空
             String sms_code = params.get(BaofooApiConstant.FIELD_SMS_CODE);//短信验证码
@@ -556,14 +560,14 @@ public class AppController extends AbstractController {
                             mbank.setIsWithdraw(0);//默认不可提现(不可圈提)
                         }
 
-                        mbank.setMemberInfoId(Long.valueOf(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MEMBER_NO))).longValue());
+                        mbank.setMemberInfoId(memberId);
                         mbank.setIsRecharge(1);//可充值(可圈存)
                         mbank.setBfBindId(String.valueOf(bindId));
                         mbank.setBankAccCard(bankCardID);
-                        mbank.setBankAccName(params.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
-                        mbank.setBankCode(params.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        mbank.setBankAccName(accName);
+                        mbank.setBankCode(payCode);
 
-                        MemberInfoEntity member = memberInfoService.getMemberInfoByNO(memberNO);
+                        MemberInfoEntity member = memberInfoService.getMemberInfoEntityById(memberId);
                         if (member != null)
                             mbank.setMemberInfoId(member.getId());
 
@@ -596,9 +600,9 @@ public class AppController extends AbstractController {
     public ResultData preRecharge(HttpServletRequest request, @RequestBody Map<String, String> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
             //宝付认证支付类预支付交易
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.preparePay.getValue());
 

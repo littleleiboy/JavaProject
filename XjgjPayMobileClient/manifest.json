@@ -287,7 +287,8 @@
 					"page/module/barcode.html",
 					"page/module/website.html",
 					"page/module/recharge.html",
-					"page/module/recharge_binding.html"
+					"page/module/recharge_binding.html",
+					"page/module/bindmemberbeforewithdraw.html"
 				],
 				"priority": 0
 			},
@@ -317,6 +318,14 @@
 				"resources": [],
 				"refer": [
 					"page/main/main.html"
+				],
+				"priority": 0
+			},
+			"page/module/recharge_binding.html": {
+				"resources": [],
+				"refer": [
+					"page/module/recharge_binding.html",
+					"page/module/recharge.html"
 				],
 				"priority": 0
 			}

@@ -77,9 +77,10 @@
 					var acc_no = doc.getElementById('acc_no');
 					var id_card = doc.getElementById('id_card');
 					var id_holder = doc.getElementById('id_holder');
+					var data = {};
 
 					//------begin: 银行列表选择器------
-					var bankItem = {};
+					var bankSelectedItem = {};
 					var bankPicker = new $.PopPicker();
 
 					common.postJSON(common.getServiceUrl('listBank'), {}, function(result) {
@@ -98,6 +99,7 @@
 					bank.addEventListener('tap', function(event) {
 						bankPicker.show(function(items) {
 							//console.log(JSON.stringify(items[0]));
+							bankSelectedItem = items[0];
 							bank.value = items[0].text;
 						});
 					}, false);
@@ -105,20 +107,6 @@
 
 					//	------begin: 提交预绑卡申请并获取短信验证码------
 					btnGetSms.addEventListener('tap', function() {
-						btnGetSms.disabled = true;
-
-						var count = 60;
-						var timer = setInterval(function() {
-							if(count === 0) {
-								clearInterval(timer);
-								btnGetSms.disabled = false;
-								btnGetSms.innerHTML = '获取验证码';
-							} else {
-								btnGetSms.innerHTML = count + '秒后重新获取';
-								count--;
-							}
-						}, 1000);
-
 						//获取验证码之前验证表单
 						if(common.isNullOrEmpty(localSettings.member_mobile)) {
 							toLogin();
@@ -141,15 +129,31 @@
 							return false;
 						}
 
-						var data = {};
-						$.post(common.getServiceUrl('preBindBaofoo'), {
+						//控制按钮点击频率
+						btnGetSms.disabled = true;
+
+						var count = 60;
+						var timer = setInterval(function() {
+							if(count === 0) {
+								clearInterval(timer);
+								btnGetSms.disabled = false;
+								btnGetSms.innerHTML = '获取验证码';
+							} else {
+								btnGetSms.innerHTML = count + '秒后重新获取';
+								count--;
+							}
+						}, 1000);
+
+						//提交数据
+						common.postJSON(common.getServiceUrl('preBindBaofoo'), {
 							access_token: localSettings.access_token,
 							mobile: mobile.value,
 							acc_no: acc_no.value,
 							id_card: id_card.value,
 							id_holder: id_holder.value,
-							pay_code: bank.value
+							pay_code: bankSelectedItem.value
 						}, function(result) {
+							//console.log(JSON.stringify(result));
 							if(result.success) {
 								data = result.data;
 							} else {
@@ -158,18 +162,23 @@
 							clearInterval(timer);
 							btnGetSms.disabled = false;
 							btnGetSms.innerHTML = '获取验证码';
-						}, 'json');
+						});
 					});
 					//	------end: 提交预绑卡申请并获取短信验证码------
 
-					//------begin: 申请绑定圈存------
+					//------begin: 绑定圈存------
 					btnSubmit.addEventListener('tap', function() {
 						if(common.isNullOrEmpty(sms_code.value)) {
-							plus.nativUI.toast('请输入短信验证码');
+							plus.nativeUI.toast('请输入短信验证码');
 							return false;
 						}
 						data.sms_code = sms_code.value;
-						$.post(common.getServiceUrl('confirmBindBaofoo'), data, function(result) {
+						data.member_pk = localSettings.member_pk;
+						data.access_token = localSettings.access_token;
+						data.acc_no = acc_no.value;
+						data.id_holder = id_holder.value;
+						data.pay_code = bankSelectedItem.value;
+						common.postJSON(common.getServiceUrl('confirmBindBaofoo'), data, function(result) {
 							if(result.success) {
 								plus.nativeUI.toast(result.msg);
 								//去圈存
@@ -177,7 +186,6 @@
 									url: 'recharge.html',
 									id: 'pageRecharge'
 								});
-								$.back(); //关闭当前窗体
 							} else {
 								plus.nativeUI.toast(result.msg);
 							}

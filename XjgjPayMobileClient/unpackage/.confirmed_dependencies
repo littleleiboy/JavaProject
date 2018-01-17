@@ -9,7 +9,8 @@
 			"page/module/barcode.html",
 			"page/module/website.html",
 			"page/module/recharge.html",
-			"page/module/recharge_binding.html"
+			"page/module/recharge_binding.html",
+			"page/module/bindmemberbeforewithdraw.html"
 		],
 		"resources": []
 	},
@@ -33,6 +34,12 @@
 	"page/module/recharge.html": {
 		"refer": [
 			"page/main/main.html"
+		]
+	},
+	"page/module/recharge_binding.html": {
+		"refer": [
+			"page/module/recharge_binding.html",
+			"page/module/recharge.html"
 		]
 	}
 }

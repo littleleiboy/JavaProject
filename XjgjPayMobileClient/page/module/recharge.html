@@ -17,11 +17,11 @@
 			<form class="mui-input-group">
 				<div class="mui-input-row">
 					<label>银行卡号</label>
-					<input id="accNo" type="text" class="mui-input-clear" placeholder="请核对银行账号" readonly="readonly">
+					<input id="accNo" type="text" class="mui-input" placeholder="请核对银行账号" readonly="readonly">
 				</div>
 				<div class="mui-input-row">
 					<label>账户姓名</label>
-					<input id="accName" type="text" class="mui-input-clear" placeholder="请核对账户姓名" readonly="readonly" />
+					<input id="accName" type="text" class="mui-input" placeholder="请核对账户姓名" readonly="readonly" />
 				</div>
 				<div class="mui-input-row">
 					<label>圈存金额</label>
@@ -82,39 +82,23 @@
 					var bindAcc = {};
 					var data = {};
 
-					window.addEventListener('show', function() {
-						//加载已绑定的圈存银行卡
-						$.post(common.getServiceUrl('getFirstMemberBankcard'), {
-							access_token: localSettings.access_token,
-							memberInfoId: localSettings.member_pk,
-							isRecharge: 1
-						}, function(result) {
-							if(result.success) {
-								bindAcc = result.data;
-								accNo.value = bindAcc.bankAccCard;
-								accName.value = bindAcc.bankAccName;
-							} else {
-								plus.nativeUI.toast(common.msg.msgServerErr());
-							}
-						}, 'json');
-					}, false);
+					//加载已绑定的圈存银行卡
+					common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
+						access_token: localSettings.access_token,
+						memberInfoId: localSettings.member_pk,
+						isRecharge: 1
+					}, function(result) {
+						if(result.success) {
+							bindAcc = result.data;
+							accNo.value = bindAcc.bankAccCard;
+							accName.value = bindAcc.bankAccName;
+						} else {
+							plus.nativeUI.toast(common.msg.msgServerErr());
+						}
+					});
 
 					//	------begin: 提交预支付交易并获取短信验证码------
 					btnGetSms.addEventListener('tap', function() {
-						btnGetSms.disabled = true;
-
-						var count = 60;
-						var timer = setInterval(function() {
-							if(count === 0) {
-								clearInterval(timer);
-								btnGetSms.disabled = false;
-								btnGetSms.innerHTML = '获取验证码';
-							} else {
-								btnGetSms.innerHTML = count + '秒后重新获取';
-								count--;
-							}
-						}, 1000);
-
 						//获取验证码之前验证表单
 						if(common.isDigit(money.value)) {
 							plus.nativeUI.toast('请输入圈存金额');
@@ -130,6 +114,19 @@
 						if(common.isNullOrEmpty(accName.value)) {
 							return false;
 						}
+						
+						btnGetSms.disabled = true;
+						var count = 60;
+						var timer = setInterval(function() {
+							if(count === 0) {
+								clearInterval(timer);
+								btnGetSms.disabled = false;
+								btnGetSms.innerHTML = '获取验证码';
+							} else {
+								btnGetSms.innerHTML = count + '秒后重新获取';
+								count--;
+							}
+						}, 1000);
 
 						//请求结算系统验证主卡密码
 						$.post(common.getServiceUrl('checkMemberPass'), {

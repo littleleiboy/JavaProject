@@ -60,6 +60,11 @@ public class MemberInfoServiceImpl implements MemberInfoService {
     }
 
     @Override
+    public MemberInfoEntity getMemberInfoEntityById(Long id) {
+        return memberInfoManager.getMemberInfoById(id);
+    }
+
+    @Override
     public R updateMemberInfo(MemberInfoEntity memberInfo) {
         int count = memberInfoManager.updateMemberInfo(memberInfo);
         return CommonUtils.msg(count);

@@ -25,8 +25,10 @@ public interface MemberInfoService {
 	R saveMemberInfo(MemberInfoEntity memberInfo);
 	
 	R getMemberInfoById(Long id);
-	
-	R updateMemberInfo(MemberInfoEntity memberInfo);
+
+    MemberInfoEntity getMemberInfoEntityById(Long id);
+
+    R updateMemberInfo(MemberInfoEntity memberInfo);
 	
 	R batchRemove(Long[] id);
 	
