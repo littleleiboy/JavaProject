@@ -317,7 +317,9 @@
 			"page/module/recharge.html": {
 				"resources": [],
 				"refer": [
-					"page/main/main.html"
+					"page/main/main.html",
+					"page/module/recharge.html",
+					"page/module/trade_result.html"
 				],
 				"priority": 0
 			},

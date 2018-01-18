@@ -20,9 +20,9 @@
 			</h3>
 			<ul>
 				<li>描述：<span id="r_description"></span></li>
-				<li>交易流水号：<span id="r_trans_serial_no"></span></li>
-				<li>订单号：<span id="r_trans_id"></span></li>
-				<li>订单发送时间：<span id="r_time"></span></li>
+				<li id="liTranSN">交易流水号：<span id="r_trans_serial_no"></span></li>
+				<li id="liOrderID">订单号：<span id="r_trans_id"></span></li>
+				<li id="liTime">订单发送时间：<span id="r_time"></span></li>
 			</ul>
 			<button type="button" class='mui-btn mui-action-back'>关闭</button>
 		</div>
@@ -30,13 +30,25 @@
 		<script type="text/javascript">
 			(function($, doc) {
 				mui.init();
+
 				$.plusReady(function() {
+					function hasDataShow(rowId, valueId, value) {
+						var el = document.getElementById(rowId);
+						if(value) {
+							el.style.display = 'block';
+							document.getElementById(valueId).innerHTML = value;
+						} else {
+							el.style.display = 'none';
+						}
+					}
+
 					var currentWebview = plus.webview.currentWebview();
 					doc.getElementById('r_title').innerHTML = currentWebview.r_title;
 					doc.getElementById('r_description').innerHTML = currentWebview.r_description;
-					doc.getElementById('r_trans_serial_no').innerHTML = currentWebview.r_trans_serial_no;
-					doc.getElementById('r_trans_id').innerHTML = currentWebview.r_trans_id;
-					doc.getElementById('r_time').innerHTML = currentWebview.r_time;
+
+					hasDataShow('liTranSN', 'r_trans_serial_no', currentWebview.r_trans_serial_no);
+					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_trans_id);
+					hasDataShow('liTime', 'r_time', currentWebview.r_time);
 				});
 			}(mui, document));
 		</script>

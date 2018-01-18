@@ -120,9 +120,10 @@
 						};
 						app.login(common.getServiceUrl('appLogin'), loginInfo, function(err) {
 							if(err) {
-								plus.nativeUI.toast(err);
+								plus.nativeUI.alert(err);
 								return;
 							}
+							//console.log(JSON.stringify(common.getSettings()));
 							toMain();
 						});
 					});

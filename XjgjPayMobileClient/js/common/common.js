@@ -36,14 +36,14 @@ var common = {
 	 * 判断是否为空值
 	 */
 	"isNullOrEmpty": function(obj) {
-		return(obj == null || obj == "");
+		return (obj == null || obj == "");
 	},
 	/**
-	 * 验证是否为数字
+	 * 验证是否为保留两位小数的金额
 	 */
-	"isDigit": function(str) {
-		str = str || '';
-		return(/^\d+$/.test(str));
+	"isMoney": function(str) {
+		var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+		return (reg.test(str));
 	},
 	/**
 	 * 通用消息提示语

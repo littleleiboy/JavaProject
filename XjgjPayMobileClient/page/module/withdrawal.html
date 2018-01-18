@@ -91,7 +91,7 @@
 					}, false);
 					
 					//确定圈提之前验证表单
-					if(common.isDigit(money.value)) {
+					if(common.isMoney(money.value)) {
 							plus.nativeUI.toast('请输入圈提金额');
 							return false;
 						}

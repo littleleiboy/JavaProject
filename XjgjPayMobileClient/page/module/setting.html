@@ -207,7 +207,7 @@
 							<li class="mui-table-view-cell">
 								<a href="#lock" class="mui-navigate-right">设置锁屏图案</a>
 							</li>
-						</ul>	
+						</ul>
 						<ul class="mui-table-view">
 							<li class="mui-table-view-cell" style="text-align: center;">
 								<a id='exit'>退出</a>
@@ -411,7 +411,7 @@
 			if(mui.os.ios) {
 				app.setState({});
 				mui.openWindow({
-					url: 'login.html',
+					url: '../login/login.html',
 					id: 'login',
 					show: {
 						aniShow: 'pop-in'
@@ -436,20 +436,17 @@
 					case 1:
 						//注销账号
 						app.setState({});
-						/*
-						 * 注意：
-						 * 1、因本示例应用启动页就是登录页面，因此注册成功后，直接显示登录页即可；
-						 * 2、如果真实案例中，启动页不是登录页，则需修改，使用mui.openWindow打开真实的登录页面
-						 */
-						plus.webview.getLaunchWebview().show("pop-in");
-						//若启动页不是登录页，则需通过如下方式打开登录页
-						//						mui.openWindow({
-						//							url: 'login.html',
-						//							id: 'login',
-						//							show: {
-						//								aniShow: 'pop-in'
-						//							}
-						//						});
+						//plus.webview.getLaunchWebview().show("pop-in");
+						mui.openWindow({
+							url: '../login/login.html',
+							id: 'login',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
 						break;
 					case 2:
 						plus.runtime.quit();

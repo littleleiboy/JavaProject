@@ -121,7 +121,6 @@ public class AppController extends AbstractController {
             logger.info("验证app token失败，不是会员。");
             return false;
         }
-
         /*//使用方法：
         //验证访问口令
         if (!checkAccessToken(acc_token)) {
@@ -624,8 +623,14 @@ public class AppController extends AbstractController {
             //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
-                logger.info(String.format("宝付预支付交易处理成功，申请交易金额：%s 元，宝付业务流水号：%s 。", txn_amt, String.valueOf(mapResult.get(BaofooApiConstant.FIELD_BUSINESS_NO))));
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                logger.info("宝付预支付处理返回结果：" + JacksonUtils.beanToJson(mapResult));
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    logger.info(String.format("宝付预支付交易处理成功，申请交易金额：%s 元，宝付业务流水号：%s 。", txn_amt, String.valueOf(mapResult.get(BaofooApiConstant.FIELD_BUSINESS_NO))));
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    String error = MsgConstant.MSG_OPERATION_FAILED + " " + String.valueOf(mapResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    return new ResultData("err_response_baofoo", false, error);
+                }
             } else {
                 return new ResultData("err_remote", false, MsgConstant.MSG_OPERATION_FAILED);
             }
@@ -645,9 +650,9 @@ public class AppController extends AbstractController {
     public ResultData recharge(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
             params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
@@ -719,7 +724,8 @@ public class AppController extends AbstractController {
                         return new ResultData("err_remote_xj", false, MsgConstant.MSG_REMOTE_ERROR);
                     }
                 } else {
-                    return new ResultData("err_response_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+                    String error = MsgConstant.MSG_OPERATION_FAILED + " " + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    return new ResultData("err_response_baofoo", false, error);
                 }
             } else {
                 return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);

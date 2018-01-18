@@ -33,7 +33,9 @@
 	},
 	"page/module/recharge.html": {
 		"refer": [
-			"page/main/main.html"
+			"page/main/main.html",
+			"page/module/recharge.html",
+			"page/module/trade_result.html"
 		]
 	},
 	"page/module/recharge_binding.html": {

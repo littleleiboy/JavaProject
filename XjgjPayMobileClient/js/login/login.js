@@ -17,7 +17,7 @@
 			data: loginInfo,
 			dataType: 'json',
 			type: 'post',
-			timeout: 600000,
+			timeout: 300000,
 			success: function(result) {
 				if(result.success) {
 					return owner.createState(result.data, callback);
@@ -27,7 +27,7 @@
 			},
 			error: function(xhr, type, errorThrown) {
 				console.log(type);
-				plus.nativeUI.toast('请检查网络连接，或稍后再试');
+				plus.nativeUI.alert('请检查网络连接，或稍后再试');
 			}
 		});
 	};
