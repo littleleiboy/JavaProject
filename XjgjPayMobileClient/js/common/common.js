@@ -39,6 +39,13 @@ var common = {
 		return (obj == null || obj == "");
 	},
 	/**
+	 * 验证是否为数字
+	 */
+	"isDigit": function(str) {
+		str = str || '';
+		return(/^\d+$/.test(str));
+	},
+	/**
 	 * 验证是否为保留两位小数的金额
 	 */
 	"isMoney": function(str) {
