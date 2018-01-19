@@ -51,6 +51,18 @@ public class SystemConstant {
      * APP会员登录后返回数据KEY：会员手机号
      */
     public static final String MEMBER_MOBILE = "member_mobile";
+    /**
+     * 圈存交易状态：支付成功，结算成功。
+     */
+    public static final int RECHARGE_STATE_SUCCESS = 1;
+    /**
+     * 圈存交易状态：支付失败，未结算。
+     */
+    public static final int RECHARGE_STATE_FAILED = 2;
+    /**
+     * 圈存交易状态：支付成功，结算失败。
+     */
+    public static final int RECHARGE_STATE_PAY_OK = 3;
 
     /**
      * 菜单类型

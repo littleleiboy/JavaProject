@@ -61,7 +61,7 @@ create table `trade_log`(
 	`bank_code` varchar(50) default '' comment '发卡行编号',
 	`bf_bind_id` varchar(100) default '' comment '宝付绑定标识号',
 	`remark` varchar(100) comment '备注',
-  `state` int default '0' comment '交易状态(1-成功；2-失败)',
+  `state` int default '0' comment '交易状态(1-处理成功；2-处理失败；3-宝付处理成功西郊结算处理失败)',
 	`gmt_create` datetime comment '交易时间',
 	primary key pk_id(`id`),
 	unique key uk_trans_sn(`trans_sn`),

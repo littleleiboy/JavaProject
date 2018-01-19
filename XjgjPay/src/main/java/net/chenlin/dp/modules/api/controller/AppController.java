@@ -644,16 +644,33 @@ public class AppController extends AbstractController {
             if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
-
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
             params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
-            //宝付认证支付类确认支付交易
-            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmPay.getValue());
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.confirmPay.getValue());//宝付认证支付类确认支付交易
             //String sms_code = params.get(BaofooApiConstant.FIELD_SMS_CODE);//支付短信验证码
             String business_no = params.get(BaofooApiConstant.FIELD_BUSINESS_NO);//宝付业务流水号
             if (null == business_no || "".equals(business_no)) {
                 return new ResultData("err_business_no_isnull", false, "支付业务流水号不能为空！");
             }
+            //保存交易记录
+            TradeLogEntity trade = new TradeLogEntity();
+            trade.setTransSn(business_no);//圈存交易流水号和宝付支付流水号一致
+            trade.setTransType(SystemConstant.TradeType.RECHARGE.getValue());
+            trade.setSellerOrderId(OrderNumberUtils.generateInTime());
+            trade.setPayModeId(SystemConstant.PayMode.BAOFOO.getValue());
+
+            String bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
+            if (null != bindId || !"".equals(bindId)) {
+                MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
+                if (bankCard != null) {
+                    trade.setBankAccName(bankCard.getBankAccName());
+                    trade.setBankAccCard(bankCard.getBankAccCard());
+                    trade.setBankCode(bankCard.getBankCode());
+                }
+                trade.setBfBindId(bindId);
+            }
+            trade.setGmtCreate(new Date());
+
             //调用宝付接口
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
@@ -665,27 +682,10 @@ public class AppController extends AbstractController {
                             mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO),
                             succAmt));
 
-                    //保存交易记录
-                    TradeLogEntity trade = new TradeLogEntity();
                     trade.setTransSn(String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)));//圈存交易流水号和宝付支付流水号一致
-                    trade.setTransType(SystemConstant.TradeType.RECHARGE.getValue());
-                    trade.setSellerOrderId(OrderNumberUtils.generateInTime());
                     trade.setAmtMoney(succAmt);
-                    trade.setPayModeId(SystemConstant.PayMode.BAOFOO.getValue());
 
-                    String bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
-                    if (null != bindId || !"".equals(bindId)) {
-                        MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
-                        if (bankCard != null) {
-                            trade.setBankAccName(bankCard.getBankAccName());
-                            trade.setBankAccCard(bankCard.getBankAccCard());
-                            trade.setBankCode(bankCard.getBankCode());
-                        }
-                        trade.setBfBindId(bindId);
-                    }
-                    trade.setGmtCreate(new Date());
-
-                    //再调用西郊结算系统接口记录圈存交易
+                    //调用西郊结算系统接口记录圈存交易
                     Map<String, Object> xjParams = new HashMap<>();
                     xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NO, params.get(XjgjAccApiConstant.FIELD_MEMBER_NO));
                     xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
@@ -695,14 +695,14 @@ public class AppController extends AbstractController {
                     Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
                     if (mapXjResult != null) {
                         if ("1".equals(mapXjResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
-                            trade.setState(1);//交易成功
+                            trade.setState(SystemConstant.RECHARGE_STATE_SUCCESS);//支付成功且结算成功
                             tradeLogService.saveTradeLog(trade);
 
                             logger.info("宝付确认支付成功！西郊国际结算处理成功！交易流水号："
                                     + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
                             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
                         } else {
-                            trade.setState(2);//交易失败(宝付交易成功，推送给结算系统失败)
+                            trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
                             tradeLogService.saveTradeLog(trade);
 
                             logger.info("宝付确认支付成功！西郊国际结算处理失败！交易流水号："
@@ -710,12 +710,16 @@ public class AppController extends AbstractController {
                             return new ResultData("err_xj", false, "支付成功，结算处理失败。" + String.valueOf(mapXjResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapBfResult);
                         }
                     } else {
-                        trade.setState(2);//交易失败(宝付交易成功，推送给结算系统失败)
+                        trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
                         tradeLogService.saveTradeLog(trade);
                         return new ResultData("err_remote_xj", false, MsgConstant.MSG_REMOTE_ERROR);
                     }
                 } else {
-                    String error = MsgConstant.MSG_OPERATION_FAILED + " " + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算(宝付圈存交易失败，则不执行西郊结算系统的圈存交易)
+                    tradeLogService.saveTradeLog(trade);
+
+                    String error = "圈存交易失败！" + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    logger.info(error);
                     return new ResultData("err_response_baofoo", false, error);
                 }
             } else {
@@ -728,13 +732,106 @@ public class AppController extends AbstractController {
     }
 
     /**
-     * 会员圈存(充值)失败重试
+     * 查询宝付圈存交易结果
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/resultBfRecharge")
+    public ResultData resultBfRecharge(@RequestBody Map<String, String> params) {
+        try {
+            //验证token
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            //宝付交易状态查询类交易
+            params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.selectTradeState.getValue());
+            String orig_trans_id = params.get(BaofooApiConstant.FIELD_ORIG_TRANS_ID);
+            if (null == orig_trans_id || "".equals(orig_trans_id)) {
+                return new ResultData("err_orig_trans_id_isnull", false, "原始商户订单号不能为空！");
+            }
+            Map<String, Object> mapBfResult = bfService.backTrans(params);
+            if (mapBfResult != null) {
+                logger.info("查询宝付圈存交易结果：" + JacksonUtils.beanToJson(mapBfResult));
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapBfResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    logger.info("查询宝付圈存交易结果:" + MsgConstant.MSG_OPERATION_SUCCESS);
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
+                } else {
+                    String error = MsgConstant.MSG_OPERATION_FAILED + " " + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    logger.info(error);
+                    return new ResultData("err_response_baofoo", false, error);
+                }
+            } else {
+                return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+            }
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 更新宝付圈存交易状态，并进行西郊结算
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/updateBfRechargeSuccess")
+    public ResultData updateBfRechargeSuccess(@RequestBody Map<String, Object> params) {
+        try {
+            //验证token
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+            }
+            Object orig_trans_id = params.get(BaofooApiConstant.FIELD_ORIG_TRANS_ID);
+            if (null == orig_trans_id || "".equals(orig_trans_id)) {
+                return new ResultData("err_orig_trans_id_isnull", false, "原始商户订单号不能为空！");
+            }
+            TradeLogEntity trade = new TradeLogEntity();
+            trade.setSellerOrderId(String.valueOf(orig_trans_id));//根据商户订单号更新
+
+            //调用西郊结算系统接口记录圈存交易
+            Map<String, Object> xjParams = new HashMap<>();
+            xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NO, params.get(XjgjAccApiConstant.FIELD_MEMBER_NO));
+            xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
+            xjParams.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInMillis());
+            xjParams.put(XjgjAccApiConstant.FIELD_PASSWORD, params.get(XjgjAccApiConstant.FIELD_PASSWORD));
+            xjParams.put(XjgjAccApiConstant.FIELD_MONEY, params.get(XjgjAccApiConstant.FIELD_MONEY));
+            Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
+            if (mapXjResult != null) {
+                if ("1".equals(mapXjResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
+                    trade.setState(SystemConstant.RECHARGE_STATE_SUCCESS);//支付成功且结算成功
+                    tradeLogService.updateTradeLog(trade);
+
+                    logger.info("已更新宝付圈存交易状态为成功，西郊国际结算处理圈存成功！商户订单号：" + String.valueOf(orig_trans_id) + "。");
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapXjResult);
+                } else {
+                    trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
+                    tradeLogService.updateTradeLog(trade);
+
+                    logger.info("已更新宝付圈存交易状态为成功，西郊国际结算处理圈存失败！商户订单号：" + String.valueOf(orig_trans_id) + "。");
+                    return new ResultData("err_xj", false, "支付成功，结算处理失败。" + String.valueOf(mapXjResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapXjResult);
+                }
+            } else {
+                trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);
+                tradeLogService.updateTradeLog(trade);
+                logger.info("已更新宝付圈存交易状态为成功，西郊国际结算处理圈存失败！商户订单号：" + String.valueOf(orig_trans_id) + "。");
+                return new ResultData("err_remote_xj", false, "支付成功，结算处理失败。");
+            }
+        } catch (Exception e) {
+            logger.error(MsgConstant.MSG_SERVER_ERROR, e);
+            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 西郊结算会员圈存(充值)失败重试
      *
      * @param params
      * @return 返回结果
      */
-    @RequestMapping("/retryRecharge")
-    public ResultData retryCharge(@RequestBody Map<String, Object> params) {
+    @RequestMapping("/retryXjRecharge")
+    public ResultData retryXjRecharge(@RequestBody Map<String, Object> params) {
         try {
             //验证token
             if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
@@ -744,7 +841,7 @@ public class AppController extends AbstractController {
             if (null == tranSN || "".equals(tranSN)) {
                 return new ResultData("err_tran_sn_isnull", false, "原圈存交易流水号不能为空！");
             }
-            params.put(XjgjAccApiConstant.FIELD_REQUEST_NO,OrderNumberUtils.generateInTime());
+            params.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInTime());
 
             Map<String, Object> mapResult = xjgjService.retryRecharge(params);
             if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
@@ -754,7 +851,7 @@ public class AppController extends AbstractController {
                 trade.setState(1);//宝付交易处理成功且西郊结算交易处理成功
                 tradeLogService.updateTradeLog(trade);
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-            }else {
+            } else {
                 logger.info("西郊国际结算系统重试圈存交易处理失败！交易流水号："
                         + String.valueOf(tranSN) + "。");
                 return new ResultData("err_xj", false, "结算重试圈存交易处理失败。" + String.valueOf(mapResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapResult);

@@ -94,6 +94,7 @@
         <where>
             <if test="id != null">AND `id` = #{id}</if>
             <if test="transSn != null">AND `trans_sn` = #{transSn}</if>
+			<if test="sellerOrderId != null">AND `seller_order_id` = #{sellerOrderId}</if>
         </where>
     </update>
 
