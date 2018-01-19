@@ -414,11 +414,6 @@ public class AppController extends AbstractController {
             params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());//商户流水号
             params.put(BaofooApiConstant.FIELD_TRANS_ID, OrderNumberUtils.generateInTime());//商户订单号
 
-            /*//商户订单号不能为空
-            String trans_id = params.get(BaofooApiConstant.FIELD_TRANS_ID);
-            if (null == trans_id || "".equals(trans_id)) {
-                return new ResultData("err_trans_id", false, BaofooApiConstant.MSG_REQUIRE_TRANS_ID);
-            }*/
             //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
@@ -442,9 +437,9 @@ public class AppController extends AbstractController {
     public ResultData cancelBinding(@RequestBody Map<String, String> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
+            if (!checkAccessToken(params.get(SystemConstant.ACCESS_TOKEN))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             //解除绑定关系
             params.put(BaofooApiConstant.FIELD_TXN_SUB_TYPE, BaofooApiConstant.TradeType.cancelBinding.getValue());
@@ -456,10 +451,6 @@ public class AppController extends AbstractController {
                 return new ResultData("err_acc_no_isnull", false, "请求解绑的银行卡号不能为空！");
             }
 
-            //验证访问口令
-            /*if (!checkStrAccToken(params)) {
-                return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
             // 调用宝付接口解除绑定交易
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
@@ -742,16 +733,32 @@ public class AppController extends AbstractController {
      * @param params
      * @return 返回结果
      */
-    @RequestMapping("/retryCharge")
+    @RequestMapping("/retryRecharge")
     public ResultData retryCharge(@RequestBody Map<String, Object> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
+            Object tranSN = params.get(BaofooApiConstant.FIELD_BUSINESS_NO);//原圈存交易流水号
+            if (null == tranSN || "".equals(tranSN)) {
+                return new ResultData("err_tran_sn_isnull", false, "原圈存交易流水号不能为空！");
+            }
+            params.put(XjgjAccApiConstant.FIELD_REQUEST_NO,OrderNumberUtils.generateInTime());
 
             Map<String, Object> mapResult = xjgjService.retryRecharge(params);
-            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
+                //重试成功后更新上次失败的交易记录为成功
+                TradeLogEntity trade = new TradeLogEntity();
+                trade.setTransSn(String.valueOf(tranSN));
+                trade.setState(1);//宝付交易处理成功且西郊结算交易处理成功
+                tradeLogService.updateTradeLog(trade);
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            }else {
+                logger.info("西郊国际结算系统重试圈存交易处理失败！交易流水号："
+                        + String.valueOf(tranSN) + "。");
+                return new ResultData("err_xj", false, "结算重试圈存交易处理失败。" + String.valueOf(mapResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapResult);
+            }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
             return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);

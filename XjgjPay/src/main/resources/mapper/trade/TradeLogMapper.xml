@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="net.chenlin.dp.modules.trade.dao.TradeLogMapper">
-	
-	<select id="listForPage" resultType="net.chenlin.dp.modules.trade.entity.TradeLogEntity">
+
+    <select id="listForPage" resultType="net.chenlin.dp.modules.trade.entity.TradeLogEntity">
 		SELECT
 			`id`, 
 			`trans_sn`, 
@@ -23,8 +23,8 @@
 		ORDER BY
 			id DESC
 	</select>
-	
-	<insert id="save">
+
+    <insert id="save">
 		INSERT INTO trade_log (
 			`trans_sn`, 
 			`trans_type`, 
@@ -54,8 +54,8 @@
 			#{gmtCreate}
 		)
 	</insert>
-	
-	<select id="getObjectById" resultType="net.chenlin.dp.modules.trade.entity.TradeLogEntity">
+
+    <select id="getObjectById" resultType="net.chenlin.dp.modules.trade.entity.TradeLogEntity">
 		SELECT
 			`id`, 
 			`trans_sn`, 
@@ -75,36 +75,37 @@
 		WHERE
 			id = #{id}
 	</select>
-	
-	<update id="update">
-		UPDATE trade_log
-	 	<set>
-			<if test="transSn != null">`trans_sn` = #{transSn}, </if>
-			<if test="transType != null">`trans_type` = #{transType}, </if>
-			<if test="sellerOrderId != null">`seller_order_id` = #{sellerOrderId}, </if>
-			<if test="amtMoney != null">`amt_money` = #{amtMoney}, </if>
-			<if test="payModeId != null">`pay_mode_id` = #{payModeId}, </if>
-			<if test="bankAccName != null">`bank_acc_name` = #{bankAccName}, </if>
-			<if test="bankAccCard != null">`bank_acc_card` = #{bankAccCard}, </if>
-			<if test="bankCode != null">`bank_code` = #{bankCode}, </if>
-			<if test="bfBindId != null">`bf_bind_id` = #{bfBindId}, </if>
-			<if test="remark != null">`remark` = #{remark}, </if>
-			<if test="state != null">`state` = #{state}, </if>
-			<if test="gmtCreate != null">`gmt_create` = #{gmtCreate}</if>
-		</set>
-		WHERE
-			id = #{id}
-	</update>
-	
-	<delete id="batchRemove">
-		DELETE
-		FROM
-			trade_log
-		WHERE
-			id IN
-		<foreach item="id" collection="array" open="(" separator="," close=")">
-			#{id}
-		</foreach>
-	</delete>
+
+    <update id="update">
+        UPDATE trade_log
+        <set>
+            <if test="transSn != null">`trans_sn` = #{transSn},</if>
+            <if test="transType != null">`trans_type` = #{transType},</if>
+            <if test="sellerOrderId != null">`seller_order_id` = #{sellerOrderId},</if>
+            <if test="amtMoney != null">`amt_money` = #{amtMoney},</if>
+            <if test="payModeId != null">`pay_mode_id` = #{payModeId},</if>
+            <if test="bankAccName != null">`bank_acc_name` = #{bankAccName},</if>
+            <if test="bankAccCard != null">`bank_acc_card` = #{bankAccCard},</if>
+            <if test="bankCode != null">`bank_code` = #{bankCode},</if>
+            <if test="bfBindId != null">`bf_bind_id` = #{bfBindId},</if>
+            <if test="remark != null">`remark` = #{remark},</if>
+            <if test="state != null">`state` = #{state},</if>
+        </set>
+        <where>
+            <if test="id != null">AND `id` = #{id}</if>
+            <if test="transSn != null">AND `trans_sn` = #{transSn}</if>
+        </where>
+    </update>
+
+    <delete id="batchRemove">
+        DELETE
+        FROM
+        trade_log
+        WHERE
+        id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>
