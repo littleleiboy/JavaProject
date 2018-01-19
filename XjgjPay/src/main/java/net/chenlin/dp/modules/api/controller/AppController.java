@@ -916,10 +916,10 @@ public class AppController extends AbstractController {
                         mBankcardInfo.setGmtModified(new Date());
                         mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
                         mBankcardInfo.setIsWithdraw(1);//可提现
-                        mBankcardInfo.setBfBindId(mapResult.get(XjgjAccApiConstant.FIELD_BIND_ID).toString());
-                        mBankcardInfo.setBankAccCard(mapResult.get(BaofooApiConstant.FIELD_ACC_NO).toString());
-                        mBankcardInfo.setBankAccName(mapResult.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
-                        mBankcardInfo.setBankCode(mapResult.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        mBankcardInfo.setBankAccCard(params.get(BaofooApiConstant.FIELD_ACC_NO).toString());
+                        mBankcardInfo.setBankAccName(params.get(BaofooApiConstant.FIELD_ID_HOLDER).toString());
+                        mBankcardInfo.setBankCode(params.get(BaofooApiConstant.FIELD_PAY_CODE).toString());
+                        mBankcardInfo.setMemberInfoId(Long.parseLong(params.get(BaofooApiConstant.FIELD_MEMBER_ID).toString()));
                         memberBankService.saveMemberBankcard(mBankcardInfo);
                         return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                     }
