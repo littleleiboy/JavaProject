@@ -160,4 +160,10 @@
 		WHERE `id` = #{id}
 	</update>
 
+
+	<update id="updateWithdrawMemberBankCardInfo">
+		UPDATE member_bankcard
+		SET `is_withdraw` = 0
+		WHERE `id` = #{id}
+	</update>
 </mapper>

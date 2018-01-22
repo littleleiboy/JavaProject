@@ -36,4 +36,6 @@ public interface MemberBankcardService {
 	boolean removeBankcardInfoByBankcardNo(String bankAccCard);
 
 	boolean updateMemberBankCardInfo(Long id);
+
+	boolean updateWithdrawMemberBankCardInfo(Long id);
 }

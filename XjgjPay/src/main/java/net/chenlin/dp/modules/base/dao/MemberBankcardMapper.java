@@ -23,4 +23,6 @@ public interface MemberBankcardMapper extends BaseMapper<MemberBankcardEntity> {
     boolean removeBankcardInfoByBankcardNo(String bankAccCard);
 
     boolean updateMemberBankInfo(long id);
+
+    boolean updateWithdrawMemberBankCardInfo(Long id);
 }

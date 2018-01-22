@@ -808,25 +808,29 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
-                    //保存圈提绑定信息到数据库
-                    MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
-                    if (mBankcardInfo != null) {
-                        mBankcardInfo.setGmtModified(new Date());
-                        memberBankService.updateMemberBankcard(mBankcardInfo);
-                        return new ResultData("err", false, "该银行卡已经绑定过", "");
-                    } else {
-                        mBankcardInfo = new MemberBankcardEntity();
-                        mBankcardInfo.setGmtModified(new Date());
-                        mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
-                        mBankcardInfo.setIsWithdraw(1);//可提现
-                        mBankcardInfo.setBankAccCard(params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
-                        mBankcardInfo.setBankAccName(params.get(XjgjAccApiConstant.FIELD_BANK_NAME).toString());
-                        mBankcardInfo.setBankCode("BOC");
-                        mBankcardInfo.setMemberInfoId(Long.parseLong(String.valueOf(memberNo)));
-                        memberBankService.saveMemberBankcard(mBankcardInfo);
-                        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                    if("1".equals(mapResult.get("result"))) {
+                        //保存圈提绑定信息到数据库
+                        MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
+                        if (mBankcardInfo != null) {
+                            mBankcardInfo.setGmtModified(new Date());
+                            memberBankService.updateMemberBankcard(mBankcardInfo);
+                            return new ResultData("err", false, "该银行卡已经绑定过", "");
+                        } else {
+                            mBankcardInfo = new MemberBankcardEntity();
+                            mBankcardInfo.setGmtModified(new Date());
+                            mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
+                            mBankcardInfo.setIsWithdraw(1);//可提现
+                            mBankcardInfo.setBankAccCard(params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
+                            mBankcardInfo.setBankAccName(params.get(XjgjAccApiConstant.FIELD_BANK_NAME).toString());
+                            mBankcardInfo.setBankCode("BOC");
+                            mBankcardInfo.setMemberInfoId(Long.parseLong(String.valueOf(memberNo)));
+                            memberBankService.saveMemberBankcard(mBankcardInfo);
+                            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                        }
+                    } else{
+                        return new ResultData("err", false, mapResult.get("message").toString(), "");
                     }
-                    //return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+
                 } else {
                     return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
                 }
@@ -855,14 +859,17 @@ public class AppController extends AbstractController {
 
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
-                MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
-                if (memberBankcardInfo != null) {
-                    //更新数据库该银行卡的信息
-                    //TODO 修改更新语句
-                    memberBankService.updateMemberBankCardInfo(memberBankcardInfo.getId());
-                    return new ResultData("ok", true, "解除绑定关系成功", mapResult);
-                } else {
-                    return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                if("1".equals(mapResult.get("result"))) {
+                    MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
+                    if (memberBankcardInfo != null) {
+                        //更新数据库该银行卡的信息
+                        memberBankService.updateWithdrawMemberBankCardInfo(memberBankcardInfo.getId());
+                        return new ResultData("ok", true, "解除绑定关系成功", mapResult);
+                    } else {
+                        return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                    }
+                } else{
+                    return new ResultData("err", false, mapResult.get("message").toString(), "");
                 }
             } else {
                 return new ResultData("err", false, MsgConstant.MSG_OPERATION_FAILED, "");
@@ -897,7 +904,7 @@ public class AppController extends AbstractController {
                 Map<String, Object> newMap = new HashMap<>();
                 newMap.put("memberNo", Params.get("memberNo").toString());
                 Map<String, Object> momenyBalanceMap = xjgjService.searchMemberAccountBalance(newMap);//查询剩余金额
-                Map<String, Object> map = null; //xjgjService.memberWithDraw(Params);
+                Map<String, Object> map = xjgjService.memberWithDraw(Params);
                 List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(Params, 1);//判断圈提是否绑定成功
 
                 if (map != null) {
@@ -906,10 +913,10 @@ public class AppController extends AbstractController {
                             BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.get(XjgjAccApiConstant.FIELD_ACCOUNT_QTY).toString());
                             BigDecimal drawMoney = new BigDecimal(String.valueOf(Params.get(XjgjAccApiConstant.FIELD_MONEY)));//圈提金额
                             if (drawMoney.compareTo(accountBalance) > 0) {
-                                return new ResultData("err", false, "账户余额不足！", "");
+                                return new ResultData("err", false, "账户余额不足！", " ");
                             }
                             if (drawMoney.equals(BigDecimal.ZERO)) {
-                                return new ResultData("err", false, "圈提金额不能为0！", "");
+                                return new ResultData("err", false, "圈提金额不能为0！", " ");
                             }
                             //  圈提记录保存到交易记录数据库
                             TradeLogEntity trade = new TradeLogEntity();
@@ -928,7 +935,7 @@ public class AppController extends AbstractController {
                             return new ResultData("err_noBind", false, "圈提绑定中国银行银行卡信息错误，请核对！", "");
                         }
                     } else {
-                        return new ResultData("err_search_failed", false, "西郊国际圈提失败", "");
+                        return new ResultData("err_search_failed", false, map.get("message").toString(), "");
                     }
                 } else {
                     return new ResultData("err_no_response", false, "圈提响应超时", "");
