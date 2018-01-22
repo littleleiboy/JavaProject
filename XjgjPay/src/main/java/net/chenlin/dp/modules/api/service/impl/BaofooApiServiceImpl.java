@@ -129,13 +129,14 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                     break;
                 case selectTradeState:
                     data.put(BaofooApiConstant.FIELD_ORIG_TRANS_ID, map.get(BaofooApiConstant.FIELD_ORIG_TRANS_ID));
+                    data.put(BaofooApiConstant.FIELD_TRADE_DATE, formatter.format(map.get(BaofooApiConstant.FIELD_ORIG_TRADE_DATE)));
                     break;
             }
 
             /*Map<Object, Object> dataContent = new HashMap<>();
             dataContent.put(BaofooApiConstant.FIELD_DATA_CONTENT, data);*/
 
-            String jsonOrXml ;
+            String jsonOrXml;
             if (BaofooApiConstant.DataType.JSON.getValue().equalsIgnoreCase(data_type)) {
                 jsonOrXml = JacksonUtils.beanToJson(data);
             } else {

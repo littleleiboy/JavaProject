@@ -707,12 +707,12 @@ public class AppController extends AbstractController {
 
                             logger.info("宝付确认支付成功！西郊国际结算处理失败！交易流水号："
                                     + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
-                            return new ResultData("err_xj", false, "支付成功，结算处理失败。" + String.valueOf(mapXjResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapBfResult);
+                            return new ResultData("err_bf1xj0", false, "支付成功，结算失败。" + String.valueOf(mapXjResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapBfResult);
                         }
                     } else {
                         trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
                         tradeLogService.saveTradeLog(trade);
-                        return new ResultData("err_remote_xj", false, MsgConstant.MSG_REMOTE_ERROR);
+                        return new ResultData("err_bf1xj0", false, "支付成功，结算失败。" + MsgConstant.MSG_REMOTE_ERROR);
                     }
                 } else {
                     trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算(宝付圈存交易失败，则不执行西郊结算系统的圈存交易)
@@ -720,10 +720,15 @@ public class AppController extends AbstractController {
 
                     String error = "圈存交易失败！" + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
                     logger.info(error);
-                    return new ResultData("err_response_baofoo", false, error);
+                    return new ResultData("err_bf0xj0", false, error, mapBfResult);
                 }
             } else {
-                return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+                trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算
+                tradeLogService.saveTradeLog(trade);
+
+                String error = "圈存交易失败！支付服务暂时无法访问。";
+                logger.info(error);
+                return new ResultData("err_bf0xj0", false, error);
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
@@ -750,6 +755,11 @@ public class AppController extends AbstractController {
             if (null == orig_trans_id || "".equals(orig_trans_id)) {
                 return new ResultData("err_orig_trans_id_isnull", false, "原始商户订单号不能为空！");
             }
+            String orig_trade_date = params.get(BaofooApiConstant.FIELD_ORIG_TRADE_DATE);
+            if (null == orig_trade_date || "".equals(orig_trade_date)) {
+                return new ResultData("err_orig_trade_date_isnull", false, "原交易订单时间不能为空！");
+            }
+
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
                 logger.info("查询宝付圈存交易结果：" + JacksonUtils.beanToJson(mapBfResult));
@@ -771,7 +781,7 @@ public class AppController extends AbstractController {
     }
 
     /**
-     * 更新宝付圈存交易状态，并进行西郊结算
+     * 更新支付圈存交易状态，并进行(西郊)结算
      *
      * @param params
      * @return
@@ -783,7 +793,7 @@ public class AppController extends AbstractController {
             if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
-            Object orig_trans_id = params.get(BaofooApiConstant.FIELD_ORIG_TRANS_ID);
+            Object orig_trans_id = params.get(XjgjAccApiConstant.FIELD_OLDREQUEST_NO);
             if (null == orig_trans_id || "".equals(orig_trans_id)) {
                 return new ResultData("err_orig_trans_id_isnull", false, "原始商户订单号不能为空！");
             }
@@ -791,13 +801,8 @@ public class AppController extends AbstractController {
             trade.setSellerOrderId(String.valueOf(orig_trans_id));//根据商户订单号更新
 
             //调用西郊结算系统接口记录圈存交易
-            Map<String, Object> xjParams = new HashMap<>();
-            xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NO, params.get(XjgjAccApiConstant.FIELD_MEMBER_NO));
-            xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
-            xjParams.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInMillis());
-            xjParams.put(XjgjAccApiConstant.FIELD_PASSWORD, params.get(XjgjAccApiConstant.FIELD_PASSWORD));
-            xjParams.put(XjgjAccApiConstant.FIELD_MONEY, params.get(XjgjAccApiConstant.FIELD_MONEY));
-            Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
+            params.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInMillis());
+            Map<String, Object> mapXjResult = xjgjService.recharge(params);
             if (mapXjResult != null) {
                 if ("1".equals(mapXjResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
                     trade.setState(SystemConstant.RECHARGE_STATE_SUCCESS);//支付成功且结算成功
@@ -820,7 +825,7 @@ public class AppController extends AbstractController {
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
-            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -837,7 +842,7 @@ public class AppController extends AbstractController {
             if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
-            Object tranSN = params.get(BaofooApiConstant.FIELD_BUSINESS_NO);//原圈存交易流水号
+            Object tranSN = params.get(XjgjAccApiConstant.FIELD_OLDREQUEST_NO);//原圈存交易流水号
             if (null == tranSN || "".equals(tranSN)) {
                 return new ResultData("err_tran_sn_isnull", false, "原圈存交易流水号不能为空！");
             }
@@ -858,7 +863,7 @@ public class AppController extends AbstractController {
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
-            return new ResultData("err", false, MsgConstant.MSG_SERVER_ERROR);
+            return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);
         }
     }
 
@@ -1053,7 +1058,7 @@ public class AppController extends AbstractController {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
             Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
-            if ("1".equals(mapResult.get("result")) ) {
+            if ("1".equals(mapResult.get("result"))) {
                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
                 return new ResultData("err", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult.get("message").toString());

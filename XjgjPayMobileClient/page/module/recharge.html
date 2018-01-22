@@ -37,7 +37,7 @@
 				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary">确认圈存</button>
+				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary" data-loading-text="提交中...">确认圈存</button>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
@@ -54,21 +54,13 @@
 					});
 				}
 
-				function toTradeResult(title, description, data) {
-					data = data || {
-						trans_serial_no: '',
-						trans_id: '',
-						trade_date: ''
-					};
+				function toTradeResult(title, description, result) {
 					var webview = mui.openWindow({
 						url: 'trade_result.html',
 						extras: {
 							r_type: 'recharge',
 							r_title: title,
-							r_description: description,
-							r_trans_serial_no: data.trans_serial_no,
-							r_trans_id: data.trans_id,
-							r_time: data.trade_date
+							r_description: description
 						}
 					});
 				}
@@ -173,17 +165,22 @@
 							plus.nativUI.toast('请输入短信验证码');
 							return false;
 						}
+						mui('body').progressbar().show();
+						btnSubmit.disabled = true;
+
 						data.sms_code = sms_code.value;
 						data.access_token = localSettings.access_token;
 						common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.success) {
 								plus.nativeUI.toast(result.msg);
-								toTradeResult('交易处理成功', '圈存交易成功！', result.data);
+								toTradeResult('交易处理成功', '圈存交易成功！', result);
 							} else {
 								plus.nativeUI.toast(result.msg);
-								toTradeResult('交易处理失败', '圈存交易处理出错。' + result.msg, result.data);
+								toTradeResult('交易处理失败重试', '圈存交易处理出错，正在尝试重试…' + result.msg, result);
 							}
+							mui('body').progressbar().hide();
+							btnSubmit.disabled = false;
 						})
 					});
 					//------end: 确认圈存交易------
