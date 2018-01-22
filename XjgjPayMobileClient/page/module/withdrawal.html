@@ -53,9 +53,9 @@
 							r_type: 'withdraw',
 							r_title: title,
 							r_description: description,
-							r_trans_serial_no: data.trans_serial_no,
-							r_trans_id: data.trans_id,
-							r_time: data.trade_date
+							r_trans_serial_no: new Date().getMilliseconds(),
+							r_trans_id: new Date(),
+							r_time: new Date().getDate()
 						}
 					});
 				}
@@ -73,32 +73,30 @@
 					var bindAcc = {};
 					var data = {};
 					
-					window.addEventListener('show', function() {
-						//加载已绑定的圈提银行卡
-						$.post(common.getServiceUrl('getFirstMemberBankcard'), {
+					//加载已绑定的圈提银行卡
+					common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
 							access_token: localSettings.access_token,
 							memberInfoId: localSettings.member_pk,
 							isWithdraw: 1
-						}, function(result) {
+					}, function(result) {
 							if(result.success) {
 								bindAcc = result.data;
 								accNo.value = bindAcc.bankAccCard;
-								accName.value = bindAcc.bankAccName;
 							} else {
 								plus.nativeUI.toast(common.msg.msgServerErr());
 							}
 						}, 'json');
-					}, false);
+
 					
 					//确定圈提之前验证表单
-					if(common.isMoney(money.value)) {
+					/*if(common.isMoney(money.value)) {
 							plus.nativeUI.toast('请输入圈提金额');
 							return false;
 						}
 					if(common.isNullOrEmpty(memberPass.value)) {
 						plus.nativeUI.toast('请输入主卡密码');
 						return false;
-						}
+						}*/
 						
 					//请求结算系统验证主卡密码
 						$.post(common.getServiceUrl('checkMemberPass'), {
@@ -117,9 +115,13 @@
 						
 						//------begin: 确认圈提交易------
 					btnWithdraw.addEventListener('tap', function() {
-						
-						$.post(common.getServiceUrl('memberWithDraw'), data, function(result) {
-							var r_msg;
+						var data={
+							memberName:localSettings.member_name,
+							memberNo:localSettings.member_no,
+							password: memberPass.value,
+							moneyQty:money.value
+						};
+						common.postJSON(common.getServiceUrl('memberWithDraw'), data, function(result) {
 							if(result.success) {
 								plus.nativeUI.toast(result.msg);
 								toTradeResult('交易处理成功', '圈提交易成功！', result.data);
