@@ -463,7 +463,7 @@ public class AppController extends AbstractController {
                             memberBankService.updateMemberBankCardInfo(memberBankcardInfo.getId());
                             return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                         } else {
-                            return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                            return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                         }
                     } else {
                         return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
@@ -782,23 +782,23 @@ public class AppController extends AbstractController {
             if (params != null) {
                 Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
                 if (null == memberName || "".equals(memberName)) {
-                    return new ResultData("err_memberName_isnull", false, "会员姓名不能为空！");
+                    return new ResultData("err_memberName_isnull", false, "会员姓名不能为空");
                 }
                 Object memberNo = params.get(XjgjAccApiConstant.FIELD_MEMBER_NO);//会员姓名
                 if (null == memberNo || "".equals(memberNo)) {
-                    return new ResultData("err_memberNo_isnull", false, "会员账号不能为空！");
+                    return new ResultData("err_memberNo_isnull", false, "会员账号不能为空");
                 }
                 Object bankName = params.get(XjgjAccApiConstant.FIELD_BANK_NAME);//开户姓名
                 if (null == bankName || "".equals(bankName)) {
-                    return new ResultData("err_bankName_isnull", false, "开户姓名不能为空！");
+                    return new ResultData("err_bankName_isnull", false, "开户姓名不能为空");
                 }
                 Object idCard = params.get(XjgjAccApiConstant.FIELD_ID_CARD);//身份证号
                 if (null == idCard || "".equals(idCard)) {
-                    return new ResultData("err_idCard_isnull", false, "开户身份证号不能为空！");
+                    return new ResultData("err_idCard_isnull", false, "开户身份证号不能为空");
                 }
                 Object bankAccountNo = params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT);//手机号
                 if (null == bankAccountNo || "".equals(bankAccountNo)) {
-                    return new ResultData("err_bankAccountNo_isnull", false, "中国银行卡号不能为空！");
+                    return new ResultData("err_bankAccountNo_isnull", false, "中国银行卡号不能为空");
                 }
                 Object pass = params.get(XjgjAccApiConstant.FIELD_PASSWORD);//会员密码
                 if (null == pass || "".equals(pass)) {
@@ -809,23 +809,29 @@ public class AppController extends AbstractController {
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
                     if("1".equals(mapResult.get("result"))) {
-                        //保存圈提绑定信息到数据库
+                        //圈提绑定信息保存到数据库
                         MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
                         if (mBankcardInfo != null) {
                             mBankcardInfo.setGmtModified(new Date());
                             memberBankService.updateMemberBankcard(mBankcardInfo);
-                            return new ResultData("err", false, "该银行卡已经绑定过", "");
+                            return new ResultData("OK", true, MsgConstant.MSG_OPERATION_SUCCESS, "");
                         } else {
-                            mBankcardInfo = new MemberBankcardEntity();
-                            mBankcardInfo.setGmtModified(new Date());
-                            mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
-                            mBankcardInfo.setIsWithdraw(1);//可提现
-                            mBankcardInfo.setBankAccCard(params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
-                            mBankcardInfo.setBankAccName(params.get(XjgjAccApiConstant.FIELD_BANK_NAME).toString());
-                            mBankcardInfo.setBankCode("BOC");
-                            mBankcardInfo.setMemberInfoId(Long.parseLong(String.valueOf(memberNo)));
-                            memberBankService.saveMemberBankcard(mBankcardInfo);
-                            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                            MemberInfoEntity memberInfo = memberInfoService.getMemberInfoByNO(String.valueOf(memberNo));
+                            if(memberInfo != null) {
+                                mBankcardInfo = new MemberBankcardEntity();
+                                mBankcardInfo.setGmtModified(new Date());
+                                mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
+                                mBankcardInfo.setIsWithdraw(1);//可提现
+                                mBankcardInfo.setBankAccCard(params.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
+                                mBankcardInfo.setBankAccName(params.get(XjgjAccApiConstant.FIELD_BANK_NAME).toString());
+                                mBankcardInfo.setBankCode("BOC");
+                                mBankcardInfo.setMemberInfoId(memberInfo.getId());
+                                memberBankService.saveMemberBankcard(mBankcardInfo);
+                                logger.info("本地数据库查询信息" + mBankcardInfo);
+                                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                            }else{
+                                return new ResultData("ok", true, "本地数据库缺少信息", "");
+                            }
                         }
                     } else{
                         return new ResultData("err", false, mapResult.get("message").toString(), "");
@@ -866,7 +872,8 @@ public class AppController extends AbstractController {
                         memberBankService.updateWithdrawMemberBankCardInfo(memberBankcardInfo.getId());
                         return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                     } else {
-                        return new ResultData("err_no_message", false, "获取不到该银行卡的绑定信息!");
+                        logger.info("本地数据库查询信息" +memberBankcardInfo);
+                        return new ResultData("ok", true, "解除绑定关系成功");
                     }
                 } else{
                     return new ResultData("err", false, mapResult.get("message").toString(), "");
@@ -963,13 +970,17 @@ public class AppController extends AbstractController {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
             Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
-            if ("1".equals(mapResult.get("result")) ) {
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-            } else {
-                return new ResultData("err", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult.get("message").toString());
+            if(mapResult != null) {
+                if ("1".equals(mapResult.get("result"))) {
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    return new ResultData("err", true, mapResult.get("message").toString(), "");
+                }
+            }else{
+                return new ResultData("err_no_response", false, "查询响应超时", "");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(MsgConstant.MSG_OPERATION_FAILED, e);
             return new ResultData("e1", false, MsgConstant.MSG_OPERATION_FAILED + e.getMessage(), "");
         }
     }
