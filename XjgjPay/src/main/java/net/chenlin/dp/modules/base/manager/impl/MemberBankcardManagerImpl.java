@@ -69,7 +69,12 @@ public class MemberBankcardManagerImpl implements MemberBankcardManager {
     }
 
     @Override
-    public boolean updateMemberBankInfo(long id){
+    public boolean updateMemberBankInfo(Long id){
         return memberBankcardMapper.updateMemberBankInfo(id);
+    }
+
+    @Override
+    public boolean updateWithdrawMemberBankCardInfo(Long id){
+        return memberBankcardMapper.updateWithdrawMemberBankCardInfo(id);
     }
 }

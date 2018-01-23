@@ -31,5 +31,8 @@ public interface MemberBankcardManager {
 	MemberBankcardEntity getBankcardByBfBindID(String bfBindId);
 
 	boolean removeBankcardInfoByBankcardNo(String bankAccCard);
-	boolean updateMemberBankInfo(long id);
+
+	boolean updateMemberBankInfo(Long id);
+
+	boolean updateWithdrawMemberBankCardInfo(Long id);
 }
