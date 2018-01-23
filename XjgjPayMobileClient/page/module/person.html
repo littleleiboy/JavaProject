@@ -10,12 +10,49 @@
 
 	<body>
 		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		    <h1 class="mui-title">个人中心</h1>
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">个人中心</h1>
 		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a>姓名<span id="memberName" class="mui-pull-right"></span></a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a>账号<span id="memberNO" class="mui-pull-right"></span></a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a>手机号<span id="mobile" class="mui-pull-right"></span></a>
+				</li>
+			</ul>
+		</div>
+		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script src="../../js/common/common.js"></script>
 		<script type="text/javascript">
-			mui.init();
+			(function($, doc) {
+				$.init();
+
+				function toLogin() {
+					plus.nativeUI.toast('请登录');
+					$.openWindow({
+						url: '../login/login.html',
+						id: 'login'
+					});
+				}
+				$.plusReady(function() {
+					window.addEventListener('show', function() {
+						var localSettings = common.getSettings();
+						if(common.isEmptyObject(localSettings)) {
+							toLogin();
+							return false;
+						}
+						doc.getElementById('memberName').innerHTML = localSettings.member_name;
+						doc.getElementById('memberNO').innerHTML = localSettings.member_no;
+						doc.getElementById('mobile').innerHTML = localSettings.member_mobile;
+					}, false);
+				});
+			}(mui, document));
 		</script>
 	</body>
 

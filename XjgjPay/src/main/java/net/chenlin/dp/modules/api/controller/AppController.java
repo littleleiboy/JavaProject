@@ -417,7 +417,11 @@ public class AppController extends AbstractController {
             //调用宝付接口
             Map<String, Object> mapResult = bfService.backTrans(params);
             if (mapResult != null) {
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
+                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+                } else {
+                    return new ResultData("err_bf", false, MsgConstant.MSG_OPERATION_SUCCESS + "(" + mapResult.get(BaofooApiConstant.FIELD_RESP_MSG) + ")", mapResult);
+                }
             } else {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             }
@@ -565,11 +569,15 @@ public class AppController extends AbstractController {
                             memberBankService.saveMemberBankcard(mbank);
                         else
                             memberBankService.updateMemberBankcard(mbank);
+
+                        return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                     } else {
                         return new ResultData("err_remote", false, MsgConstant.MSG_REMOTE_ERROR);
                     }
+                } else {
+                    logger.info("宝付确认绑卡失败！" + mapResult.get(BaofooApiConstant.FIELD_RESP_MSG));
+                    return new ResultData("err_bf", false, MsgConstant.MSG_OPERATION_FAILED + "(" + mapResult.get(BaofooApiConstant.FIELD_RESP_MSG) + ")", mapResult);
                 }
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
             } else {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);
             }
@@ -910,7 +918,7 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
-                    if("1".equals(mapResult.get("result"))) {
+                    if ("1".equals(mapResult.get("result"))) {
                         //圈提绑定信息保存到数据库
                         MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
                         if (mBankcardInfo != null) {
@@ -919,7 +927,7 @@ public class AppController extends AbstractController {
                             return new ResultData("OK", true, MsgConstant.MSG_OPERATION_SUCCESS, "");
                         } else {
                             MemberInfoEntity memberInfo = memberInfoService.getMemberInfoByNO(String.valueOf(memberNo));
-                            if(memberInfo != null) {
+                            if (memberInfo != null) {
                                 mBankcardInfo = new MemberBankcardEntity();
                                 mBankcardInfo.setGmtModified(new Date());
                                 mBankcardInfo.setIsRecharge(0);//新增的绑定圈提银行卡默认不能圈存，只能圈提，圈存需要再做圈存绑定后更新这个属性。
@@ -931,11 +939,11 @@ public class AppController extends AbstractController {
                                 memberBankService.saveMemberBankcard(mBankcardInfo);
                                 logger.info("本地数据库查询信息" + mBankcardInfo);
                                 return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-                            }else{
+                            } else {
                                 return new ResultData("ok", true, "本地数据库缺少信息", "");
                             }
                         }
-                    } else{
+                    } else {
                         return new ResultData("err", false, mapResult.get("message").toString(), "");
                     }
 
@@ -967,17 +975,17 @@ public class AppController extends AbstractController {
 
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
-                if("1".equals(mapResult.get("result"))) {
+                if ("1".equals(mapResult.get("result"))) {
                     MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
                     if (memberBankcardInfo != null) {
                         //更新数据库该银行卡的信息
                         memberBankService.updateWithdrawMemberBankCardInfo(memberBankcardInfo.getId());
                         return new ResultData("ok", true, "解除绑定关系成功", mapResult);
                     } else {
-                        logger.info("本地数据库查询信息" +memberBankcardInfo);
+                        logger.info("本地数据库查询信息" + memberBankcardInfo);
                         return new ResultData("ok", true, "解除绑定关系成功");
                     }
-                } else{
+                } else {
                     return new ResultData("err", false, mapResult.get("message").toString(), "");
                 }
             } else {
@@ -1072,13 +1080,13 @@ public class AppController extends AbstractController {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
             }
             Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
-            if(mapResult != null) {
+            if (mapResult != null) {
                 if ("1".equals(mapResult.get("result"))) {
                     return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {
                     return new ResultData("err", true, mapResult.get("message").toString(), "");
                 }
-            }else{
+            } else {
                 return new ResultData("err_no_response", false, "查询响应超时", "");
             }
         } catch (Exception e) {

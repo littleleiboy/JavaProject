@@ -16,7 +16,7 @@ public class OrderNumberUtils {
      */
     public static String generateInMillis() {
         Long millis = Calendar.getInstance().getTimeInMillis();
-        String four = String.valueOf((Math.random() * 9 + 1) * 1000);
+        int four = (int) (Math.random() * 1000 + 1000);
         return String.valueOf(millis) + four;
     }
 
@@ -28,8 +28,8 @@ public class OrderNumberUtils {
     public static String generateInTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyMMddHHmmssSSS");
         String formatStr = formatter.format(new Date());
-        String four = String.valueOf((Math.random() * 9 + 1) * 1000);
-        return String.valueOf(formatStr) + four;
+        int four = (int) (Math.random() * 1000 + 1000);
+        return formatStr + String.valueOf(four);
     }
 
 }

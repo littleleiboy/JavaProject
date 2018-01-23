@@ -43,5 +43,10 @@
 			"page/module/recharge_binding.html",
 			"page/module/recharge.html"
 		]
+	},
+	"page/module/setting.html": {
+		"refer": [
+			"page/login/login.html"
+		]
 	}
 }

@@ -330,6 +330,13 @@
 					"page/module/recharge.html"
 				],
 				"priority": 0
+			},
+			"page/module/setting.html": {
+				"resources": [],
+				"refer": [
+					"page/login/login.html"
+				],
+				"priority": 0
 			}
 		},
 		"idle": {

@@ -43,7 +43,7 @@
 				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary">申请绑定圈存</button>
+				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary" disabled="disabled">申请绑定圈存</button>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
@@ -156,8 +156,10 @@
 							//console.log(JSON.stringify(result));
 							if(result.success) {
 								data = result.data;
+								btnSubmit.disabled = false;
 							} else {
-								plus.nativeUI.toast(result.msg);
+								plus.nativeUI.alert(result.msg);
+								btnSubmit.disabled = true;
 							}
 							clearInterval(timer);
 							btnGetSms.disabled = false;
@@ -172,6 +174,7 @@
 							plus.nativeUI.toast('请输入短信验证码');
 							return false;
 						}
+						btnSubmit.disabled = true;
 						data.sms_code = sms_code.value;
 						data.member_pk = localSettings.member_pk;
 						data.access_token = localSettings.access_token;
@@ -187,7 +190,7 @@
 									id: 'pageRecharge'
 								});
 							} else {
-								plus.nativeUI.toast(result.msg);
+								plus.nativeUI.alert(result.msg);
 							}
 						})
 					});

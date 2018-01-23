@@ -161,7 +161,7 @@
 					});
 				}
 				//打开圈提界面
-				function toWithdraw(){
+				function toWithdraw() {
 					$.openWindow({
 						url: '../module/withdrawal.html',
 						id: 'aWithdrawal'
@@ -303,6 +303,7 @@
 								pageAbout.hide();
 								break;
 							case 'tpPerson':
+								$.fire(pagePerson, 'show', null);
 								pagePerson.show();
 								break;
 							case 'tpWebsite':
