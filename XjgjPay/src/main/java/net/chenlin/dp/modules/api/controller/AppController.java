@@ -885,9 +885,9 @@ public class AppController extends AbstractController {
     public ResultData memberBindBOC(@RequestBody Map<String, Object> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             if (params != null) {
                 Object memberName = params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME);//会员姓名
@@ -918,7 +918,7 @@ public class AppController extends AbstractController {
                 }
                 Map<String, Object> mapResult = xjgjService.memberBindBOC(params);
                 if (mapResult != null) {
-                    if ("1".equals(mapResult.get("result"))) {
+                    if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {
                         //圈提绑定信息保存到数据库
                         MemberBankcardEntity mBankcardInfo = memberBankService.getBankcardByBankCardID(String.valueOf(bankAccountNo));
                         if (mBankcardInfo != null) {
@@ -969,13 +969,13 @@ public class AppController extends AbstractController {
     public ResultData memberUnBindBOC(@RequestBody Map<String, Object> params) {
         try {
             //验证token
-            /*if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             Map<String, Object> mapResult = xjgjService.memberUnBindBOC(params);
             if (mapResult != null) {
-                if ("1".equals(mapResult.get("result"))) {
+                if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {
                     MemberBankcardEntity memberBankcardInfo = memberBankService.getBankcardByBankCardID(mapResult.get(XjgjAccApiConstant.FIELD_BANK_ACCOUNT).toString());
                     if (memberBankcardInfo != null) {
                         //更新数据库该银行卡的信息
@@ -1007,25 +1007,28 @@ public class AppController extends AbstractController {
     public ResultData memberWithDraw(@RequestBody Map<String, Object> Params) {
         try {
             //验证token
-            /*if (!checkAccessToken(String.valueOf(Params.get(SystemConstant.ACCESS_TOKEN)))) {
+            if (!checkAccessToken(String.valueOf(Params.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }*/
+            }
 
             if (Params != null) {
-                Object drawMoneyQty = Params.get(XjgjAccApiConstant.FIELD_MONEY);//圈提金额
+                Object drawMoneyQty = Params.get(XjgjAccApiConstant.FIELD_MONEY);//以元为单位的支付金额
+
                 if (null == drawMoneyQty || "".equals(drawMoneyQty)) {
                     return new ResultData("err_moneyQty_isnull", false, "圈提金额不能为空！");
                 }
 
-                Params.put("requestNo", OrderNumberUtils.generateInTime());
+                BigDecimal txn_amt_num = new BigDecimal(String.valueOf(drawMoneyQty)).multiply(BigDecimal.valueOf(100));//金额转换成分
+                Params.put(XjgjAccApiConstant.FIELD_MONEY, String.valueOf(txn_amt_num.setScale(0)));//以分为单位的金额
+                Params.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInTime());
                 Map<String, Object> newMap = new HashMap<>();
-                newMap.put("memberNo", Params.get("memberNo").toString());
+                newMap.put(XjgjAccApiConstant.FIELD_MEMBER_NO, Params.get(XjgjAccApiConstant.FIELD_MEMBER_NO).toString());
                 Map<String, Object> momenyBalanceMap = xjgjService.searchMemberAccountBalance(newMap);//查询剩余金额
                 Map<String, Object> map = xjgjService.memberWithDraw(Params);
                 List<MemberBankcardEntity> listData = memberBankService.listMemberBankcard(Params, 1);//判断圈提是否绑定成功
 
                 if (map != null) {
-                    if ("1".equals(map.get("result"))) {
+                    if ("1".equals(map.get(XjgjAccApiConstant.FIELD_RESULT))) {
                         if (listData.size() != 0) {
                             BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.get(XjgjAccApiConstant.FIELD_ACCOUNT_QTY).toString());
                             BigDecimal drawMoney = new BigDecimal(String.valueOf(Params.get(XjgjAccApiConstant.FIELD_MONEY)));//圈提金额
@@ -1081,7 +1084,7 @@ public class AppController extends AbstractController {
             }
             Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
             if (mapResult != null) {
-                if ("1".equals(mapResult.get("result"))) {
+                if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {
                     return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {
                     return new ResultData("err", true, mapResult.get("message").toString(), "");
