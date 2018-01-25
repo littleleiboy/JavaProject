@@ -79,6 +79,8 @@
 					var memberPass = doc.getElementById('memberPass');
 					var bindAcc = {};
 					var data = {};
+					var pass;
+					var tradeMoney;
 
 					//加载已绑定的圈存银行卡
 					common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
@@ -129,22 +131,25 @@
 							}
 						}, 1000);
 
+						pass = memberPass.value;
 						//请求结算系统验证主卡密码
 						common.postJSON(common.getServiceUrl('checkMemberPass'), {
 							access_token: localSettings.access_token,
 							memberNo: localSettings.member_no,
-							password: memberPass.value
+							password: pass
 						}, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.data.result == '1') {
 								//提交预交易并发送短信验证码
-								common.postJSON(common.getServiceUrl('preRecharge'), {
+								var preData = {
 									access_token: localSettings.access_token,
 									bind_id: bindAcc.bfBindId,
 									txn_amt: money.value
-								}, function(result) {
+								};
+								common.postJSON(common.getServiceUrl('preRecharge'), preData, function(result) {
 									if(result.success) {
 										data = result.data;
+										tradeMoney = preData.txn_amt;
 										btnSubmit.disabled = false;
 									} else {
 										plus.nativeUI.alert(result.msg);
@@ -173,6 +178,11 @@
 
 						data.sms_code = sms_code.value;
 						data.access_token = localSettings.access_token;
+						data.bind_id = bindAcc.bfBindId;
+						data.memberNo = localSettings.member_no;
+						data.memberName = localSettings.member_name;
+						data.password = pass;
+						data.moneyQty = tradeMoney;
 						common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.success) {

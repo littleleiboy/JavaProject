@@ -701,7 +701,12 @@ public class AppController extends AbstractController {
                     xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
                     xjParams.put(XjgjAccApiConstant.FIELD_REQUEST_NO, trade.getSellerOrderId());
                     xjParams.put(XjgjAccApiConstant.FIELD_PASSWORD, params.get(XjgjAccApiConstant.FIELD_PASSWORD));
-                    xjParams.put(XjgjAccApiConstant.FIELD_MONEY, params.get(XjgjAccApiConstant.FIELD_MONEY));
+                    String strMoney = params.get(XjgjAccApiConstant.FIELD_MONEY);
+                    if (null == strMoney || "".equals(strMoney)) {
+                        return new ResultData("err_money_isnull", false, "交易金额不能为空！");
+                    }
+                    BigDecimal numMoney = new BigDecimal(strMoney).multiply(BigDecimal.valueOf(100));//金额元转换成分
+                    xjParams.put(XjgjAccApiConstant.FIELD_MONEY, String.valueOf(numMoney.setScale(0)));
                     Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
                     if (mapXjResult != null) {
                         mapBfResult.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
