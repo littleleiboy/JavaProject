@@ -865,18 +865,18 @@ public class AppController extends AbstractController {
             params.put(XjgjAccApiConstant.FIELD_REQUEST_NO, OrderNumberUtils.generateInTime());
 
             Map<String, Object> mapResult = xjgjService.retryRecharge(params);
-            //if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
-            //重试成功后更新上次失败的交易记录为成功
-            TradeLogEntity trade = new TradeLogEntity();
-            trade.setSellerOrderId(String.valueOf(trans_id));
-            trade.setState(1);//宝付交易处理成功且西郊结算交易处理成功
-            tradeLogService.updateTradeLog(trade);
-            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
-            /*} else {
+            if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
+                //重试成功后更新上次失败的交易记录为成功
+                TradeLogEntity trade = new TradeLogEntity();
+                trade.setSellerOrderId(String.valueOf(trans_id));
+                trade.setState(1);//宝付交易处理成功且西郊结算交易处理成功
+                tradeLogService.updateTradeLog(trade);
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
+            } else {
                 logger.info("西郊国际结算系统重试圈存交易处理失败！交易流水号："
                         + String.valueOf(trans_id) + "。");
                 return new ResultData("err_xj", false, "结算重试圈存交易处理失败。" + String.valueOf(mapResult.get(XjgjAccApiConstant.FIELD_MESSAGE)), mapResult);
-            }*/
+            }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
             return new ResultData("err_exception", false, MsgConstant.MSG_SERVER_ERROR);

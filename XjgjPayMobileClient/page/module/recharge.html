@@ -173,7 +173,7 @@
 							plus.nativUI.toast('请输入短信验证码');
 							return false;
 						}
-						mui('body').progressbar().show();
+						$('body').progressbar().show();
 						btnSubmit.disabled = true;
 
 						data.sms_code = sms_code.value;
@@ -188,9 +188,9 @@
 							if(result.success) {
 								toTradeResult('交易处理成功', '圈存交易成功！', result);
 							} else {
-								toTradeResult('交易处理失败重试', '圈存交易处理出错，正在尝试重试…' + result.msg, result);
+								toTradeResult('交易处理失败重试', result.msg + ' 正在尝试重试…', result);
 							}
-							mui('body').progressbar().hide();
+							$('body').progressbar().hide();
 							btnSubmit.disabled = false;
 						})
 					});
