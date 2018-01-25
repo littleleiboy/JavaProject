@@ -60,7 +60,8 @@
 						extras: {
 							r_type: 'recharge',
 							r_title: title,
-							r_description: description
+							r_description: description,
+							r_result: result
 						}
 					});
 				}
@@ -175,10 +176,8 @@
 						common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.success) {
-								plus.nativeUI.toast(result.msg);
 								toTradeResult('交易处理成功', '圈存交易成功！', result);
 							} else {
-								plus.nativeUI.toast(result.msg);
 								toTradeResult('交易处理失败重试', '圈存交易处理出错，正在尝试重试…' + result.msg, result);
 							}
 							mui('body').progressbar().hide();

@@ -31,77 +31,27 @@
 		<script src="../../js/common/common.js"></script>
 		<script type="text/javascript">
 			(function($, doc) {
-				mui.init();
+				$.init();
+
+				function hasDataShow(rowId, valueId, value) {
+					var el = document.getElementById(rowId);
+					if(value) {
+						el.style.display = 'block';
+						document.getElementById(valueId).innerHTML = value;
+					} else {
+						el.style.display = 'none';
+					}
+				}
 
 				$.plusReady(function() {
-
-					function hasDataShow(rowId, valueId, value) {
-						var el = document.getElementById(rowId);
-						if(value) {
-							el.style.display = 'block';
-							document.getElementById(valueId).innerHTML = value;
-						} else {
-							el.style.display = 'none';
-						}
-					}
-
+					var localSettings = common.getSettings();
 					var currentWebview = plus.webview.currentWebview();
-					//var btnRetry = doc.getElementById('btnRetry');
-					var title = doc.getElementById('r_title');
-					var description = doc.getElementById('r_description');
-					title.innerHTML = currentWebview.r_title;
-					description.innerHTML = currentWebview.r_description;
-
-					hasDataShow('liTranSN', 'r_trans_serial_no', currentWebview.data.trans_serial_no);
-					hasDataShow('liOrderID', 'r_trans_id', currentWebview.data.trans_id);
-					hasDataShow('liTime', 'r_time', currentWebview.data.trade_date);
-
-					//处理交易失败重试
-					var retryPayTimes = 3;
-					var resp = currentWebview.data;
-					if(resp.success === false) {
-						mui('body').progressbar().show();
-
-						var localSettings = common.getSettings();
-						if(common.isEmptyObject(localSettings)) {
-							var err = '读取本地配置出错，无法重试失败的交易，请联系客服。';
-							console.log(err);
-							plus.nativeUI.alert(err);
-							return false;
-						}
-
-						//btnRetry.style.display = 'block';
-						if(currentWebview.r_type === 'recharge') { //圈存（充值）
-							if(resp.code === 'err_bf1xj0') {
-								console.log('支付成功，结算失败，开始重试结算……');
-								$.toast('请勿关闭本页！支付成功，结算失败，正在重试结算……', {
-									duration: 600000,
-									type: 'div'
-								})
-								//重试结算处理
-								retryAcc();
-							} else if(resp.code === 'err_bf0xj0') {
-								console.log('支付未成功，未结算，开始查询支付结果……');
-								$.toast('请勿关闭本页！支付尚未成功，正在查询支付结果……', {
-									duration: 600000,
-									type: 'div'
-								})
-								//查询支付处理结果并重试
-								retryPay();
-							}
-						}
-						mui('body').progressbar().hide();
-					} else {
-						//btnRetry.style.display = 'none';
-					}
-					$.closePopups(); //关闭全部的H5提示消息
-
 					var retryPay = function() {
 						setTimeout(function() {
 							common.postJSON(common.getServiceUrl('resultBfRecharge'), {
 								access_token: localSettings.access_token,
-								orig_trans_id: currentWebview.data.trans_serial_no,
-								orig_trade_date: currentWebview.data.trade_date
+								orig_trans_id: currentWebview.r_result.trans_serial_no,
+								orig_trade_date: currentWebview.r_result.trade_date
 							}, function(result) {
 								console.log('查询支付结果返回：' + JSON.stringify(result));
 								if(result.success) {
@@ -113,7 +63,7 @@
 												access_token: localSettings.access_token,
 												memberName: localSettings.member_name,
 												memberNo: localSettings.member_no,
-												oldRequestNo: currentWebview.data.trans_serial_no
+												oldRequestNo: currentWebview.r_result.data.oldRequestNo
 											}, function(result) {
 												console.log('结算返回：' + JSON.stringify(result));
 												if(result.success) {
@@ -163,31 +113,78 @@
 							});
 						}, 2000);
 					}
-				});
+					var retryAcc = function() {
+						setTimeout(function() {
+							//console.log(JSON.stringify(currentWebview.r_result));
+							common.postJSON(common.getServiceUrl('retryXjRecharge'), {
+								access_token: localSettings.access_token,
+								memberName: localSettings.member_name,
+								memberNo: localSettings.member_no,
+								oldRequestNo: currentWebview.r_result.data.oldRequestNo
+							}, function(result) {
+								console.log('重试结算返回：' + JSON.stringify(result));
+								if(result.success) {
+									console.log('支付成功，结算重试处理成功！');
+									title.innerHTML = '圈存成功';
+									description.innerHTML = '圈存交易处理成功！';
+								} else {
+									console.log('支付成功，结算重试处理失败！');
+									title.innerHTML = '圈存失败';
+									description.innerHTML = '圈存支付成功，但结算失败，请联系客服处理。';
+									plus.nativeUI.alert(result.msg);
+								}
+							});
+						}, 2000);
+					}
 
-				var retryAcc = function() {
-					setTimeout(function() {
-						common.postJSON(common.getServiceUrl('retryXjRecharge') {
-							access_token: localSettings.access_token,
-							memberName: localSettings.member_name,
-							memberNo: localSettings.member_no,
-							oldRequestNo: currentWebview.data.trans_serial_no
-						}, function(result) {
-							console.log('重试结算返回：' + JSON.stringify(result));
-							if(result.success) {
-								console.log('支付成功，结算重试处理成功！');
-								title.innerHTML = '圈存处理成功';
-								description.innerHTML = '圈存交易成功！';
-							} else {
-								console.log('支付成功，结算重试处理失败！');
-								title.innerHTML = '圈存支付成功，但结算失败，请联系客服处理。';
-								description.innerHTML = '圈存交易成功！';
-								plus.nativeUI.alert(result.msg + '\n 请联系客服处理。');
+					//var btnRetry = doc.getElementById('btnRetry');
+					var title = doc.getElementById('r_title');
+					var description = doc.getElementById('r_description');
+					title.innerHTML = currentWebview.r_title;
+					description.innerHTML = currentWebview.r_description;
+
+					hasDataShow('liTranSN', 'r_trans_serial_no', currentWebview.r_result.data.trans_serial_no);
+					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
+					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
+
+					//处理交易失败重试
+					console.log('交易失败重试……');
+					var retryPayTimes = 3;
+					var resp = currentWebview.r_result;
+					if(resp.success === false) {
+						mui('body').progressbar().show();
+						if(common.isEmptyObject(localSettings)) {
+							var err = '读取本地配置出错，无法重试失败的交易，请联系客服。';
+							console.log(err);
+							plus.nativeUI.alert(err);
+							return false;
+						}
+
+						//btnRetry.style.display = 'block';
+						if(currentWebview.r_type === 'recharge') { //圈存（充值）
+							if(resp.code === 'err_bf1xj0') {
+								console.log('支付成功，结算失败，开始重试结算……');
+								$.toast('请勿关闭本页！支付成功，结算失败，正在重试结算……', {
+									duration: 600000,
+									type: 'div'
+								})
+								//重试结算处理
+								retryAcc();
+							} else if(resp.code === 'err_bf0xj0') {
+								console.log('支付未成功，未结算，开始查询支付结果……');
+								$.toast('请勿关闭本页！支付尚未成功，正在查询支付结果……', {
+									duration: 600000,
+									type: 'div'
+								})
+								//查询支付处理结果并重试
+								retryPay();
 							}
-						});
-					}, 2000);
-				};
-
+						}
+						mui('body').progressbar().hide();
+					} else {
+						//btnRetry.style.display = 'none';
+					}
+				});
 			}(mui, document));
 		</script>
 	</body>
