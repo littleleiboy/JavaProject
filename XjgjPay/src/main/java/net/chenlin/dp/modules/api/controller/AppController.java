@@ -731,6 +731,7 @@ public class AppController extends AbstractController {
                         return new ResultData("err_bf1xj0", false, "支付成功，结算失败。" + MsgConstant.MSG_REMOTE_ERROR);
                     }
                 } else {
+                    trade.setAmtMoney(BigDecimal.ZERO);
                     trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算(宝付圈存交易失败，则不执行西郊结算系统的圈存交易)
                     tradeLogService.saveTradeLog(trade);
 
@@ -775,18 +776,12 @@ public class AppController extends AbstractController {
             if (null == orig_trade_date || "".equals(orig_trade_date)) {
                 return new ResultData("err_orig_trade_date_isnull", false, "原交易订单时间不能为空！");
             }
+            params.put(BaofooApiConstant.FIELD_TRANS_SERIAL_NO, OrderNumberUtils.generateInTime());
 
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
                 logger.info("查询宝付圈存交易结果：" + JacksonUtils.beanToJson(mapBfResult));
-                if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapBfResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
-                    logger.info("查询宝付圈存交易结果:" + MsgConstant.MSG_OPERATION_SUCCESS);
-                    return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
-                } else {
-                    String error = MsgConstant.MSG_OPERATION_FAILED + " " + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_RESP_MSG));
-                    logger.info(error);
-                    return new ResultData("err_response_baofoo", false, error);
-                }
+                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
             } else {
                 return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
             }

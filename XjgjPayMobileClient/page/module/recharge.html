@@ -54,14 +54,16 @@
 					});
 				}
 
-				function toTradeResult(title, description, result) {
+				function toTradeResult(title, description, result, money, pwd) {
 					var webview = mui.openWindow({
 						url: 'trade_result.html',
 						extras: {
 							r_type: 'recharge',
 							r_title: title,
 							r_description: description,
-							r_result: result
+							r_result: result,
+							r_money: money,
+							r_pwd: pwd
 						}
 					});
 				}
@@ -186,9 +188,9 @@
 						common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.success) {
-								toTradeResult('交易处理成功', '圈存交易成功！', result);
+								toTradeResult('交易处理成功', '圈存交易成功！', result, tradeMoney, pass);
 							} else {
-								toTradeResult('交易处理失败重试', result.msg + ' 正在尝试重试…', result);
+								toTradeResult('交易处理失败重试', result.msg + ' 正在尝试重试…', result, tradeMoney, pass);
 							}
 							$('body').progressbar().hide();
 							btnSubmit.disabled = false;

@@ -19,12 +19,13 @@
 				<span id="r_title">交易结果</span>
 			</h3>
 			<ul>
-				<li>描述：<span id="r_description"></span></li>
-				<li id="liTranSN">交易流水号：<span id="r_trans_serial_no"></span></li>
-				<li id="liOrderID">订单号：<span id="r_trans_id"></span></li>
-				<li id="liTime">订单时间：<span id="r_time"></span></li>
+				<p id='liMoney'>交易金额：<span id="r_money"></span></p>
+				<p>描述：<span id="r_description"></span></p>
+				<p id="liTranSN">交易流水号：<span id="r_trans_serial_no"></span></p>
+				<p id="liOrderID">订单号：<span id="r_trans_id"></span></p>
+				<p id="liTime">订单时间：<span id="r_time"></span></p>
 			</ul>
-			<button id="backBtn" type="button" class='mui-btn mui-action-back'>关闭</button>
+			<!--<button id="backBtn" type="button" class='mui-btn mui-action-back'>关闭</button>-->
 			<!--<button id="btnRetry" type="button" class="mui-btn mui-btn-danger mui-btn-outlined" style="display: none;">重试</button>-->
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
@@ -51,16 +52,28 @@
 				$.plusReady(function() {
 					var localSettings = common.getSettings();
 					var currentWebview = plus.webview.currentWebview();
+					console.log(JSON.stringify(currentWebview.r_result));
 
 					var retryPay = function() {
 						setTimeout(function() {
 							common.postJSON(common.getServiceUrl('resultBfRecharge'), {
 								access_token: localSettings.access_token,
-								orig_trans_id: currentWebview.r_result.trans_serial_no,
-								orig_trade_date: currentWebview.r_result.trade_date
+								orig_trans_id: currentWebview.r_result.data.trans_id,
+								orig_trade_date: currentWebview.r_result.data.trade_date
 							}, function(result) {
 								console.log('查询支付结果返回：' + JSON.stringify(result));
-								if(result.success) {
+								if(result.data.resp_code == 'BF00113') { //交易处理中，请稍后查询
+									if(retryPayTimes > 0) {
+										retryPayTimes--;
+										retryPay();
+									} else {
+										var err = '圈存结果未知，支付状态长期处于处理中，如需帮助请联系客服。';
+										console.log(err);
+										title.innerHTML = '圈存结果未知';
+										description.innerHTML = err;
+										plus.nativeUI.alert(err);
+									}
+								} else if(result.data.resp_code == '0000') {
 									switch(result.data.order_stat) {
 										case 'S': //交易成功
 											console.log('支付状态查询结果为成功，开始更新状态并结算……');
@@ -69,6 +82,8 @@
 												access_token: localSettings.access_token,
 												memberName: localSettings.member_name,
 												memberNo: localSettings.member_no,
+												moneyQty: currentWebview.r_money,
+												password: currentWebview.r_pwd,
 												oldRequestNo: currentWebview.r_result.data.oldRequestNo
 											}, function(result) {
 												console.log('结算返回：' + JSON.stringify(result));
@@ -106,15 +121,15 @@
 											console.log(err);
 											title.innerHTML = '圈存失败';
 											description.innerHTML = err + '请联系客服处理。';
-											plus.nativeUI.alert(result.msg + '\n 请联系客服处理。');
+											plus.nativeUI.alert(result.msg + '\n请联系客服处理。');
 											break;
 									}
 								} else {
-									var err = '圈存失败，查询支付结果出错！';
+									var err = '圈存失败！';
 									console.log(err);
 									title.innerHTML = '圈存失败';
 									description.innerHTML = err + '请联系客服处理。';
-									plus.nativeUI.alert(result.msg + '\n 请联系客服处理。');
+									plus.nativeUI.alert(result.msg + '\n请联系客服处理。');
 								}
 							});
 						}, 2000);
@@ -152,6 +167,7 @@
 					hasDataShow('liTranSN', 'r_trans_serial_no', currentWebview.r_result.data.trans_serial_no);
 					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
 					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
+					hasDataShow('liMoney', 'r_money', currentWebview.r_money);
 
 					//处理交易失败重试
 					console.log('交易失败重试……');

@@ -217,7 +217,7 @@
 					});
 					var pageBank = $.preload({
 						"id": 'pageBank',
-						"url": '../module/bank.html'
+						"url": '../module/bocservice.html'
 					});
 
 					$('.mui-table-view-cell').on('tap', 'a', function() {
@@ -272,7 +272,6 @@
 								break;
 							case 'aBank': //银行
 								pageBank.show();
-								title.innerHTML = '中国银行增值服务';
 								break;
 							default:
 								plus.nativeUI.toast('暂未开通！');

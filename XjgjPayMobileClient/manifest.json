@@ -288,7 +288,8 @@
 					"page/module/website.html",
 					"page/module/recharge.html",
 					"page/module/recharge_binding.html",
-					"page/module/bindmemberbeforewithdraw.html"
+					"page/module/bindmemberbeforewithdraw.html",
+					"page/module/bocservice.html"
 				],
 				"priority": 0
 			},
