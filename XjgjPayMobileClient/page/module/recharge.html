@@ -39,6 +39,9 @@
 			<div class="mui-content-padded">
 				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary" data-loading-text="提交中..." disabled="disabled">确认圈存</button>
 			</div>
+			<div class="mui-content-padded">
+				<button id='btnCancal' class="mui-action-back mui-btn mui-btn-block">取消</button>
+			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
 		<script src="../../js/common/common.js"></script>
@@ -84,6 +87,13 @@
 					var pass;
 					var tradeMoney;
 
+					var disabledForm = function(flag) {
+						accNo.disabled = flag;
+						accName.disabled = flag;
+						money.disabled = flag;
+						memberPass.disabled = flag;
+					};
+
 					//加载已绑定的圈存银行卡
 					common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
 						access_token: localSettings.access_token,
@@ -119,6 +129,7 @@
 						if(common.isNullOrEmpty(accName.value)) {
 							return false;
 						}
+						disabledForm(true);
 
 						btnGetSms.disabled = true;
 						var count = 60;
@@ -156,6 +167,7 @@
 									} else {
 										plus.nativeUI.alert(result.msg);
 										btnSubmit.disabled = true;
+										disabledForm(false);
 									}
 									clearInterval(timer);
 									btnGetSms.disabled = false;
@@ -177,6 +189,7 @@
 						}
 						$('body').progressbar().show();
 						btnSubmit.disabled = true;
+						disabledForm(true);
 
 						data.sms_code = sms_code.value;
 						data.access_token = localSettings.access_token;
@@ -194,6 +207,7 @@
 							}
 							$('body').progressbar().hide();
 							btnSubmit.disabled = false;
+							disabledForm(false);
 						})
 					});
 					//------end: 确认圈存交易------

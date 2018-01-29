@@ -680,10 +680,12 @@ public class AppController extends AbstractController {
                 trade.setBfBindId(bindId);
             }
             trade.setGmtCreate(new Date());
+            BigDecimal txnAmt = new BigDecimal(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY)));
 
             //调用宝付接口
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
+                mapBfResult.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
                 logger.info("宝付确认支付处理返回结果：" + JacksonUtils.beanToJson(mapBfResult));
                 if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapBfResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
                     //宝付接口返回成功消息
@@ -709,7 +711,6 @@ public class AppController extends AbstractController {
                     xjParams.put(XjgjAccApiConstant.FIELD_MONEY, String.valueOf(numMoney.setScale(0)));
                     Map<String, Object> mapXjResult = xjgjService.recharge(xjParams);
                     if (mapXjResult != null) {
-                        mapBfResult.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
                         if ("1".equals(mapXjResult.get(XjgjAccApiConstant.FIELD_RESULT))) {//西郊结算返回成功消息
                             trade.setState(SystemConstant.RECHARGE_STATE_SUCCESS);//支付成功且结算成功
                             tradeLogService.saveTradeLog(trade);
@@ -728,10 +729,10 @@ public class AppController extends AbstractController {
                     } else {
                         trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
                         tradeLogService.saveTradeLog(trade);
-                        return new ResultData("err_bf1xj0", false, "支付成功，结算失败。" + MsgConstant.MSG_REMOTE_ERROR);
+                        return new ResultData("err_bf1xj0", false, "支付成功，结算失败。" + MsgConstant.MSG_REMOTE_ERROR, mapBfResult);
                     }
                 } else {
-                    trade.setAmtMoney(BigDecimal.ZERO);
+                    trade.setAmtMoney(txnAmt);
                     trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算(宝付圈存交易失败，则不执行西郊结算系统的圈存交易)
                     tradeLogService.saveTradeLog(trade);
 
@@ -740,12 +741,15 @@ public class AppController extends AbstractController {
                     return new ResultData("err_bf0xj0", false, error, mapBfResult);
                 }
             } else {
+                trade.setAmtMoney(txnAmt);
                 trade.setState(SystemConstant.RECHARGE_STATE_FAILED);//支付失败且不结算
                 tradeLogService.saveTradeLog(trade);
 
                 String error = "圈存交易失败！支付服务暂时无法访问。";
                 logger.info(error);
-                return new ResultData("err_bf0xj0", false, error);
+                Map<String, Object> rData = new HashMap<>();
+                rData.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
+                return new ResultData("err_bf0xj0", false, error, rData);
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);
@@ -781,9 +785,9 @@ public class AppController extends AbstractController {
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
                 logger.info("查询宝付圈存交易结果：" + JacksonUtils.beanToJson(mapBfResult));
-                return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
+                return new ResultData("ok", true, "", mapBfResult);
             } else {
-                return new ResultData("err_remote_baofoo", false, MsgConstant.MSG_OPERATION_FAILED);
+                return new ResultData("err_remote_baofoo", false, "查询圈存支付结果失败。");
             }
         } catch (Exception e) {
             logger.error(MsgConstant.MSG_SERVER_ERROR, e);

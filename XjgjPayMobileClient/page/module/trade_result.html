@@ -19,11 +19,11 @@
 				<span id="r_title">交易结果</span>
 			</h3>
 			<ul>
-				<p id='liMoney'>交易金额：<span id="r_money"></span></p>
-				<p>描述：<span id="r_description"></span></p>
-				<p id="liTranSN">交易流水号：<span id="r_trans_serial_no"></span></p>
-				<p id="liOrderID">订单号：<span id="r_trans_id"></span></p>
-				<p id="liTime">订单时间：<span id="r_time"></span></p>
+				<p id='liMoney'>交易金额：<span id="r_money" style="font-size: large ;"></span></p>
+				<p>描述：<br><span id="r_description"></span></p>
+				<p id="liTranSN">交易流水号：<br><span id="r_business_no"></span></p>
+				<p id="liOrderID">订单号：<br><span id="r_trans_id"></span></p>
+				<p id="liTime">订单时间：<br><span id="r_time"></span></p>
 			</ul>
 			<!--<button id="backBtn" type="button" class='mui-btn mui-action-back'>关闭</button>-->
 			<!--<button id="btnRetry" type="button" class="mui-btn mui-btn-danger mui-btn-outlined" style="display: none;">重试</button>-->
@@ -54,6 +54,18 @@
 					var currentWebview = plus.webview.currentWebview();
 					console.log(JSON.stringify(currentWebview.r_result));
 
+					//var btnRetry = doc.getElementById('btnRetry');
+					var title = doc.getElementById('r_title');
+					var description = doc.getElementById('r_description');
+					title.innerHTML = currentWebview.r_title;
+					description.innerHTML = currentWebview.r_description;
+					var trans_id = doc.getElementById('r_trans_id');
+
+					hasDataShow('liTranSN', 'r_business_no', currentWebview.r_result.data.business_no);
+					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
+					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
+					hasDataShow('liMoney', 'r_money', currentWebview.r_money);
+
 					var retryPay = function() {
 						setTimeout(function() {
 							common.postJSON(common.getServiceUrl('resultBfRecharge'), {
@@ -62,7 +74,12 @@
 								orig_trade_date: currentWebview.r_result.data.trade_date
 							}, function(result) {
 								console.log('查询支付结果返回：' + JSON.stringify(result));
-								if(result.data.resp_code == 'BF00113') { //交易处理中，请稍后查询
+								if(result.data.resp_code == 'BF00112' ||
+									result.data.resp_code == 'BF00113' ||
+									result.data.resp_code == 'BF00115' ||
+									result.data.resp_code == 'BF00144' ||
+									result.data.resp_code == 'BF00202') { //交易结果未知，请稍后查询
+									console.log('宝付交易结果未知，正在查询……');
 									if(retryPayTimes > 0) {
 										retryPayTimes--;
 										retryPay();
@@ -91,6 +108,7 @@
 													console.log('支付状态查询结果为成功，更新状态并结算成功！');
 													title.innerHTML = '圈存处理成功';
 													description.innerHTML = '圈存交易成功！';
+													trans_id.innerHTML = currentWebview.r_result.data.oldRequestNo;
 												} else {
 													console.log('支付状态查询结果为成功，结算处理失败，开始重试结算……');
 													retryAcc();
@@ -148,26 +166,17 @@
 									console.log('支付成功，结算重试处理成功！');
 									title.innerHTML = '圈存成功';
 									description.innerHTML = '圈存交易处理成功！';
+									trans_id.innerHTML = currentWebview.r_result.data.oldRequestNo;
 								} else {
 									console.log('支付成功，结算重试处理失败！');
 									title.innerHTML = '圈存失败';
 									description.innerHTML = '圈存支付成功，但结算失败，请联系客服处理。';
+									trans_id.innerHTML = currentWebview.r_result.data.oldRequestNo;
 									plus.nativeUI.alert(result.msg);
 								}
 							});
 						}, 2000);
 					}
-
-					//var btnRetry = doc.getElementById('btnRetry');
-					var title = doc.getElementById('r_title');
-					var description = doc.getElementById('r_description');
-					title.innerHTML = currentWebview.r_title;
-					description.innerHTML = currentWebview.r_description;
-
-					hasDataShow('liTranSN', 'r_trans_serial_no', currentWebview.r_result.data.trans_serial_no);
-					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
-					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
-					hasDataShow('liMoney', 'r_money', currentWebview.r_money);
 
 					//处理交易失败重试
 					console.log('交易失败重试……');
@@ -194,6 +203,9 @@
 								description.innerHTML = '<span style="color: #CF2D28;">请勿关闭本页！</span>支付尚未成功，正在查询支付结果……';
 								//查询支付处理结果并重试
 								retryPay();
+							} else if(resp.code === 'err_exception') {
+								title.innerHTML = '圈存失败';
+								description.innerHTML = '后台处理错误，请联系客服处理。';
 							}
 						}
 						mui('body').progressbar().hide();

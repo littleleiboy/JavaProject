@@ -86,7 +86,7 @@ var common = {
 		var error = arguments[3] || function(xhr, type, errorThrown) {
 			console.log(url);
 			console.log(type);
-			plus.nativeUI.toast(common.msg.msgServerErr());
+			mui.toast(common.msg.msgServerErr());
 		}
 
 		mui.ajax(url, {
