@@ -5,7 +5,7 @@
 		"iPad"
 	],
 	"id": "H59FF7CB6",/*应用的标识，创建应用时自动生成，勿手动修改*/
-	"name": "XjgjMobilePay",/*应用名称，程序桌面图标名称*/
+	"name": "上菜宝",/*应用名称，程序桌面图标名称*/
 	"version": {
 		"name": "1.0.0",/*应用版本名称*/
 		"code": "83"
@@ -87,7 +87,7 @@
 	"plus": {
 		"splashscreen": {
 			"autoclose": false,/*是否自动关闭程序启动界面，true表示应用加载应用入口页面后自动关闭；false则需调plus.navigator.closeSplashscreen()关闭*/
-			"waiting": true
+			"waiting": true,"delay":"0"
 		},
 		"runmode": "liberate",/*应用的首次启动运行模式，可取liberate或normal，liberate模式在第一次启动时将解压应用资源（Android平台File API才可正常访问_www目录）*/
 		"signature": "Sk9JTiBVUyBtYWlsdG86aHIyMDEzQGRjbG91ZC5pbw==",/*可选，保留给应用签名，暂不使用*/
@@ -152,26 +152,26 @@
 				"ios": {
 					"iphone": {
 						"default": "", /*iPhone3启动图片选，分辨率：320x480*/
-						"retina35": "",/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
-						"retina40": ""
+						"retina35": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash640_960.png",/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
+						"retina40": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash640_1136.png","iphonex":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1125_2436.png","retina47":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash750_1334.png","retina55":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1242_2208.png","iphonexl":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2436_1125.png","retina55l":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2208_1242.png"
 					},
 					"ipad": {
-						"portrait": "", /*iPad竖屏启动图片，分辨率：768x1004*/
-						"portrait-retina": "",/*iPad高分屏竖屏图片，分辨率：1536x2008*/
-						"landscape": "", /*iPad横屏启动图片，分辨率：1024x748*/
-						"landscape-retina": "", /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
-						"portrait7": "", /*iPad iOS7竖屏启动图片，分辨率：768x1024*/
-						"portrait-retina7": "",/*iPad iOS7高分屏竖屏图片，分辨率：1536x2048*/
-						"landscape7": "", /*iPad iOS7横屏启动图片，分辨率：1024x768*/
-						"landscape-retina7": ""
+						"portrait": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash768_1004.png", /*iPad竖屏启动图片，分辨率：768x1004*/
+						"portrait-retina": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1536_2008.png",/*iPad高分屏竖屏图片，分辨率：1536x2008*/
+						"landscape": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1024_748.png", /*iPad横屏启动图片，分辨率：1024x748*/
+						"landscape-retina": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2048_1496.png", /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
+						"portrait7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash768_1024.png", /*iPad iOS7竖屏启动图片，分辨率：768x1024*/
+						"portrait-retina7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1536_2048.png",/*iPad iOS7高分屏竖屏图片，分辨率：1536x2048*/
+						"landscape7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1024_768.png", /*iPad iOS7横屏启动图片，分辨率：1024x768*/
+						"landscape-retina7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2048_1536.png"
 					}
 				},
 				"android": {
 					"mdpi": "", /*普通屏启动图片，分辨率：240x282*/
 					"ldpi": "", /*大屏启动图片，分辨率：320x442*/
-					"hdpi": "", /*高分屏启动图片，分辨率：480x762*/
-					"xhdpi": "", /*720P高分屏启动图片，分辨率：720x1242*/
-					"xxhdpi": ""
+					"hdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash480_762.png", /*高分屏启动图片，分辨率：480x762*/
+					"xhdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash720_1242.png", /*720P高分屏启动图片，分辨率：720x1242*/
+					"xxhdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1080_1882.png"
 				}
 			},"debug":true
 		}
