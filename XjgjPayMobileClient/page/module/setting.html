@@ -190,9 +190,9 @@
 				<div class="mui-scroll-wrapper">
 					<div class="mui-scroll">
 						<ul class="mui-table-view mui-table-view-chevron">
-							<li class="mui-table-view-cell">
+							<!--<li class="mui-table-view-cell">
 								<a id="rate" class="mui-navigate-right">评分鼓励</a>
-							</li>
+							</li>-->
 							<!--<li class="mui-table-view-cell">
 								<a id="share" class="mui-navigate-right">分享推荐</a>
 							</li>-->
@@ -311,7 +311,7 @@
 		//初始化单页的区域滚动
 		mui('.mui-scroll-wrapper').scroll();
 		//分享操作 
-		var shares = {};
+		/*var shares = {};
 		mui.plusReady(function() {
 			plus.share.getServices(function(s) {
 				if(s && s.length > 0) {
@@ -389,9 +389,9 @@
 			}, function(e) {
 				console.log("分享到\"" + share.description + "\"失败: " + e.code + " - " + e.message);
 			});
-		}
+		}*/
 		//去评分
-		document.getElementById("rate").addEventListener('tap', function() {
+		/*document.getElementById("rate").addEventListener('tap', function() {
 			if(mui.os.ios) {
 				location.href = 'https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=682211190&pageNumber=0&sortOrdering=2&type=&mt=8';
 			} else if(mui.os.android) {
@@ -401,7 +401,7 @@
 					}, "com.qihoo.appstore");
 				}, "com.tencent.android.qqdownloader");
 			}
-		});
+		});*/
 		//客服电话
 		document.getElementById("tel").addEventListener('tap', function() {
 			plus.device.dial("021-69798888");
