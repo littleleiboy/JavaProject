@@ -4,13 +4,13 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
         druid:
             first:
-                url: jdbc:mysql://localhost:3306/renren_fast?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
-                username: renren
-                password: 123456
+                url: jdbc:mysql://localhost:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: XIjiao!20@17!GuOjIfmsza!
             second:
-                url: jdbc:mysql://localhost:3306/renren_fast?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
-                username: renren
-                password: 123456
+                url: jdbc:mysql://localhost:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: XIjiao!20@17!GuOjIfmsza!
             initial-size: 10
             max-active: 100
             min-idle: 10
@@ -36,7 +36,8 @@ spring:
                 wall:
                     config:
                         multi-statement-allow: true
-
+logging:
+    file: log\xjgjpay_prod.log
 myprop:
     api:
         jsxt:
@@ -45,7 +46,7 @@ myprop:
             app-url: #结算系统接口url
                 https://124.74.156.50:8443/app/
             jks-name:
-                xjgj_jsxt_truststore.jks
+                C:\UserData\xjgjpay\prod\xjgj_jsxt_truststore.jks
             jks-pwd:
                 XjgjD208
         baofoo:
@@ -56,11 +57,11 @@ myprop:
             char-set: #宝付接口默认编码格式
                 UTF-8
             pfx-name: #商户私钥路径
-                bfkey_100000276@@100000990.pfx
+                C:\UserData\xjgjpay\prod\bfkey_100000276@@100000990.pfx
             pfx-pwd: #商户私钥密码
                 123456
             cer-name: #宝付公钥路径
-                bfkey_100000276@@100000990.cer
+                C:\UserData\xjgjpay\prod\bfkey_100000276@@100000990.cer
             terminal-id: #终端号
                 100000990
             member-id: #商户号

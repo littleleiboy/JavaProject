@@ -96,7 +96,7 @@ public class CommonUtils {
     }
 
     public static String getClassRoot() {
-        return Class.class.getClass().getResource("/").getPath();
+        return CommonUtils.class.getResource("/").getPath();
     }
 
 }

@@ -47,8 +47,8 @@ public class XjgjAccApiManagerImpl implements XjgjAccApiManager {
     }
 
     private String postSSL(String apiUrl, String data) {
-        String jksFilePath = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\" + jksName;
-        return HttpUtils.postRequestSSL(apiUrl, data, jksFilePath, jksPassword);
+        //String jksFilePath = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\" + jksName;
+        return HttpUtils.postRequestSSL(apiUrl, data, jksName, jksPassword);
     }
 
     /**

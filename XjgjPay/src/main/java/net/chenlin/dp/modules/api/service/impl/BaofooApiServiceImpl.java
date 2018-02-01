@@ -143,9 +143,9 @@ public class BaofooApiServiceImpl implements BaofooApiService {
                 jsonOrXml = JacksonUtils.beanToXml(data);
             }
 
-            String path = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\";
-            String pfxPath = path + pfx_name;//商户私钥
-            String cerPath = path + cer_name;//宝付公钥
+            //String path = CommonUtils.getClassRoot() + "\\" + SystemConstant.KEY_FILE_ROOT + "\\";
+            String pfxPath = pfx_name;//商户私钥
+            String cerPath = cer_name;//宝付公钥
 
             String base64str = EncryptUtils.Base64Encode(jsonOrXml);
             String data_content = RSAUtils.encryptByPriPfxFile(base64str, pfxPath, pfx_pwd);
