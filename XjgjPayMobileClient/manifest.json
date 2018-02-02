@@ -16,9 +16,9 @@
 	},
 	"launch_path": "page/login/login.html",/*应用的入口页面，默认为根目录下的index.html；支持网络地址，必须以http://或https://开头*/
 	"developer": {
-		"name": "",/*开发者名称*/
-		"email": "",/*开发者邮箱地址*/
-		"url": "http://www.dcloud.io"
+		"name": "Mingze",/*开发者名称*/
+		"email": "wangdy@mingze.com",/*开发者邮箱地址*/
+		"url": "http://www.mingze.com"
 	},
 	"permissions": {
 		"Accelerometer": {
@@ -152,26 +152,26 @@
 				"ios": {
 					"iphone": {
 						"default": "", /*iPhone3启动图片选，分辨率：320x480*/
-						"retina35": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash640_960.png",/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
-						"retina40": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash640_1136.png","iphonex":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1125_2436.png","retina47":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash750_1334.png","retina55":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1242_2208.png","iphonexl":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2436_1125.png","retina55l":"D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2208_1242.png"
+						"retina35": "unpackage/res/images/splash640_960.png",/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
+						"retina40": "unpackage/res/images/splash640_1136.png","iphonex":"unpackage/res/images/splash1125_2436.png","retina47":"unpackage/res/images/splash750_1334.png","retina55":"unpackage/res/images/splash1242_2208.png","iphonexl":"unpackage/res/images/splash2436_1125.png","retina55l":"unpackage/res/images/splash2208_1242.png"
 					},
 					"ipad": {
-						"portrait": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash768_1004.png", /*iPad竖屏启动图片，分辨率：768x1004*/
-						"portrait-retina": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1536_2008.png",/*iPad高分屏竖屏图片，分辨率：1536x2008*/
-						"landscape": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1024_748.png", /*iPad横屏启动图片，分辨率：1024x748*/
-						"landscape-retina": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2048_1496.png", /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
-						"portrait7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash768_1024.png", /*iPad iOS7竖屏启动图片，分辨率：768x1024*/
-						"portrait-retina7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1536_2048.png",/*iPad iOS7高分屏竖屏图片，分辨率：1536x2048*/
-						"landscape7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1024_768.png", /*iPad iOS7横屏启动图片，分辨率：1024x768*/
-						"landscape-retina7": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash2048_1536.png"
+						"portrait": "unpackage/res/images/splash768_1004.png", /*iPad竖屏启动图片，分辨率：768x1004*/
+						"portrait-retina": "unpackage/res/images/splash1536_2008.png",/*iPad高分屏竖屏图片，分辨率：1536x2008*/
+						"landscape": "unpackage/res/images/splash1024_748.png", /*iPad横屏启动图片，分辨率：1024x748*/
+						"landscape-retina": "unpackage/res/images/splash2048_1496.png", /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
+						"portrait7": "unpackage/res/images/splash768_1024.png", /*iPad iOS7竖屏启动图片，分辨率：768x1024*/
+						"portrait-retina7": "unpackage/res/images/splash1536_2048.png",/*iPad iOS7高分屏竖屏图片，分辨率：1536x2048*/
+						"landscape7": "unpackage/res/images/splash1024_768.png", /*iPad iOS7横屏启动图片，分辨率：1024x768*/
+						"landscape-retina7": "unpackage/res/images/splash2048_1536.png"
 					}
 				},
 				"android": {
 					"mdpi": "", /*普通屏启动图片，分辨率：240x282*/
 					"ldpi": "", /*大屏启动图片，分辨率：320x442*/
-					"hdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash480_762.png", /*高分屏启动图片，分辨率：480x762*/
-					"xhdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash720_1242.png", /*720P高分屏启动图片，分辨率：720x1242*/
-					"xxhdpi": "D:/WorkData/Space_Project/Project/XiJiaoGuoJi/XiJiaoPay/applogo/splash1080_1882.png"
+					"hdpi": "unpackage/res/images/splash480_762.png", /*高分屏启动图片，分辨率：480x762*/
+					"xhdpi": "unpackage/res/images/splash720_1242.png", /*720P高分屏启动图片，分辨率：720x1242*/
+					"xxhdpi": "unpackage/res/images/splash1080_1882.png"
 				}
 			},"debug":true
 		}
@@ -350,6 +350,7 @@
 		}
 	},
 	"unpackage":[
-	  "README.md"
+	  "README.md",
+	  "images/user-photo.png"
 	]
 }

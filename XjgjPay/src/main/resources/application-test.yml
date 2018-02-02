@@ -3,14 +3,18 @@ spring:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.jdbc.Driver
         druid:
-            first:
-                url: jdbc:mysql://localhost:3306/xjgjpay_test?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
-                username: root
-                password: XIjiao!20@17!GuOjIfmsza!
-            second:
-                url: jdbc:mysql://localhost:3306/xjgjpay_test?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
-                username: root
-                password: XIjiao!20@17!GuOjIfmsza!
+              default:  #默认数据源
+                    url: jdbc:mysql://139.196.34.5:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                    username: root
+                    password: root51698844
+#            first:
+#                url: jdbc:mysql://localhost:3306/xjgjpay_test?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+#                username: root
+#                password: XIjiao!20@17!GuOjIfmsza!
+#            second:
+#                url: jdbc:mysql://localhost:3306/xjgjpay_test?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+#                username: root
+#                password: XIjiao!20@17!GuOjIfmsza!
             initial-size: 10
             max-active: 100
             min-idle: 10
@@ -44,9 +48,9 @@ myprop:
             app-key: #结算系统访问口令生成密钥
                 bfb0aebe0aa35d2aa9db2a15aaf02609
             app-url: #结算系统接口url
-                https://124.74.156.50:8443/app/
+                https://xjgjapp.com:8443/app/
             jks-name:
-                C:\UserData\xjgjpay\test\xjgj_jsxt_truststore.jks
+                C:\UserData\xjgjpay\xjgj_jsxt_truststore.jks
             jks-pwd:
                 XjgjD208
         baofoo:
@@ -57,11 +61,11 @@ myprop:
             char-set: #宝付接口默认编码格式
                 UTF-8
             pfx-name: #商户私钥路径
-                C:\UserData\xjgjpay\test\bfkey_100000276@@100000990.pfx
+                C:\UserData\xjgjpay\bfkey_100000276@@100000990.pfx
             pfx-pwd: #商户私钥密码
                 123456
             cer-name: #宝付公钥路径
-                C:\UserData\xjgjpay\test\bfkey_100000276@@100000990.cer
+                C:\UserData\xjgjpay\bfkey_100000276@@100000990.cer
             terminal-id: #终端号
                 100000990
             member-id: #商户号
