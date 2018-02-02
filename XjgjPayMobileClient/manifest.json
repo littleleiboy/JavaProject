@@ -174,7 +174,7 @@
 					"xxhdpi": "unpackage/res/images/splash1080_1882.png"
 				}
 			},"debug":true
-		}
+		},"ads":{"rp":false,"splash":false,"push":false,"spot":false},"adid":""
 	},
 	"dependencies": {
 		"pages": {
