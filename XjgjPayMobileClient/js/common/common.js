@@ -6,7 +6,7 @@ var common = {
 	 * 获取APP服务URL
 	 */
 	"getServiceUrl": function(method) {
-		return 'https://scb.weidusx.com:8443/api/app/' + method;
+		return 'https://weidusx.com:8443/api/app/' + method;
 	},
 	"localSettingsKey": "local_settings",
 	/**
