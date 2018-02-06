@@ -24,6 +24,9 @@
 				<li class="mui-table-view-cell">
 					<a>手机号<span id="mobile" class="mui-pull-right"></span></a>
 				</li>
+				<li class="mui-table-view-cell">
+					<a>余额<span id="balance" class="mui-pull-right" style="color: #FF0000"></span></a>
+				</li>
 			</ul>
 		</div>
 		</div>
@@ -50,6 +53,16 @@
 						doc.getElementById('memberName').innerHTML = localSettings.member_name;
 						doc.getElementById('memberNO').innerHTML = localSettings.member_no;
 						doc.getElementById('mobile').innerHTML = localSettings.member_mobile;
+
+						//查询余额
+						common.postJSON(common.getServiceUrl('searchMemberAccountBalance'), {
+							memberNo: localSettings.member_no,
+							access_token: localSettings.access_token
+						}, function(result) {
+							if(result.success) {
+								doc.getElementById('balance').innerHTML = result.data.accountQty;
+							}
+						});
 					}, false);
 				});
 			}(mui, document));
