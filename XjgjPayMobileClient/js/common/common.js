@@ -7,6 +7,7 @@ var common = {
 	 */
 	"getServiceUrl": function(method) {
 		return 'https://weidusx.com:8443/api/app/' + method;
+		//return 'http://1637344my0.imwork.net/api/app/' + method;
 	},
 	"localSettingsKey": "local_settings",
 	/**
