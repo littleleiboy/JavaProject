@@ -1,12 +1,22 @@
+server:
+    port: 8443
+    #打开注释，则通过【http://localhost/dp-lte】访问
+    #context-path: /dp-lte
+
+    ssl:
+        key-store: classpath:xjgjpay.pfx
+        key-store-password: 214319422710085
+        keyStoreType: PKCS12
+
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.jdbc.Driver
         druid:
             default:  #默认数据源
-                  url: jdbc:mysql://139.196.34.5:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                  url: jdbc:mysql://localhost:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
                   username: root
-                  password: root51698844
+                  password: XIjiao!20@17!GuOjIfmsza!
 #            first:
 #                url: jdbc:mysql://139.196.34.5:3306/xjgjpay?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
 #                username: root

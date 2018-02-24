@@ -153,8 +153,10 @@ public class BaofooApiServiceImpl implements BaofooApiService {
 
             //请求宝付接口方法
             String r = apiManager.backTrans(param);
+            logger.info("宝付接口返回数据，解密前：\n" + r);
             if (!r.isEmpty()) {
                 r = RSAUtils.decryptByPubCerFile(r, cerPath);
+                logger.info("宝付接口返回数据，解密后：\n" + r);
                 if (r.isEmpty()) {//判断解密是否正确。如果为空则宝付公钥不正确
                     logger.info("宝付解密公钥不正确！");
                     return null;
