@@ -152,6 +152,7 @@ public class BaofooApiServiceImpl implements BaofooApiService {
             param.put(BaofooApiConstant.FIELD_DATA_CONTENT, data_content);
 
             //请求宝付接口方法
+            logger.info("请求宝付接口传参：" + JacksonUtils.beanToJson(map));
             String r = apiManager.backTrans(param);
             logger.info("宝付接口返回数据，解密前：\n" + r);
             if (!r.isEmpty()) {

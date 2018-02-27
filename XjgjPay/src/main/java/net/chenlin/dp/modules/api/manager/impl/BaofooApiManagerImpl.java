@@ -38,7 +38,7 @@ public class BaofooApiManagerImpl implements BaofooApiManager {
      * 2018-01-15
     * */
      private static String createLinkStringByGetKey(Map<String, String> params) throws UnsupportedEncodingException {
-        List<String> keys = new ArrayList< >(params.keySet());
+        List<String> keys = new ArrayList<>(params.keySet());
         Collections.sort(keys);
         String returnstr = "";
         for (int i = 0; i < keys.size(); i++) {

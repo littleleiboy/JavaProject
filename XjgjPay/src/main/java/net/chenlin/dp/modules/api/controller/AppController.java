@@ -420,7 +420,7 @@ public class AppController extends AbstractController {
                 if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
                     return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {
-                    return new ResultData("err_bf", false, MsgConstant.MSG_OPERATION_SUCCESS + "(" + mapResult.get(BaofooApiConstant.FIELD_RESP_MSG) + ")", mapResult);
+                    return new ResultData("err_bf", false, MsgConstant.MSG_OPERATION_FAILED + "(" + mapResult.get(BaofooApiConstant.FIELD_RESP_MSG) + ")", mapResult);
                 }
             } else {
                 return new ResultData("err_response", false, MsgConstant.MSG_OPERATION_FAILED);

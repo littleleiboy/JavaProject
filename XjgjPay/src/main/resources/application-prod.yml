@@ -65,7 +65,7 @@ myprop:
                 XjgjD208
         baofoo:
             url: #宝付支付接口url
-                https://public.baofoo.com/cutpayment/api/backTransRequest
+                https://vgw.baofoo.com/cutpayment/api/backTransRequest
             version:
                 4.0.0.0
             char-set: #宝付接口默认编码格式
@@ -83,4 +83,4 @@ myprop:
             data-type: #数据类型json/xml
                 json
             biz-type: #接入类型
-                0000
+                "0000"

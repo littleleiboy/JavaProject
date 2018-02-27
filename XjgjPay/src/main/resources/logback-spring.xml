@@ -15,7 +15,7 @@
     <springProfile name="prod">
         <logger name="org.springframework.web" level="ERROR"/>
         <logger name="org.springboot.sample" level="ERROR" />
-        <logger name="net.chenlin" level="ERROR" />
+        <logger name="net.chenlin" level="DEBUG" />
     </springProfile>
 
 </configuration>
