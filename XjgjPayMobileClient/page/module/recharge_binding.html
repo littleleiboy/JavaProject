@@ -161,6 +161,7 @@
 								data = result.data;
 								btnSubmit.disabled = false;
 							} else {
+								console.log('宝付预支付接口返回错误：' + JSON.stringify(result.data));
 								plus.nativeUI.alert(result.msg);
 								btnSubmit.disabled = true;
 							}
@@ -193,6 +194,7 @@
 									id: 'pageRecharge'
 								});
 							} else {
+								console.log('宝付确认支付接口返回错误：' + JSON.stringify(result.data));
 								plus.nativeUI.alert(result.msg);
 							}
 						})
