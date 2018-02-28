@@ -70,10 +70,16 @@ public class DynamicTokenUtils {
         Calendar cal = Calendar.getInstance();
         result.add(generateToken(key + sdf.format(cal.getTime())));
 
+        cal.add(Calendar.MINUTE, -2);
+        result.add(generateToken(key + sdf.format(cal.getTime())));
+
         cal.add(Calendar.MINUTE, -1);
         result.add(generateToken(key + sdf.format(cal.getTime())));
 
         cal.add(Calendar.MINUTE, 2);
+        result.add(generateToken(key + sdf.format(cal.getTime())));
+
+        cal.add(Calendar.MINUTE, 3);
         result.add(generateToken(key + sdf.format(cal.getTime())));
 
         return result;
