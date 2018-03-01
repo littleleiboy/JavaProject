@@ -25,7 +25,7 @@
 				<p id="liOrderID">订单号：<br><span id="r_trans_id"></span></p>
 				<p id="liTime">订单时间：<br><span id="r_time"></span></p>
 			</ul>
-			<!--<button id="backBtn" type="button" class='mui-btn mui-action-back'>关闭</button>-->
+			<button id="backBtn" type="button" class='mui-btn mui-action-back'>关闭</button>
 			<!--<button id="btnRetry" type="button" class="mui-btn mui-btn-danger mui-btn-outlined" style="display: none;">重试</button>-->
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
@@ -50,6 +50,8 @@
 				}*/
 
 				$.plusReady(function() {
+					plus.webview.close('recharge');
+					
 					var localSettings = common.getSettings();
 					var currentWebview = plus.webview.currentWebview();
 					console.log(JSON.stringify(currentWebview.r_result));

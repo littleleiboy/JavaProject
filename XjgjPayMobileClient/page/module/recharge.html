@@ -59,6 +59,7 @@
 
 				function toTradeResult(title, description, result, money, pwd) {
 					var webview = mui.openWindow({
+						id: 'trade_result',
 						url: 'trade_result.html',
 						extras: {
 							r_type: 'recharge',
@@ -72,6 +73,8 @@
 				}
 
 				$.plusReady(function() {
+					plus.webview.close('recharge_binding');
+
 					var localSettings = common.getSettings();
 					if(common.isEmptyObject(localSettings)) {
 						toLogin();

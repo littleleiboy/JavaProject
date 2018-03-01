@@ -163,7 +163,7 @@
 				function toRecharge() {
 					$.openWindow({
 						url: '../module/recharge.html',
-						id: 'pageRecharge'
+						id: 'recharge'
 					});
 				}
 				//打开圈提界面
@@ -245,6 +245,7 @@
 											plus.nativeUI.toast('请先绑定用于圈存的银行卡');
 											//去绑定圈存
 											$.openWindow({
+												id: 'recharge_binding',
 												url: '../module/recharge_binding.html'
 											});
 										}
