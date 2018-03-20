@@ -1,0 +1,5 @@
+D:\NETWEB\FileOrderTest\FileOrderTest\bin\Debug\FileOrderTest.exe
+D:\NETWEB\FileOrderTest\FileOrderTest\bin\Debug\FileOrderTest.pdb
+D:\NETWEB\FileOrderTest\FileOrderTest\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\NETWEB\FileOrderTest\FileOrderTest\obj\x86\Debug\FileOrderTest.exe
+D:\NETWEB\FileOrderTest\FileOrderTest\obj\x86\Debug\FileOrderTest.pdb
