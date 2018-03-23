@@ -589,7 +589,7 @@ public class AppController extends AbstractController {
 
 
     /**
-     * 圈存（充值）预交易
+     * 会员圈存（充值）预交易
      *
      * @param params
      * @return
@@ -640,7 +640,7 @@ public class AppController extends AbstractController {
     }
 
     /**
-     * 确认圈存（充值）交易
+     * 确认会员圈存（充值）交易
      *
      * @param params
      * @return
@@ -669,6 +669,7 @@ public class AppController extends AbstractController {
             trade.setSellerOrderId(trans_id);
             trade.setPayModeId(SystemConstant.PayMode.BAOFOO.getValue());
 
+            String bankCode = "";
             String bindId = params.get(BaofooApiConstant.FIELD_BIND_ID);
             if (null != bindId || !"".equals(bindId)) {
                 MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
@@ -676,23 +677,31 @@ public class AppController extends AbstractController {
                     trade.setBankAccName(bankCard.getBankAccName());
                     trade.setBankAccCard(bankCard.getBankAccCard());
                     trade.setBankCode(bankCard.getBankCode());
+                    bankCode = bankCard.getBankCode();
                 }
                 trade.setBfBindId(bindId);
             }
             trade.setGmtCreate(new Date());
             BigDecimal txnAmt = new BigDecimal(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY)));
 
+            //计算手续费
+            BigDecimal poundage = xjgjService.poundageRecharge(txnAmt, bankCode);//手续费
+            BigDecimal rechargeAmount = txnAmt.subtract(poundage);//不含手续费金额
+            params.put(XjgjAccApiConstant.FIELD_MONEY, String.valueOf(rechargeAmount));//更新扣除手续费的实际充值金额
+
             //调用宝付接口
             Map<String, Object> mapBfResult = bfService.backTrans(params);
             if (mapBfResult != null) {
-                mapBfResult.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
                 logger.info("宝付确认支付处理返回结果：" + JacksonUtils.beanToJson(mapBfResult));
+                mapBfResult.put(XjgjAccApiConstant.FIELD_OLDREQUEST_NO, trade.getSellerOrderId());
                 if (BaofooApiConstant.RESP_CODE_SUCCESS.equals(mapBfResult.get(BaofooApiConstant.FIELD_RESP_CODE))) {
                     //宝付接口返回成功消息
                     BigDecimal succAmt = new BigDecimal(String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_SUCC_AMT))).divide(BigDecimal.valueOf(100));//把分转换成元
-                    logger.info(String.format("宝付确认支付交易处理成功，宝付支付业务流水号：%s，成功金额：%s 元。",
+                    logger.info(String.format("宝付确认支付交易处理成功，宝付支付业务流水号：%s，圈存金额：%s 元，西郊圈存手续费：%s 元。",
                             mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO),
-                            succAmt));
+                            succAmt, poundage));
+                    mapBfResult.put(XjgjAccApiConstant.FIELD_POUNDAGE, poundage);//西郊圈存手续费
+                    mapBfResult.put(XjgjAccApiConstant.FIELD_ACTUAL_AMOUNT, succAmt);//支付成功的不含手续费圈存金额
 
                     trade.setTransSn(String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)));//圈存交易流水号和宝付支付流水号一致
                     trade.setAmtMoney(succAmt);
@@ -703,6 +712,9 @@ public class AppController extends AbstractController {
                     xjParams.put(XjgjAccApiConstant.FIELD_MEMBER_NAME, params.get(XjgjAccApiConstant.FIELD_MEMBER_NAME));
                     xjParams.put(XjgjAccApiConstant.FIELD_REQUEST_NO, trade.getSellerOrderId());
                     xjParams.put(XjgjAccApiConstant.FIELD_PASSWORD, params.get(XjgjAccApiConstant.FIELD_PASSWORD));
+                    xjParams.put(XjgjAccApiConstant.FIELD_BF_ORDERNO, business_no);
+                    xjParams.put(XjgjAccApiConstant.FIELD_XJ_ORDERNO, trans_id);
+                    xjParams.put(XjgjAccApiConstant.FIELD_BF_TRADENO, trans_serial_no);
                     String strMoney = params.get(XjgjAccApiConstant.FIELD_MONEY);
                     if (null == strMoney || "".equals(strMoney)) {
                         return new ResultData("err_money_isnull", false, "交易金额不能为空！");
@@ -717,7 +729,10 @@ public class AppController extends AbstractController {
 
                             logger.info("宝付确认支付成功！西郊国际结算处理成功！交易流水号："
                                     + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
-                            return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapBfResult);
+
+                            //支付并结算成功提示消息
+                            String successMsg = String.format("圈存成功！圈存金额：%s元，手续费：%s元。", succAmt, poundage);
+                            return new ResultData("ok", true, successMsg, mapBfResult);
                         } else {
                             trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
                             tradeLogService.saveTradeLog(trade);
@@ -1178,6 +1193,35 @@ public class AppController extends AbstractController {
         } else {
             return new ResultData("no", true, noMsg);
         }
+    }
+
+    /**
+     * 试算圈存手续费
+     *
+     * @param params
+     * @return
+     */
+    @RequestMapping("/poundageRecharge")
+    public ResultData poundageRecharge(@RequestBody Map<String, Object> params) {
+        //验证token
+        if (!checkAccessToken(String.valueOf(params.get(SystemConstant.ACCESS_TOKEN)))) {
+            return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
+        }
+        try {
+            BigDecimal txnAmt = new BigDecimal(String.valueOf(params.get(XjgjAccApiConstant.FIELD_MONEY)));
+            String bindId = String.valueOf(params.get(BaofooApiConstant.FIELD_BIND_ID));
+
+            if (null != bindId || !"".equals(bindId)) {
+                MemberBankcardEntity bankCard = memberBankService.getBankcardByBfBindID(bindId);
+                if (bankCard != null) {
+                    BigDecimal poundage = xjgjService.poundageRecharge(txnAmt, bankCard.getBankCode());
+                    return new ResultData("ok", true, "手续费：" + poundage, poundage);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("无法计算手续费。", e);
+        }
+        return new ResultData("err", false, "无法计算手续费。");
     }
 
 }

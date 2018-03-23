@@ -8,7 +8,7 @@ server:
 spring:
     # 环境 dev:开发环境|test:测试环境|prod:生成环境
     profiles:
-        active: prod
+        active: dev
     # jackson时间格式化
     jackson:
         time-zone: GMT+8

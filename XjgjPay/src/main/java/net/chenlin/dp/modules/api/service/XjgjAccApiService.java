@@ -1,5 +1,6 @@
 package net.chenlin.dp.modules.api.service;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public interface XjgjAccApiService {
@@ -100,4 +101,6 @@ public interface XjgjAccApiService {
      * @throws Exception
     * */
     Map<String,Object> searchMemberCostLog(Map<String, Object> map) throws Exception;
+
+    BigDecimal poundageRecharge(BigDecimal amount, String bankId);
 }

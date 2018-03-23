@@ -38,12 +38,12 @@ public class XjgjAccApiConstant {
 
     /**
      * 会员圈提绑定
-    * */
+     */
     public static final String METHOD_MEMBER_BIND_BOC = "memberBankBindRequest";
 
     /**
      * 会员圈提解绑
-    * */
+     */
     public static final String METHOD_MEMBER_UNBIND_BOC = "memberBankUnBindRequest";
 
     /**
@@ -76,7 +76,7 @@ public class XjgjAccApiConstant {
     public static final String FIELD_PASSWORD = "password";
     public static final String FIELD_BANK_ACCOUNT = "bankAccountNo";
     public static final String FIELD_MEMBER_CARD_NO = "mCardNo2";
-    public static final String FIELD_MEMBER_ADDRESS="memberAddress";
+    public static final String FIELD_MEMBER_ADDRESS = "memberAddress";
     public static final String FIELD_TO_CORP_ADDRESS = "toCorpAddress";
     public static final String FIELD_BANK_NAME = "bankName";
     public static final String FIELD_ACCOUNT_QTY = "accountQty";
@@ -87,5 +87,10 @@ public class XjgjAccApiConstant {
     public static final String FIELD_START_DATE = "startDate";
     public static final String FIELD_END_DATE = "endDate";
     public static final String FIELD_COST_LOG = "costLog";
+    public static final String FIELD_BF_ORDERNO = "BFOrderNo";
+    public static final String FIELD_XJ_ORDERNO = "XJOrderNo";
+    public static final String FIELD_BF_TRADENO = "BFTradeNo";
+    public static final String FIELD_POUNDAGE = "poundage";
+    public static final String FIELD_ACTUAL_AMOUNT = "actualAmount";
 
 }
