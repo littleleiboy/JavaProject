@@ -6,8 +6,12 @@ var common = {
 	 * 获取APP服务URL
 	 */
 	"getServiceUrl": function(method) {
-		return 'https://weidusx.com:8443/api/app/' + method;
-		//return 'http://1637344my0.imwork.net/api/app/' + method;
+		//return 'https://weidusx.com:8443/api/app/' + method;
+		return 'http://1637344my0.imwork.net/api/app/' + method;
+	},
+	"getDomainUrl": function(pagePath) {
+		//return 'https://weidusx.com:8443/' + pagePath;
+		return 'http://1637344my0.imwork.net/' + pagePath;
 	},
 	"localSettingsKey": "local_settings",
 	/**
@@ -37,7 +41,7 @@ var common = {
 	 * 判断是否为空值
 	 */
 	"isNullOrEmpty": function(obj) {
-		return (obj == null || obj == "");
+		return(obj == null || obj == "");
 	},
 	/**
 	 * 验证是否为数字
@@ -51,7 +55,7 @@ var common = {
 	 */
 	"isMoney": function(str) {
 		var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
-		return (reg.test(str));
+		return(reg.test(str));
 	},
 	/**
 	 * 通用消息提示语

@@ -24,8 +24,8 @@
 					<input id="accName" type="text" class="mui-input" placeholder="请核对账户姓名" readonly="readonly" />
 				</div>
 				<div class="mui-input-row">
-					<label>圈存金额</label>
-					<input id="money" type="text" class="mui-input-clear" placeholder="请输入圈存金额">
+					<label>交易金额</label>
+					<input id="money" type="text" class="mui-input-clear" placeholder="请输入含手续费的圈存金额">
 				</div>
 				<div class="mui-input-row">
 					<label>主卡密码</label>
@@ -36,6 +36,8 @@
 					<a id='btnGetSms' class="mui-btn" data-loading-text="60秒后重新获取" style="width: 38%">获取验证码</a>
 				</div>
 			</form>
+			<div class="mui-content-padded" id="divPoundage" style="display: none;">估算手续费：<span id="estPoundage">0</span></div>
+			<div class="mui-content-padded" id="divActualAmt" style="display: none;">估算圈存金额：<span id="estActualAmt">0</span></div>
 			<div class="mui-content-padded">
 				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary" data-loading-text="提交中..." disabled="disabled">确认圈存</button>
 			</div>
@@ -43,8 +45,8 @@
 				<button id='btnCancal' class="mui-action-back mui-btn mui-btn-block">取消</button>
 			</div>
 			<div class="mui-content-padded">
-				<p>提示：交易会产生手续费，费率说明请
-					<a href="">点此</a>了解。 </p>
+				<p>提示：估算手续费仅供参考，请以实际交易结算结果为准，费率说明请
+					<a href="#">点此</a>了解。 </p>
 			</div>
 		</div>
 		<script src="../../lib/mui/js/mui.min.js"></script>
@@ -52,6 +54,10 @@
 		<script type="text/javascript">
 			(function($, doc) {
 				$.init();
+				var divActualAmt = doc.getElementById('divActualAmt');
+				var estActualAmt = doc.getElementById('estActualAmt');
+				var divPoundage = doc.getElementById('divPoundage');
+				var estPoundage = doc.getElementById('estPoundage');
 
 				function toLogin() {
 					plus.nativeUI.toast('请登录');
@@ -137,6 +143,21 @@
 							return false;
 						}
 						disabledForm(true);
+
+						//试算圈存手续费
+						common.postJSON(common.getServiceUrl('poundageRecharge'), {
+							access_token: localSettings.access_token,
+							bind_id: bindAcc.bfBindId,
+							moneyQty: money.value
+						}, function(result) {
+							console.log(JSON.stringify(result));
+							if(result.success) {
+								estPoundage.value = result.data;
+								estActualAmt.value = money.value - result.data;
+								common.show(divActualAmt);
+								common.show(divPoundage);
+							}
+						});
 
 						btnGetSms.disabled = true;
 						var count = 60;
