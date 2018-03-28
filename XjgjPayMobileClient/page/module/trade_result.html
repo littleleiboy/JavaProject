@@ -20,6 +20,7 @@
 			</h3>
 			<ul>
 				<p id='liMoney'>交易金额：<span id="r_money" style="font-size: large ;"></span></p>
+				<p id='liPoundage'>手续费：<span id="r_poundage" style="font-size: large ;"></span></p>
 				<p>描述：<br><span id="r_description"></span></p>
 				<p id="liTranSN">交易流水号：<br><span id="r_business_no"></span></p>
 				<p id="liOrderID">订单号：<br><span id="r_trans_id"></span></p>
@@ -51,7 +52,7 @@
 
 				$.plusReady(function() {
 					plus.webview.close('recharge');
-					
+
 					var localSettings = common.getSettings();
 					var currentWebview = plus.webview.currentWebview();
 					console.log(JSON.stringify(currentWebview.r_result));
@@ -66,7 +67,8 @@
 					hasDataShow('liTranSN', 'r_business_no', currentWebview.r_result.data.business_no);
 					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
 					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
-					hasDataShow('liMoney', 'r_money', currentWebview.r_money);
+					hasDataShow('liMoney', 'r_money', currentWebview.actualAmount);
+					hasDataShow('liPoundage', 'r_poundage', currentWebview.poundage);
 
 					var retryPay = function() {
 						setTimeout(function() {

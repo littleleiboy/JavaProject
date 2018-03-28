@@ -6,6 +6,11 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#divPoundage span {
+				color: #000000;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -20,12 +25,28 @@
 					<input id="accNo" type="text" class="mui-input" placeholder="请核对银行账号" readonly="readonly">
 				</div>
 				<div class="mui-input-row">
-					<label>账户姓名</label>
+					<label>银行账户</label>
 					<input id="accName" type="text" class="mui-input" placeholder="请核对账户姓名" readonly="readonly" />
+				</div>
+				<div class="mui-input-row">
+					<label>西郊账号</label>
+					<input id="memberNo" type="text" class="mui-input" placeholder="请核对西郊账号" readonly="readonly" />
+				</div>
+				<div class="mui-input-row">
+					<label>西郊会员</label>
+					<input id="memberName" type="text" class="mui-input" placeholder="请核对西郊会员" readonly="readonly" />
 				</div>
 				<div class="mui-input-row">
 					<label>交易金额</label>
 					<input id="money" type="text" class="mui-input-clear" placeholder="请输入含手续费的圈存金额">
+				</div>
+				<div class="mui-input-row">
+					<label>手续费</label>
+					<input id="poundage" type="text" placeholder="估算手续费" disabled="disabled">
+				</div>
+				<div class="mui-input-row">
+					<label>到账金额</label>
+					<input id="actualMoney" type="text" placeholder="估算实际到账金额" disabled="disabled">
 				</div>
 				<div class="mui-input-row">
 					<label>主卡密码</label>
@@ -36,14 +57,15 @@
 					<a id='btnGetSms' class="mui-btn" data-loading-text="60秒后重新获取" style="width: 38%">获取验证码</a>
 				</div>
 			</form>
-			<div class="mui-content-padded" id="divPoundage" style="display: none;">估算手续费：<span id="estPoundage">0</span></div>
-			<div class="mui-content-padded" id="divActualAmt" style="display: none;">估算圈存金额：<span id="estActualAmt">0</span></div>
 			<div class="mui-content-padded">
 				<button id='btnSubmit' class="mui-btn mui-btn-block mui-btn-primary" data-loading-text="提交中..." disabled="disabled">确认圈存</button>
 			</div>
 			<div class="mui-content-padded">
 				<button id='btnCancal' class="mui-action-back mui-btn mui-btn-block">取消</button>
 			</div>
+			<!--<div class="mui-content-padded" id="divPoundage" style="display: none;">
+				<p>估算手续费：<span id="estPoundage"></span>；估算圈存金额：<span id="estActualAmt"></span></p>
+			</div>-->
 			<div class="mui-content-padded">
 				<p>提示：估算手续费仅供参考，请以实际交易结算结果为准，费率说明请
 					<a href="#">点此</a>了解。 </p>
@@ -54,10 +76,9 @@
 		<script type="text/javascript">
 			(function($, doc) {
 				$.init();
-				var divActualAmt = doc.getElementById('divActualAmt');
-				var estActualAmt = doc.getElementById('estActualAmt');
-				var divPoundage = doc.getElementById('divPoundage');
+				/*var divPoundage = doc.getElementById('divPoundage');
 				var estPoundage = doc.getElementById('estPoundage');
+				var estActualAmt = doc.getElementById('estActualAmt');*/
 
 				function toLogin() {
 					plus.nativeUI.toast('请登录');
@@ -95,6 +116,11 @@
 					var accName = doc.getElementById('accName');
 					var money = doc.getElementById('money');
 					var memberPass = doc.getElementById('memberPass');
+					var memberNo = doc.getElementById('memberNo');
+					var memberName = doc.getElementById('memberName');
+					var poundage = doc.getElementById('poundage');
+					var actualMoney = doc.getElementById('actualMoney');
+
 					var bindAcc = {};
 					var data = {};
 					var pass;
@@ -105,7 +131,14 @@
 						accName.disabled = flag;
 						money.disabled = flag;
 						memberPass.disabled = flag;
+						memberNo.disabled = flag;
+						memberName.disabled = flag;
+						poundage.disabled = flag;
+						actualMoney.disabled = flag;
 					};
+
+					memberNo.value = localSettings.member_no;
+					memberName.value = localSettings.member_name;
 
 					//加载已绑定的圈存银行卡
 					common.postJSON(common.getServiceUrl('getFirstMemberBankcard'), {
@@ -119,6 +152,25 @@
 							accName.value = bindAcc.bankAccName;
 						} else {
 							plus.nativeUI.toast(common.msg.msgServerErr());
+						}
+					});
+
+					money.addEventListener('blur', function() {
+						//试算圈存手续费
+						if(common.isDigit(money.value)) {
+							common.postJSON(common.getServiceUrl('poundageRecharge'), {
+								access_token: localSettings.access_token,
+								bind_id: bindAcc.bfBindId,
+								moneyQty: money.value
+							}, function(result) {
+								if(result.success) {
+									poundage.value = result.data;
+									actualMoney.value = money.value - result.data;
+								}
+							});
+						} else {
+							poundage.value = '';
+							actualMoney.value = '';
 						}
 					});
 
@@ -152,62 +204,63 @@
 						}, function(result) {
 							console.log(JSON.stringify(result));
 							if(result.success) {
-								estPoundage.value = result.data;
-								estActualAmt.value = money.value - result.data;
-								common.show(divActualAmt);
-								common.show(divPoundage);
-							}
-						});
+								poundage.value = result.data;
+								actualMoney.value = money.value - result.data;
+								//common.show(divPoundage);
 
-						btnGetSms.disabled = true;
-						var count = 60;
-						var timer = setInterval(function() {
-							if(count === 0) {
-								clearInterval(timer);
-								btnGetSms.disabled = false;
-								btnGetSms.innerHTML = '获取验证码';
-							} else {
-								btnGetSms.innerHTML = count + '秒后重新获取';
-								count--;
-							}
-						}, 1000);
-
-						pass = memberPass.value;
-						//请求结算系统验证主卡密码
-						common.postJSON(common.getServiceUrl('checkMemberPass'), {
-							access_token: localSettings.access_token,
-							memberNo: localSettings.member_no,
-							password: pass
-						}, function(result) {
-							console.log(JSON.stringify(result));
-							if(result.data.result == '1') {
-								//提交预交易并发送短信验证码
-								var preData = {
-									access_token: localSettings.access_token,
-									bind_id: bindAcc.bfBindId,
-									txn_amt: money.value
-								};
-								common.postJSON(common.getServiceUrl('preRecharge'), preData, function(result) {
-									if(result.success) {
-										data = result.data;
-										tradeMoney = preData.txn_amt;
-										btnSubmit.disabled = false;
+								//begin:验证会员后发起预支付请求并获取短信验证码
+								btnGetSms.disabled = true;
+								var count = 60;
+								var timer = setInterval(function() {
+									if(count === 0) {
+										clearInterval(timer);
+										btnGetSms.disabled = false;
+										btnGetSms.innerHTML = '获取验证码';
 									} else {
-										plus.nativeUI.alert(result.msg);
-										btnSubmit.disabled = true;
-										disabledForm(false);
+										btnGetSms.innerHTML = count + '秒后重新获取';
+										count--;
 									}
-									clearInterval(timer);
-									btnGetSms.disabled = false;
-									btnGetSms.innerHTML = '获取验证码';
+								}, 1000);
+
+								pass = memberPass.value;
+								//请求结算系统验证主卡密码
+								common.postJSON(common.getServiceUrl('checkMemberPass'), {
+									access_token: localSettings.access_token,
+									memberNo: localSettings.member_no,
+									password: pass
+								}, function(result) {
+									console.log(JSON.stringify(result));
+									if(result.data.result == '1') {
+										//提交预交易并发送短信验证码
+										var preData = {
+											access_token: localSettings.access_token,
+											bind_id: bindAcc.bfBindId,
+											txn_amt: money.value
+										};
+										common.postJSON(common.getServiceUrl('preRecharge'), preData, function(result) {
+											if(result.success) {
+												data = result.data;
+												tradeMoney = preData.txn_amt;
+												btnSubmit.disabled = false;
+											} else {
+												plus.nativeUI.alert(result.msg);
+												btnSubmit.disabled = true;
+												disabledForm(false);
+											}
+											clearInterval(timer);
+											btnGetSms.disabled = false;
+											btnGetSms.innerHTML = '获取验证码';
+										});
+									} else {
+										plus.nativeUI.alert('密码错误');
+										return false;
+									}
 								});
-							} else {
-								plus.nativeUI.alert('密码错误');
-								return false;
+								//end:验证会员后发起预支付请求并获取短信验证码
 							}
 						});
 					});
-					//	------end: 提交预支付交易并获取短信验证码------
+					//------end: 提交预支付交易并获取短信验证码------
 
 					//------begin: 确认圈存交易------
 					btnSubmit.addEventListener('tap', function() {
@@ -215,28 +268,42 @@
 							plus.nativUI.toast('请输入短信验证码');
 							return false;
 						}
-						$('body').progressbar().show();
-						btnSubmit.disabled = true;
-						disabledForm(true);
 
-						data.sms_code = sms_code.value;
-						data.access_token = localSettings.access_token;
-						data.bind_id = bindAcc.bfBindId;
-						data.memberNo = localSettings.member_no;
-						data.memberName = localSettings.member_name;
-						data.password = pass;
-						data.moneyQty = tradeMoney;
-						common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
-							console.log(JSON.stringify(result));
-							if(result.success) {
-								toTradeResult('交易处理成功', '圈存交易成功！', result, tradeMoney, pass);
+						//确认消息框
+						var confirmMsg = '将从您的银行卡[' + accName.value + '，' + accNo.value +
+							']中转出' + money.value + '元，实际圈存' + actualMoney.value +
+							'元到您的西郊账号[' + memberNo.value + '，' + memberName.value +
+							']中，并将扣除您' + poundage.value + '元的手续费，确认？';
+
+						$.confirm(confirmMsg, '提示', ['确认', '取消'], function(e) {
+							if(e.index == 0) {
+								//确认
+								$('body').progressbar().show();
+								btnSubmit.disabled = true;
+								disabledForm(true);
+
+								data.sms_code = sms_code.value;
+								data.access_token = localSettings.access_token;
+								data.bind_id = bindAcc.bfBindId;
+								data.memberNo = localSettings.member_no;
+								data.memberName = localSettings.member_name;
+								data.password = pass;
+								data.moneyQty = tradeMoney;
+								common.postJSON(common.getServiceUrl('recharge'), data, function(result) {
+									console.log(JSON.stringify(result));
+									if(result.success) {
+										toTradeResult('交易处理成功', '圈存交易成功！', result, tradeMoney, pass);
+									} else {
+										toTradeResult('交易处理失败重试', result.msg + ' 正在尝试重试…', result, tradeMoney, pass);
+									}
+									$('body').progressbar().hide();
+									btnSubmit.disabled = false;
+									disabledForm(false);
+								});
 							} else {
-								toTradeResult('交易处理失败重试', result.msg + ' 正在尝试重试…', result, tradeMoney, pass);
+								//取消
 							}
-							$('body').progressbar().hide();
-							btnSubmit.disabled = false;
-							disabledForm(false);
-						})
+						});
 					});
 					//------end: 确认圈存交易------
 				});
