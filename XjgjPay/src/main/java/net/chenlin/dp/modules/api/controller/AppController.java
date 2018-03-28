@@ -170,9 +170,13 @@ public class AppController extends AbstractController {
                         appUser.put(SystemConstant.ACCESS_TOKEN, accToken);
 
                         return new ResultData("ok", true, accToken, appUser);
-                    } else {
+                    } else if ("0".equals(result)) {
                         logger.info("调用结算系统接口验证会员密码，结果：会员密码错误。");
                         return new ResultData("err_password", false, "账号或密码错误");
+                    } else {
+                        String xjMsg = String.valueOf(mapResult2.get(XjgjAccApiConstant.FIELD_MESSAGE));
+                        logger.info("调用结算系统接口验证会员密码，结果：" + xjMsg);
+                        return new ResultData("err_password", false, xjMsg);
                     }
                 } else {
                     logger.info("调用结算系统接口验证会员密码，结果：远程接口出错。");
@@ -686,8 +690,7 @@ public class AppController extends AbstractController {
 
             //计算手续费
             BigDecimal poundage = xjgjService.poundageRecharge(txnAmt, bankCode);//手续费
-            BigDecimal rechargeAmount = txnAmt.subtract(poundage);//不含手续费金额
-            params.put(XjgjAccApiConstant.FIELD_MONEY, String.valueOf(rechargeAmount));//更新扣除手续费的实际充值金额
+            BigDecimal rechargeAmount = txnAmt.subtract(poundage);//不含手续费金额（扣除手续费后的实际充值金额）
 
             //调用宝付接口
             Map<String, Object> mapBfResult = bfService.backTrans(params);
@@ -715,6 +718,7 @@ public class AppController extends AbstractController {
                     xjParams.put(XjgjAccApiConstant.FIELD_BF_ORDERNO, business_no);
                     xjParams.put(XjgjAccApiConstant.FIELD_XJ_ORDERNO, trans_id);
                     xjParams.put(XjgjAccApiConstant.FIELD_BF_TRADENO, trans_serial_no);
+                    xjParams.put(XjgjAccApiConstant.FIELD_BANK_CODE, bankCode);
                     String strMoney = params.get(XjgjAccApiConstant.FIELD_MONEY);
                     if (null == strMoney || "".equals(strMoney)) {
                         return new ResultData("err_money_isnull", false, "交易金额不能为空！");
@@ -727,11 +731,12 @@ public class AppController extends AbstractController {
                             trade.setState(SystemConstant.RECHARGE_STATE_SUCCESS);//支付成功且结算成功
                             tradeLogService.saveTradeLog(trade);
 
-                            logger.info("宝付确认支付成功！西郊国际结算处理成功！交易流水号："
-                                    + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。");
-
                             //支付并结算成功提示消息
-                            String successMsg = String.format("圈存成功！圈存金额：%s元，手续费：%s元。", succAmt, poundage);
+                            String successMsg = String.format("圈存成功！圈存金额：%s元，手续费：%s元。", rechargeAmount, poundage);
+
+                            logger.info("宝付确认支付成功！西郊国际结算处理成功！交易流水号："
+                                    + String.valueOf(mapBfResult.get(BaofooApiConstant.FIELD_BUSINESS_NO)) + "。\n" + successMsg);
+
                             return new ResultData("ok", true, successMsg, mapBfResult);
                         } else {
                             trade.setState(SystemConstant.RECHARGE_STATE_PAY_OK);//支付成功但结算失败(宝付交易成功，西郊结算系统处理失败)
@@ -1106,6 +1111,7 @@ public class AppController extends AbstractController {
             }
             Map<String, Object> mapResult = xjgjService.searchMemberAccountBalance(params);
             if (mapResult != null) {
+                logger.info("查询会员余额；" + mapResult.get("message").toString());
                 if ("1".equals(mapResult.get(XjgjAccApiConstant.FIELD_RESULT))) {
                     return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
                 } else {

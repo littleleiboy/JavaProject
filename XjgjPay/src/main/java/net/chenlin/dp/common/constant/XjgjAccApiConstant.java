@@ -92,5 +92,6 @@ public class XjgjAccApiConstant {
     public static final String FIELD_BF_TRADENO = "BFTradeNo";
     public static final String FIELD_POUNDAGE = "poundage";
     public static final String FIELD_ACTUAL_AMOUNT = "actualAmount";
+    public static final String FIELD_BANK_CODE = "BankName";
 
 }
