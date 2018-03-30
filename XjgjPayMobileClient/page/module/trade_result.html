@@ -67,8 +67,8 @@
 					hasDataShow('liTranSN', 'r_business_no', currentWebview.r_result.data.business_no);
 					hasDataShow('liOrderID', 'r_trans_id', currentWebview.r_result.data.trans_id);
 					hasDataShow('liTime', 'r_time', currentWebview.r_result.data.trade_date);
-					hasDataShow('liMoney', 'r_money', currentWebview.actualAmount);
-					hasDataShow('liPoundage', 'r_poundage', currentWebview.poundage);
+					hasDataShow('liMoney', 'r_money', currentWebview.r_result.data.actualAmount);
+					hasDataShow('liPoundage', 'r_poundage', currentWebview.r_result.data.poundage);
 
 					var retryPay = function() {
 						setTimeout(function() {

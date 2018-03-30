@@ -280,6 +280,11 @@
 							case 'aBank': //银行
 								pageBank.show();
 								break;
+							case 'aDetail': //交易流水（明细）
+								$.openWindow({
+									url: '../module/trans_detail.html'
+								});
+								break;
 							default:
 								plus.nativeUI.toast('暂未开通！');
 						}

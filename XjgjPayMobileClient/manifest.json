@@ -289,7 +289,8 @@
 					"page/module/recharge.html",
 					"page/module/recharge_binding.html",
 					"page/module/bindmemberbeforewithdraw.html",
-					"page/module/bocservice.html"
+					"page/module/bocservice.html",
+					"page/module/trans_detail.html"
 				],
 				"priority": 0
 			},
