@@ -20,7 +20,16 @@
             $("#btnSelBalance").click(function () {
                 postJsonForTest('searchMemberAccountBalance', {
                     "memberNo": "1100001764",
-                    "access_token":"15921618204_a410d56665278ca8bc8f009feeadf335"
+                    "access_token": "15921618204_a410d56665278ca8bc8f009feeadf335"
+                });
+            });
+
+            $("#btnTranDetail").click(function () {
+                postJsonForTest('searchMemberAccountChange', {
+                    "memberNo": "1100001764",
+                    "startDate": "2018-01-01",
+                    "endDate": "2018-03-29",
+                    "access_token": "15921618204_a410d56665278ca8bc8f009feeadf335"
                 });
             });
 
@@ -63,6 +72,7 @@
     <button id="btnGetMemberBaseInfo">查询会员基本信息</button>
     <button id="btnGetBankList">查询支持的银行</button>
     <button id="btnSelBalance">查询余额</button>
+    <button id="btnTranDetail">查询结算系统的交易流水</button>
 </div>
 <div id="divResult" style="background-color: lightyellow"></div>
 </body>

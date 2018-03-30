@@ -1133,12 +1133,12 @@ public class AppController extends AbstractController {
      * @return
      */
     @RequestMapping("/searchMemberAccountChange")
-    public ResultData searchMemberAccountChangeByPeriodOfTime(Map<String, Object> map) {
+    public ResultData searchMemberAccountChangeByPeriodOfTime(@RequestBody Map<String, Object> map) {
         try {
             //验证token
-            if (!checkAccessToken(String.valueOf(map.get(SystemConstant.ACCESS_TOKEN)))) {
+            /*if (!checkAccessToken(String.valueOf(map.get(SystemConstant.ACCESS_TOKEN)))) {
                 return new ResultData(MsgConstant.MSG_ERR_ACCESS_TOKEN_CODE, false, MsgConstant.MSG_ERR_ACCESS_TOKEN);
-            }
+            }*/
             Map<String, Object> mapResult = xjgjService.searchMemberCostLog(map);
             return new ResultData("ok", true, MsgConstant.MSG_OPERATION_SUCCESS, mapResult);
         } catch (Exception e) {
