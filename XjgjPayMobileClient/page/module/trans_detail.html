@@ -88,14 +88,15 @@
 								var costLogArr = result.data.costLog || [];
 								for(var i = costLogArr.length - 1; i >= 0; i--) {
 									
-									//console.log(costLogArr[i]);
+									console.log(costLogArr[i]);
+									console.log("test=" + costLogArr[i][2])
 									var transDescrArr = costLogArr[i][1].split(','); //交易明细描述
 									//console.log(transDescrArr);
 									var title = transDescrArr[0]; //transDescrArr[3]
 									var trans_time = costLogArr[i][0];
 									var amt = transDescrArr[3];
 									var poudage = transDescrArr[2];
-									var inchargeQty = transDescrArr[1];
+									var inchargeQty = transDescrArr[1] || '';
 									var acoountAmt = costLogArr[i][2];
 									var balance = ',&nbsp;余额:' + costLogArr[i][3];
 
@@ -106,12 +107,12 @@
 
 									var li = document.createElement('li');
 									li.className = 'mui-table-view-cell mui-media';
-									li.innerHTML = '<a href="#"><span class="mui-media-body" style="float:left;">' +
+									li.innerHTML = '<a href="#"><span class="mui-media-body" style="float:left;word-break:normal;display:block;white-space:pre-wrap;">' +
 										'' + title +
 										' <p class="mui-ellipsis">' + detail + '</p>' +
 										'</span> ' +
 										'<span class="mui-media-body" style="float:right;">'+
-										'<p class="mui-ellipsis"  style="color:black;font-size:20px;margin-top:15px;">' + acoountAmt + '</p>' +
+										'<p class="mui-ellipsis"  style="color:black;font-size:18px;margin-top:10px;">' + acoountAmt + '</p>' +
 										'</span> '
 										'</a>';
 									table.appendChild(li);
