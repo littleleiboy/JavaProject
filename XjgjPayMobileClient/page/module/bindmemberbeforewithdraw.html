@@ -101,6 +101,7 @@
 					//------begin: 申请绑定圈提------
 					btnBind.addEventListener('tap', function() {
 						var data={
+							access_token: localSettings.access_token,
 							memberName:localSettings.member_name,
 							memberNo:localSettings.member_no,
 							bankName:id_holder.value,

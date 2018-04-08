@@ -119,6 +119,7 @@
 						//------begin: 确认圈提交易------
 					btnWithdraw.addEventListener('tap', function() {
 						var data={
+							access_token: localSettings.access_token,
 							memberName:localSettings.member_name,
 							memberNo:localSettings.member_no,
 							password: memberPass.value,
