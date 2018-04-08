@@ -1058,7 +1058,7 @@ public class AppController extends AbstractController {
                     if ("1".equals(map.get(XjgjAccApiConstant.FIELD_RESULT))) {
                         if (listData.size() != 0) {
                             BigDecimal accountBalance = new BigDecimal(momenyBalanceMap.get(XjgjAccApiConstant.FIELD_ACCOUNT_QTY).toString());
-                            BigDecimal drawMoney = new BigDecimal(String.valueOf(Params.get(XjgjAccApiConstant.FIELD_MONEY)));//圈提金额
+                            BigDecimal drawMoney = new BigDecimal(String.valueOf(Params.get(XjgjAccApiConstant.FIELD_MONEY))).divide(BigDecimal.valueOf(100));//圈提金额
                             if (drawMoney.compareTo(accountBalance) > 0) {
                                 return new ResultData("err", false, "账户余额不足！", " ");
                             }
