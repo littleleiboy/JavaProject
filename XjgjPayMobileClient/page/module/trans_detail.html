@@ -80,31 +80,40 @@
 							endDate: endDate,
 							access_token: localSettings.access_token
 						}, function(result) {
+							console.log(JSON.stringify(result));
 							if(result.success) {
 								var table = document.body.querySelector('.mui-table-view');
 								var cells = document.body.querySelectorAll('.mui-table-view-cell');
 
 								var costLogArr = result.data.costLog || [];
 								for(var i = costLogArr.length - 1; i >= 0; i--) {
-									console.log(costLogArr[i]);
+									
+									//console.log(costLogArr[i]);
 									var transDescrArr = costLogArr[i][1].split(','); //交易明细描述
+									//console.log(transDescrArr);
 									var title = transDescrArr[0]; //transDescrArr[3]
 									var trans_time = costLogArr[i][0];
 									var amt = transDescrArr[3];
 									var poudage = transDescrArr[2];
+									var inchargeQty = transDescrArr[1];
+									var acoountAmt = costLogArr[i][2];
 									var balance = ',&nbsp;余额:' + costLogArr[i][3];
 
 									amt = amt || '交易金额:' + costLogArr[i][2];
 									poudage = poudage || '手续费:0';
 
-									var detail = trans_time + balance + '<br>' + amt + ',' + poudage;
+									var detail = trans_time + balance + '<br>' + amt + ',' + poudage + '<br>' + inchargeQty;
 
 									var li = document.createElement('li');
 									li.className = 'mui-table-view-cell mui-media';
-									li.innerHTML = '<a href="#"><div class="mui-media-body">' +
+									li.innerHTML = '<a href="#"><span class="mui-media-body" style="float:left;">' +
 										'' + title +
 										' <p class="mui-ellipsis">' + detail + '</p>' +
-										'</div></a>';
+										'</span> ' +
+										'<span class="mui-media-body" style="float:right;">'+
+										'<p class="mui-ellipsis"  style="color:black;font-size:20px;margin-top:15px;">' + acoountAmt + '</p>' +
+										'</span> '
+										'</a>';
 									table.appendChild(li);
 								}
 								$('#pullrefresh').pullRefresh().endPullupToRefresh((costLogArr.length == 0)); //参数为true代表没有更多数据了。
