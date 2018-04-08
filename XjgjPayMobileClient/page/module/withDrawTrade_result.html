@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../lib/mui/css/mui.min.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a id="backTopBak" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">圈提交易结果</h1>
+		</header>
+		<div class="mui-content" style="margin-left: 20px;margin-top: 20px;">
+			<h3>
+				<span class="mui-icon mui-icon-chat" style="font-size: 1em;"></span>
+				<span id="r_WithDrawtitle">圈提交易结果</span>
+			</h3>
+			<ul>
+				<p>描述：<br><span id="r_withDrawdescription"></span></p>
+			</ul>
+			<button id="withDrawbackBtn" type="button" class='mui-btn mui-action-back'>关闭</button>
+			<!--<button id="btnRetry" type="button" class="mui-btn mui-btn-danger mui-btn-outlined" style="display: none;">重试</button>-->
+		</div>
+		<script src="../../lib/mui/js/mui.min.js"></script>
+		<script src="../../js/common/common.js"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				$.init();
+
+				function hasDataShow(rowId, valueId, value) {
+					var el = document.getElementById(rowId);
+					if(value) {
+						el.style.display = 'block';
+						document.getElementById(valueId).innerHTML = value;
+					} else {
+						el.style.display = 'none';
+					}
+				}
+
+				/*function disabledBack(b) {
+					doc.getElementById('backTop').disabled = b;
+					doc.getElementById('backBtn').disabled = b;
+				}*/
+
+				$.plusReady(function() {
+					plus.webview.close('aWithdrawal');
+
+					var localSettings = common.getSettings();
+					var currentWebview = plus.webview.currentWebview();
+					console.log(JSON.stringify(currentWebview.r_result));
+
+					//var btnRetry = doc.getElementById('btnRetry');
+					var title = doc.getElementById('r_withDrawtitle');
+					var description = doc.getElementById('r_withDrawdescription');
+					//title.innerHTML = currentWebview.r_withDrawtitle;
+					description.innerHTML = currentWebview.r_withDrawdescription;
+					
+					
+				});
+			}(mui, document));
+		</script>
+	</body>
+
+</html>
